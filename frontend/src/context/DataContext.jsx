@@ -3,36 +3,9 @@ import React, { createContext, useState, useEffect } from 'react';
 export const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
-  // Global Internships
-  const [internships, setInternships] = useState(() => {
-    const saved = localStorage.getItem('globalInternships');
-    if (saved) return JSON.parse(saved);
-    return [
-      {
-        id: 'int1',
-        title: 'Frontend Web Developer (React)',
-        company: 'Skillzeno',
-        department: 'Engineering / Frontend',
-        duration: '3 Months',
-        stipend: 'Unpaid (Certificate + LOR)',
-        type: 'Remote',
-        mode: 'Full-Time',
-        description: 'Work on premium user interfaces, state management, and real-world web applications.',
-        overview: 'Join our frontend engineering team to build production-grade React applications.',
-        responsibilities: [
-          'Build reusable UI components using React.js and modern JavaScript (ES6+)'
-        ],
-        requirements: ['HTML, CSS, JavaScript', 'React Basics'],
-        skillsLearned: ['React.js', 'State Management'],
-        perks: ['Certificate of Completion', 'Letter of Recommendation'],
-        tasks: [
-          { id: 't1', title: 'Task 1: Portfolio Website Landing Page', description: 'Build a responsive portfolio.' },
-          { id: 't2', title: 'Task 2: Weather Dashboard App', description: 'Build a weather app using an API.' },
-          { id: 't3', title: 'Task 3: E-commerce Shopping Cart', description: 'Build a cart with state management.' }
-        ]
-      }
-    ];
-  });
+  const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+
+  const [internships, setInternships] = useState([]);
 
   // Global Settings (UPI, QR Code, Fees)
   const [settings, setSettings] = useState(() => {
@@ -46,25 +19,7 @@ export const DataProvider = ({ children }) => {
     };
   });
 
-  const [quizzes, setQuizzes] = useState(() => {
-    const saved = localStorage.getItem('globalQuizzes');
-    if (saved) return JSON.parse(saved);
-    return [
-      {
-        id: 'q1',
-        title: 'React Fundamentals',
-        description: 'Test your knowledge on React hooks, state, and components.',
-        timeLimit: 10,
-        questions: [
-          {
-            question: 'What hook is used to perform side effects in functional components?',
-            options: ['useState', 'useContext', 'useEffect', 'useReducer'],
-            answer: 2
-          }
-        ]
-      }
-    ];
-  });
+  const [quizzes, setQuizzes] = useState([]);
 
   const [verifiedCertificates, setVerifiedCertificates] = useState(() => {
     const saved = localStorage.getItem('globalVerifiedCertificates');
@@ -72,14 +27,21 @@ export const DataProvider = ({ children }) => {
     return [];
   });
 
-  // Save to localStorage when updated
+  // Fetch data from backend on mount
   useEffect(() => {
-    localStorage.setItem('globalInternships', JSON.stringify(internships));
-  }, [internships]);
-
-  useEffect(() => {
-    localStorage.setItem('globalQuizzes', JSON.stringify(quizzes));
-  }, [quizzes]);
+    const fetchData = async () => {
+      try {
+        const intRes = await fetch(`${API_URL}/internships`);
+        if (intRes.ok) setInternships(await intRes.json());
+        
+        const quizRes = await fetch(`${API_URL}/quizzes`);
+        if (quizRes.ok) setQuizzes(await quizRes.json());
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      }
+    };
+    fetchData();
+  }, [API_URL]);
 
   useEffect(() => {
     localStorage.setItem('globalSettings', JSON.stringify(settings));
@@ -90,32 +52,88 @@ export const DataProvider = ({ children }) => {
   }, [verifiedCertificates]);
 
   // Admin Actions
-  const addInternship = (data) => {
-    setInternships([...internships, { ...data, id: `int_${Date.now()}` }]);
+  const addInternship = async (data) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/admin/internships`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) setInternships([...internships, await res.json()]);
+      else alert("Failed to add internship");
+    } catch (e) { console.error(e); alert("Error adding internship"); }
   };
 
-  const updateInternship = (id, data) => {
-    setInternships(internships.map(i => i.id === id ? { ...i, ...data } : i));
+  const updateInternship = async (id, data) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/admin/internships/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setInternships(internships.map(i => i.id === id ? updated : i));
+      } else alert("Failed to update internship");
+    } catch (e) { console.error(e); alert("Error updating internship"); }
   };
 
-  const deleteInternship = (id) => {
-    setInternships(internships.filter(i => i.id !== id));
+  const deleteInternship = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/admin/internships/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) setInternships(internships.filter(i => i.id !== id));
+      else alert("Failed to delete internship");
+    } catch (e) { console.error(e); alert("Error deleting internship"); }
   };
 
   const updateSettings = (data) => {
     setSettings({ ...settings, ...data });
   };
 
-  const addQuiz = (data) => {
-    setQuizzes([...quizzes, { ...data, id: `q_${Date.now()}` }]);
+  const addQuiz = async (data) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/admin/quizzes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) setQuizzes([...quizzes, await res.json()]);
+      else alert("Failed to add quiz");
+    } catch (e) { console.error(e); alert("Error adding quiz"); }
   };
 
-  const updateQuiz = (id, data) => {
-    setQuizzes(quizzes.map(q => q.id === id ? { ...q, ...data } : q));
+  const updateQuiz = async (id, data) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/admin/quizzes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setQuizzes(quizzes.map(q => q.id === id ? updated : q));
+      } else alert("Failed to update quiz");
+    } catch (e) { console.error(e); alert("Error updating quiz"); }
   };
 
-  const deleteQuiz = (id) => {
-    setQuizzes(quizzes.filter(q => q.id !== id));
+  const deleteQuiz = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/admin/quizzes/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) setQuizzes(quizzes.filter(q => q.id !== id));
+      else alert("Failed to delete quiz");
+    } catch (e) { console.error(e); alert("Error deleting quiz"); }
   };
 
   const addVerifiedCertificate = (data) => {

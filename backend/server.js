@@ -61,10 +61,41 @@ const certificateSchema = new mongoose.Schema({
   verificationHash: String, performanceRemarks: String, applicationId: String
 }, { timestamps: true });
 
+const internshipSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  company: { type: String, default: "Skillzeno" },
+  department: { type: String, required: true },
+  domain: { type: String, required: true },
+  duration: { type: String, required: true },
+  stipend: { type: String, default: "Unpaid (Certificate + LOR)" },
+  type: { type: String, required: true },
+  mode: { type: String, default: "Full-Time" },
+  description: { type: String, required: true },
+  overview: { type: String },
+  responsibilities: [String],
+  requirements: [String],
+  skillsLearned: [String],
+  perks: [String],
+  tasks: [{ id: String, title: String, description: String }]
+}, { timestamps: true });
+
+const quizSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  timeLimit: { type: Number, required: true },
+  questions: [{
+    question: String,
+    options: [String],
+    answer: Number
+  }]
+}, { timestamps: true });
+
 const User = mongoose.model("User", userSchema);
 const Application = mongoose.model("Application", applicationSchema);
 const QuizApplication = mongoose.model("QuizApplication", quizApplicationSchema);
 const Certificate = mongoose.model("Certificate", certificateSchema);
+const Internship = mongoose.model("Internship", internshipSchema);
+const Quiz = mongoose.model("Quiz", quizSchema);
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
   .then(() => console.log("MongoDB Connected"))
@@ -134,18 +165,22 @@ app.get("/api/auth/users", authenticateToken, async (req, res) => {
 });
 
 // INTERNSHIP ROUTES
-const internshipsDB = [
-  { id: "int1", title: "Frontend Web Developer (React)", company: "Skillzeno", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Frontend" },
-  { id: "int2", title: "Backend Developer (Node.js/Express)", company: "Skillzeno", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Backend" },
-  { id: "int3", title: "Full Stack Web Developer (MERN)", company: "Skillzeno", duration: "6 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Full Stack" }
-];
-
-app.get("/api/internships", (req, res) => res.json(internshipsDB));
+app.get("/api/internships", async (req, res) => {
+  try {
+    const internships = await Internship.find();
+    res.json(internships.map(i => ({ ...i.toObject(), id: i._id.toString() })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch internships" }); }
+});
 
 app.get("/api/my-internships", authenticateToken, async (req, res) => {
   try {
     const apps = await Application.find({ userId: req.user.id });
-    res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString(), details: internshipsDB.find(i => i.id === app.internshipId) })));
+    const internships = await Internship.find();
+    res.json(apps.map(app => ({ 
+      ...app.toObject(), 
+      id: app._id.toString(), 
+      details: internships.find(i => i._id.toString() === app.internshipId)?.toObject() || { title: "Archived Internship" } 
+    })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch internships" }); }
 });
 
@@ -189,6 +224,13 @@ app.post("/api/tasks/submit", authenticateToken, async (req, res) => {
 });
 
 // QUIZ ROUTES
+app.get("/api/quizzes", async (req, res) => {
+  try {
+    const quizzes = await Quiz.find();
+    res.json(quizzes.map(q => ({ ...q.toObject(), id: q._id.toString() })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch quizzes" }); }
+});
+
 app.get("/api/my-quizzes", authenticateToken, async (req, res) => {
   try {
     const apps = await QuizApplication.find({ userId: req.user.id });
@@ -236,8 +278,57 @@ app.post("/api/quizzes/payment", authenticateToken, async (req, res) => {
 app.get("/api/admin/applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
     const apps = await Application.find();
-    res.json(apps.map(app => ({ ...app.toObject(), id: app.appNumber, details: internshipsDB.find(i => i.id === app.internshipId) })));
+    const internships = await Internship.find();
+    res.json(apps.map(app => ({ 
+      ...app.toObject(), 
+      id: app.appNumber, 
+      details: internships.find(i => i._id.toString() === app.internshipId)?.toObject() || { title: "Archived Internship" } 
+    })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
+});
+
+// Admin Internship CRUD
+app.post("/api/admin/internships", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const internship = await Internship.create(req.body);
+    res.status(201).json({ ...internship.toObject(), id: internship._id.toString() });
+  } catch (e) { res.status(500).json({ message: "Failed to create internship", error: e.message }); }
+});
+
+app.put("/api/admin/internships/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const internship = await Internship.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ ...internship.toObject(), id: internship._id.toString() });
+  } catch (e) { res.status(500).json({ message: "Failed to update internship" }); }
+});
+
+app.delete("/api/admin/internships/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    await Internship.findByIdAndDelete(req.params.id);
+    res.json({ message: "Internship deleted" });
+  } catch (e) { res.status(500).json({ message: "Failed to delete internship" }); }
+});
+
+// Admin Quiz CRUD
+app.post("/api/admin/quizzes", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const quiz = await Quiz.create(req.body);
+    res.status(201).json({ ...quiz.toObject(), id: quiz._id.toString() });
+  } catch (e) { res.status(500).json({ message: "Failed to create quiz", error: e.message }); }
+});
+
+app.put("/api/admin/quizzes/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const quiz = await Quiz.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ ...quiz.toObject(), id: quiz._id.toString() });
+  } catch (e) { res.status(500).json({ message: "Failed to update quiz" }); }
+});
+
+app.delete("/api/admin/quizzes/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    await Quiz.findByIdAndDelete(req.params.id);
+    res.json({ message: "Quiz deleted" });
+  } catch (e) { res.status(500).json({ message: "Failed to delete quiz" }); }
 });
 
 app.put("/api/admin/applications/:id", authenticateToken, authorizeAdmin, async (req, res) => {
