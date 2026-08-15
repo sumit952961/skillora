@@ -270,7 +270,7 @@ app.post("/api/internships/final-submit", authenticateToken, async (req, res) =>
           title: internship.title,
           issueDate: new Date().toISOString().split("T")[0],
           applicationId: app.appNumber,
-          certificateNumber: "",
+          certificateNumber: `PENDING-${app.appNumber}`,
           performanceRemarks: ""
         });
       }
@@ -349,7 +349,7 @@ app.post("/api/quizzes/payment", authenticateToken, async (req, res) => {
         title: qApp.quizTitle,
         issueDate: new Date().toISOString().split("T")[0],
         applicationId: qApp.appNumber,
-        certificateNumber: "",
+        certificateNumber: `PENDING-${qApp.appNumber}`,
         performanceRemarks: ""
       });
     }

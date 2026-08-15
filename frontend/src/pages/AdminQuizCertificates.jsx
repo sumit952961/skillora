@@ -61,7 +61,7 @@ export default function AdminQuizCertificates() {
               domain: 'Assessment',
               title: app.quizTitle,
               issueDate: new Date().toISOString().split('T')[0],
-              certificateNumber: '',
+              certificateNumber: `PENDING-${appId}`,
               performanceRemarks: `Score: ${app.score}/${app.totalQuestions}`
             });
           }
@@ -123,7 +123,7 @@ export default function AdminQuizCertificates() {
                   <div style={{ background: 'var(--bg-primary)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <h4 style={{ marginBottom: '8px', color: 'var(--primary)' }}>{app.quizTitle}</h4>
                     <p style={{ margin: '0 0 4px 0', fontSize: '0.9rem' }}>Score: <strong>{app.score} / {app.totalQuestions}</strong></p>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Taken on: {app.takenDate}</p>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Taken on: {new Date(app.createdAt || app.takenDate || Date.now()).toLocaleDateString()}</p>
                     <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: 'var(--text-light)', display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} /> App No: {app.id}</p>
                   </div>
                 </div>

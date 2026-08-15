@@ -110,7 +110,7 @@ export default function AdminApplications() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <p style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: '600', margin: 0 }}>{app.details?.title}</p>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>Applied: {app.appliedDate}</p>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>Applied: {new Date(app.createdAt || app.appliedDate || Date.now()).toLocaleDateString()}</p>
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} /> App No: {app.id}</p>
                   </div>
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'flex-end' }}>
@@ -251,7 +251,7 @@ export default function AdminApplications() {
                                         domain: 'Internship',
                                         title: app.details?.title || 'Internship Program',
                                         issueDate: new Date().toISOString().split('T')[0],
-                                        certificateNumber: '',
+                                        certificateNumber: `PENDING-${app.id}`,
                                         performanceRemarks: ''
                                       });
                                     }

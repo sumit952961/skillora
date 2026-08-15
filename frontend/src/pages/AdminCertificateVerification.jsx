@@ -40,7 +40,7 @@ export default function AdminCertificateVerification() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {filtered.map(cert => {
-            const isCompleted = !!(cert.certificateNumber && cert.performanceRemarks);
+            const isCompleted = !!(cert.certificateNumber && !cert.certificateNumber.startsWith('PENDING-') && cert.performanceRemarks);
             return (
               <div key={cert.id} style={{ 
                 background: 'var(--bg-secondary)', 
@@ -76,7 +76,7 @@ export default function AdminCertificateVerification() {
                       type="text" 
                       className="form-input" 
                       placeholder="e.g. CERT-12345" 
-                      defaultValue={cert.certificateNumber || ''}
+                      defaultValue={cert.certificateNumber?.startsWith('PENDING-') ? '' : cert.certificateNumber}
                       id={`certNum-${cert.id}`}
                     />
                   </div>
