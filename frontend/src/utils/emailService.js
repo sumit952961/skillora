@@ -1,4 +1,4 @@
-const WEB3FORMS_ACCESS_KEY = '199dd3e9-81ac-4476-9dc5-65c369a1545f';
+const WEB3FORMS_ACCESS_KEY = 'a6ccbe68-6389-4793-96cb-6bf2fc103c49';
 
 /**
  * Sends an email notification when a student applies for an internship.
