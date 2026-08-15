@@ -464,7 +464,10 @@ app.delete("/api/admin/quizzes/:id", authenticateToken, authorizeAdmin, async (r
 
 app.put("/api/admin/applications/:id", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const app = await Application.findById(req.params.id);
+    let app = await Application.findOne({ appNumber: req.params.id });
+    if (!app && mongoose.Types.ObjectId.isValid(req.params.id)) {
+      app = await Application.findById(req.params.id);
+    }
     if (!app) return res.status(404).json({ message: "Application not found" });
     if (req.body.offerLetterUrl !== undefined) app.offerLetterUrl = req.body.offerLetterUrl;
     if (req.body.certificateUrl !== undefined) app.certificateUrl = req.body.certificateUrl;
@@ -475,7 +478,10 @@ app.put("/api/admin/applications/:id", authenticateToken, authorizeAdmin, async 
 
 app.put("/api/admin/tasks/verify", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const app = await Application.findById(req.body.applicationId);
+    let app = await Application.findOne({ appNumber: req.body.applicationId });
+    if (!app && mongoose.Types.ObjectId.isValid(req.body.applicationId)) {
+      app = await Application.findById(req.body.applicationId);
+    }
     if (!app) return res.status(404).json({ message: "Application not found" });
     const task = app.tasks.find(t => t.id === req.body.taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -495,7 +501,10 @@ app.get("/api/admin/quiz-applications", authenticateToken, authorizeAdmin, async
 
 app.put("/api/admin/quiz-applications/:id", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const app = await QuizApplication.findById(req.params.id);
+    let app = await QuizApplication.findOne({ appNumber: req.params.id });
+    if (!app && mongoose.Types.ObjectId.isValid(req.params.id)) {
+      app = await QuizApplication.findById(req.params.id);
+    }
     if (!app) return res.status(404).json({ message: "Quiz application not found" });
     app.certificateUrl = req.body.certificateUrl;
     await app.save();
