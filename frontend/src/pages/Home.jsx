@@ -109,13 +109,13 @@ export default function Home() {
     {
       title: "Govt. of India Recognized",
       subtitle: "Proudly registered under MSME (Reg No: UDYAM-UP-75-0200760).",
-      icon: <ShieldCheck size={22} />,
+      icon: null,
       graphic: (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px', width: '100%', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '220px', width: '100%', overflow: 'hidden' }}>
           <img 
             src="https://plain-apac-prod-public.komododecks.com/202608/15/3LeRCGw6I87K71JrPhDt/image.png" 
             alt="MSME Registered" 
-            style={{ height: '140px', maxWidth: '100%', objectFit: 'contain', transform: 'scale(1.1)' }}
+            style={{ height: '200px', maxWidth: '100%', objectFit: 'contain', transform: 'scale(1.25)' }}
           />
         </div>
       )
@@ -219,9 +219,11 @@ export default function Home() {
               </div>
               
               {/* Middle Badge Icon */}
-              <div className="icon-badge">
-                {carouselSlides[activeSlide].icon}
-              </div>
+              {carouselSlides[activeSlide].icon && (
+                <div className="icon-badge">
+                  {carouselSlides[activeSlide].icon}
+                </div>
+              )}
 
               {/* Description details */}
               <h3 className="illustration-title">
