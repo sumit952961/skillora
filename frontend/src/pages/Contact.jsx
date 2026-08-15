@@ -47,7 +47,7 @@ export default function Contact() {
               <div>
                 <h4 style={{ fontSize: '1rem', fontWeight: '700' }}>Email Us</h4>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                  <a href="mailto:hello.skillzeno2026@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>hello.skillzeno2026@gmail.com</a>
+                  <a href="mailto:skillzeno26@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>skillzeno26@gmail.com</a>
                 </p>
               </div>
             </div>

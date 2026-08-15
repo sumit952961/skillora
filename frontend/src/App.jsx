@@ -195,7 +195,7 @@ function AppContent() {
               </li>
               <li>
                 <Mail size={18} className="contact-icon" />
-                <a href="mailto:hello.skillzeno2026@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>hello.skillzeno2026@gmail.com</a>
+                <a href="mailto:skillzeno26@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>skillzeno26@gmail.com</a>
               </li>
             </ul>
           </div>
@@ -255,7 +255,7 @@ function PolicyModal({ policy, onClose }) {
       content: (
         <>
           <p><strong>Effective Date:</strong> August 14, 2026</p>
-          <p>Skillzeno Learning Systems respects your privacy and is committed to protecting the information you provide while using our website and services. For any privacy-related questions, contact us at <a href="mailto:hello.skillzeno2026@gmail.com">hello.skillzeno2026@gmail.com</a>.</p>
+          <p>Skillzeno Learning Systems respects your privacy and is committed to protecting the information you provide while using our website and services. For any privacy-related questions, contact us at <a href="mailto:skillzeno26@gmail.com">skillzeno26@gmail.com</a>.</p>
           
           <h4>1. Information We Collect</h4>
           <p>We may collect information such as your name, email address, phone number, academic/professional details, account information, internship applications, project submissions, quiz results, and certificate details.</p>
@@ -287,7 +287,7 @@ function PolicyModal({ policy, onClose }) {
           <p>We may update this Privacy Policy when necessary. Any changes will be posted on this page with an updated effective date.</p>
           
           <h4>8. Contact Us</h4>
-          <p>Skillzeno Learning Systems<br />Email: <a href="mailto:hello.skillzeno2026@gmail.com">hello.skillzeno2026@gmail.com</a></p>
+          <p>Skillzeno Learning Systems<br />Email: <a href="mailto:skillzeno26@gmail.com">skillzeno26@gmail.com</a></p>
         </>
       )
     },
@@ -317,7 +317,7 @@ function PolicyModal({ policy, onClose }) {
           <p>These Terms may be updated from time to time. Continued use of Skillzeno after updates constitutes acceptance of the revised Terms.</p>
           
           <h4>7. Contact</h4>
-          <p>Skillzeno Learning Systems<br />Email: <a href="mailto:hello.skillzeno2026@gmail.com">hello.skillzeno2026@gmail.com</a></p>
+          <p>Skillzeno Learning Systems<br />Email: <a href="mailto:skillzeno26@gmail.com">skillzeno26@gmail.com</a></p>
         </>
       )
     },
@@ -341,7 +341,7 @@ function PolicyModal({ policy, onClose }) {
           <p>Approved refunds will be processed to the original payment method. Processing time may vary depending on the payment provider or bank.</p>
           
           <h4>5. Contact</h4>
-          <p>For refund-related queries: <a href="mailto:hello.skillzeno2026@gmail.com">hello.skillzeno2026@gmail.com</a></p>
+          <p>For refund-related queries: <a href="mailto:skillzeno26@gmail.com">skillzeno26@gmail.com</a></p>
         </>
       )
     }
