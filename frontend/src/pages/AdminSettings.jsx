@@ -31,29 +31,7 @@ export default function AdminSettings() {
           
 
 
-          <div className="form-group">
-            <label>Internship Payment Link (Razorpay)</label>
-            <input 
-              type="url" 
-              className="form-input" 
-              placeholder="https://rzp.io/l/..."
-              value={formData.internshipPaymentLink} 
-              onChange={e => setFormData({...formData, internshipPaymentLink: e.target.value})} 
-            />
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '6px' }}>External link for Internship Final Submissions.</p>
-          </div>
 
-          <div className="form-group">
-            <label>Quiz Payment Link (Razorpay)</label>
-            <input 
-              type="url" 
-              className="form-input" 
-              placeholder="https://rzp.io/l/..."
-              value={formData.quizPaymentLink} 
-              onChange={e => setFormData({...formData, quizPaymentLink: e.target.value})} 
-            />
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '6px' }}>External link for Quiz Certificate Downloads.</p>
-          </div>
 
           <div className="form-group">
             <label>Internship Processing Fee (₹)</label>

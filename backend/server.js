@@ -116,7 +116,23 @@ const PasswordResetRequest = mongoose.model("PasswordResetRequest", passwordRese
 
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
-  .then(() => console.log("MongoDB Connected"))
+  .then(async () => {
+    console.log("Connected to MongoDB");
+    
+    // Auto-update settings in database directly
+    try {
+      let setting = await Setting.findOne();
+      if (!setting) {
+        setting = new Setting();
+      }
+      setting.internshipPaymentLink = "https://rzp.io/rzp/ddlyQEo";
+      setting.quizPaymentLink = "https://rzp.io/rzp/dzygWhL";
+      await setting.save();
+      console.log("Payment links updated in database automatically.");
+    } catch (err) {
+      console.error("Failed to update settings in DB", err);
+    }
+  })
   .catch(err => console.error("MongoDB failed:", err.message));
 
 const authenticateToken = (req, res, next) => {
