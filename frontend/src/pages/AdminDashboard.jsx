@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
-import { Users, Briefcase, Settings, ArrowRight } from 'lucide-react';
+import { Users, Briefcase, Settings, ArrowRight, BookOpen, Award, Key, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
@@ -83,6 +83,46 @@ export default function AdminDashboard() {
           </p>
           <Link to="/admin/settings" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
             <Settings size={16} /> Go to Settings
+          </Link>
+        </div>
+
+        <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ marginBottom: '16px' }}>Manage Quizzes</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
+            Create and edit quiz modules, set passing criteria, and manage questions.
+          </p>
+          <Link to="/admin/quizzes" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <BookOpen size={16} /> Go to Quizzes
+          </Link>
+        </div>
+
+        <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ marginBottom: '16px' }}>Quiz Certificates</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
+            Upload and distribute certificates for students who passed their quiz exams.
+          </p>
+          <Link to="/admin/quiz-certificates" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <Award size={16} /> Quiz Certificates
+          </Link>
+        </div>
+
+        <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ marginBottom: '16px' }}>Password Reset</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
+            Assist users by manually resetting their passwords when they lose access.
+          </p>
+          <Link to="/admin/password-reset" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <Key size={16} /> Password Reset
+          </Link>
+        </div>
+
+        <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ marginBottom: '16px' }}>Verify Certificates</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
+            Add, verify, or update the cryptographic records of issued certificates.
+          </p>
+          <Link to="/admin/certificate-verification" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <Shield size={16} /> Verification Data
           </Link>
         </div>
       </div>
