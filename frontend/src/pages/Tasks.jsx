@@ -118,8 +118,8 @@ export default function Tasks() {
               <tbody>
                 {program.tasks?.map(task => (
                   <tr key={task.id}>
-                    <td style={{ fontWeight: '600', fontSize: '0.9rem' }}>{task.title}</td>
-                    <td>
+                    <td data-label="Task Title" style={{ fontWeight: '600', fontSize: '0.9rem' }}>{task.title}</td>
+                    <td data-label="Status">
                       <span className={`status-chip ${
                         task.status === 'Approved' ? 'status-approved' : 
                         task.status === 'Submitted' ? 'status-review' : 'status-pending'
@@ -127,7 +127,7 @@ export default function Tasks() {
                         {task.status}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="Submission Link">
                       {task.submissionLink ? (
                         <a href={task.submissionLink} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', fontSize: '0.85rem' }}>
                           <LinkIcon size={14} /> Repository Link
@@ -136,10 +136,10 @@ export default function Tasks() {
                         <span style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>Not Submitted</span>
                       )}
                     </td>
-                    <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                    <td data-label="Instructor Feedback" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                       {task.feedback || 'No feedback yet'}
                     </td>
-                    <td>
+                    <td data-label="Action">
                       {task.status !== 'Approved' && task.status !== 'Submitted' ? (
                         <button 
                           onClick={() => setActiveTask({ internshipId: program.internshipId, taskId: task.id, title: task.title })} 
