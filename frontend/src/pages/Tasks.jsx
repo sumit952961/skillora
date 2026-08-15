@@ -86,7 +86,6 @@ export default function Tasks() {
   const handleMaybeLater = () => {
     setPaymentModalData(null);
   };
-  };
 
   if (loading) {
     return <div className="container"><h3>Fetching active deliverables...</h3></div>;
