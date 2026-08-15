@@ -229,8 +229,8 @@ function AppContent() {
 
           {/* Right: Udyam Registered */}
           <div className="trust-item">
-            <div className="trust-icon-wrapper">
-              <Award size={20} />
+            <div className="trust-icon-wrapper" style={{ background: 'transparent', borderRadius: '50%', padding: 0 }}>
+              <img src="/udyam-logo.png" alt="Udyam Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '50%' }} />
             </div>
             <div className="trust-text">
               <h4 style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
