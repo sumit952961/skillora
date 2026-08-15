@@ -90,7 +90,7 @@ export default function TakeQuiz({ quiz, onBack }) {
     onBack();
 
     setTimeout(() => {
-      alert('Within 24 hours you will receive an email, or you can download your certificate directly from the website.');
+      alert('Aapko mail aa jayega certificate aur website se hi download kar sakte ho.');
     }, 100);
   };
 

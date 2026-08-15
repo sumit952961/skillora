@@ -93,8 +93,8 @@ const quizSchema = new mongoose.Schema({
 const settingSchema = new mongoose.Schema({
   internshipPaymentLink: { type: String, default: "https://razorpay.me/@skillzeno" },
   quizPaymentLink: { type: String, default: "https://razorpay.me/@skillzeno" },
-  processingFee: { type: String, default: "499.00" },
-  quizProcessingFee: { type: String, default: "199.00" }
+  processingFee: { type: String, default: "99" },
+  quizProcessingFee: { type: String, default: "19" }
 }, { timestamps: true });
 
 const passwordResetRequestSchema = new mongoose.Schema({
@@ -241,6 +241,25 @@ app.post("/api/internships/final-submit", authenticateToken, async (req, res) =>
     app.finalSubmitted = true;
     app.paymentDetails = req.body.paymentDetails;
     await app.save();
+
+    const internship = await Internship.findById(app.internshipId);
+    if (internship) {
+      const existingCert = await Certificate.findOne({ applicationId: app.appNumber });
+      if (!existingCert) {
+        await Certificate.create({
+          userId: req.user.id,
+          userName: req.user.name,
+          internshipTitle: internship.title,
+          domain: internship.domain,
+          title: internship.title,
+          issueDate: new Date().toISOString().split("T")[0],
+          applicationId: app.appNumber,
+          certificateNumber: "",
+          performanceRemarks: ""
+        });
+      }
+    }
+
     res.json({ message: "Final submit successful!", application: { ...app.toObject(), id: app._id.toString() } });
   } catch (e) { res.status(500).json({ message: "Final submit failed" }); }
 });
@@ -303,6 +322,22 @@ app.post("/api/quizzes/payment", authenticateToken, async (req, res) => {
     qApp.paymentSubmitted = true;
     qApp.paymentDetails = req.body.paymentDetails;
     await qApp.save();
+
+    const existingCert = await Certificate.findOne({ applicationId: qApp.appNumber });
+    if (!existingCert) {
+      await Certificate.create({
+        userId: req.user.id,
+        userName: req.user.name,
+        internshipTitle: qApp.quizTitle,
+        domain: "Quiz",
+        title: qApp.quizTitle,
+        issueDate: new Date().toISOString().split("T")[0],
+        applicationId: qApp.appNumber,
+        certificateNumber: "",
+        performanceRemarks: ""
+      });
+    }
+
     res.json({ message: "Payment processed!", application: { ...qApp.toObject(), id: qApp._id.toString() } });
   } catch (e) { res.status(500).json({ message: "Payment failed" }); }
 });
