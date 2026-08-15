@@ -77,7 +77,7 @@ export default function Tasks() {
     });
 
     // Open Razorpay link in same window to allow return
-    const baseUrl = 'https://rzp.io/rzp/ddlyQEo';
+    const baseUrl = settings?.internshipPaymentLink || 'https://rzp.io/rzp/ddlyQEo';
     window.location.href = baseUrl;
   };
 
