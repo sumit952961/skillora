@@ -52,9 +52,9 @@ export default function Tasks() {
     }
   };
 
-  const handlePayNow = () => {
+  const handlePayNow = async () => {
     // Save payment intent to context/backend (mark as finalSubmitted = true)
-    processFinalSubmit(paymentModalData, {
+    await processFinalSubmit(paymentModalData, {
       method: 'Razorpay',
       status: 'Redirected',
       submittedOn: new Date().toISOString()
@@ -65,7 +65,7 @@ export default function Tasks() {
     );
 
     // Send email without photo
-    sendFinalSubmitEmail({
+    await sendFinalSubmitEmail({
       studentName: user?.name || 'N/A',
       studentEmail: user?.email || 'N/A',
       internshipTitle: internship?.details?.title || 'N/A',
@@ -76,13 +76,10 @@ export default function Tasks() {
       paymentScreenshotBase64: null 
     });
 
-    // Open Razorpay link
+    // Open Razorpay link in same window to allow return
     const baseUrl = settings?.internshipPaymentLink || 'https://razorpay.me/@skillzeno';
     const amount = settings?.processingFee || '99';
-    window.open(`${baseUrl}?amount=${amount}`, '_blank');
-    
-    setPaymentModalData(null);
-    alert('Aapko mail aa jayega certificate aur website se hi download kar sakte ho.');
+    window.location.href = `${baseUrl}?amount=${amount}`;
   };
 
   const handleMaybeLater = () => {

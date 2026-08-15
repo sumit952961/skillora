@@ -77,8 +77,8 @@ export default function TakeQuiz({ quiz, onBack }) {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  const handlePayNow = () => {
-    processQuizPayment(quiz.id, {
+  const handlePayNow = async () => {
+    await processQuizPayment(quiz.id, {
       method: 'Razorpay',
       paymentDate: new Date().toISOString().split('T')[0],
       status: 'Redirected'
@@ -86,14 +86,7 @@ export default function TakeQuiz({ quiz, onBack }) {
     
     const baseUrl = settings?.quizPaymentLink || 'https://razorpay.me/@skillzeno';
     const amount = settings?.quizProcessingFee || '19';
-    window.open(`${baseUrl}?amount=${amount}`, '_blank');
-    
-    setShowPaymentModal(false);
-    onBack();
-
-    setTimeout(() => {
-      alert('Aapko mail aa jayega certificate aur website se hi download kar sakte ho.');
-    }, 100);
+    window.location.href = `${baseUrl}?amount=${amount}`;
   };
 
   const handleMaybeLater = () => {

@@ -26,6 +26,7 @@ import AdminQuizzes from './pages/AdminQuizzes'
 import AdminQuizCertificates from './pages/AdminQuizCertificates'
 import AdminSettings from './pages/AdminSettings'
 import AdminCertificateVerification from './pages/AdminCertificateVerification'
+import PaymentSuccess from './pages/PaymentSuccess'
 import AdminPasswordReset from './pages/AdminPasswordReset'
 import { MapPin, Phone, Mail, BookOpen, ShieldCheck, Award } from 'lucide-react'
 import './App.css'
@@ -72,6 +73,7 @@ function AppContent() {
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
