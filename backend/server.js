@@ -213,7 +213,7 @@ app.post("/api/quizzes/payment", authenticateToken, async (req, res) => {
 // ADMIN ROUTES
 app.get("/api/admin/applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const apps = await Application.find();
+    const apps = await Application.find().populate("userId", "name email");
     res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString(), details: internshipsDB.find(i => i.id === app.internshipId) })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
 });
@@ -244,9 +244,9 @@ app.put("/api/admin/tasks/verify", authenticateToken, authorizeAdmin, async (req
 
 app.get("/api/admin/quiz-applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const apps = await QuizApplication.find();
+    const apps = await QuizApplication.find().populate("userId", "name email");
     res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString() })));
-  } catch (e) { res.status(500).json({ message: "Failed to fetch quiz applications" }); }
+  } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
 });
 
 app.put("/api/admin/quiz-applications/:id", authenticateToken, authorizeAdmin, async (req, res) => {

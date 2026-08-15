@@ -14,21 +14,15 @@ export default function AdminApplications() {
 
   const fetchData = async () => {
     try {
-      const usersRes = await fetch(`${API_URL}/auth/users`, { headers: { Authorization: `Bearer ${token}` } });
       const appsRes = await fetch(`${API_URL}/admin/applications`, { headers: { Authorization: `Bearer ${token}` } });
       
-      if (usersRes.ok && appsRes.ok) {
-        const fetchedUsers = await usersRes.json();
+      if (appsRes.ok) {
         const fetchedApps = await appsRes.json();
-        
-        const userMap = {};
-        fetchedUsers.forEach(u => { userMap[u.id] = { name: u.name, email: u.email }; });
-        setUsers(userMap);
         
         const appsWithUsers = fetchedApps.map(app => ({
           ...app,
-          studentName: userMap[app.userId]?.name || 'Unknown Student',
-          studentEmail: userMap[app.userId]?.email || 'N/A',
+          studentName: app.userId?.name || 'Unknown Student',
+          studentEmail: app.userId?.email || 'N/A',
         })).sort((a, b) => b.id.localeCompare(a.id));
         
         setAllAppsList(appsWithUsers);
