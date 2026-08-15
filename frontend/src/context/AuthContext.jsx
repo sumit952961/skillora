@@ -16,11 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [appliedInternships, setAppliedInternships] = useState([]);
   const [quizApplications, setQuizApplications] = useState([]);
 
-  // Load password reset requests
-  const [passwordResetRequests, setPasswordResetRequests] = useState(() => {
-    const saved = localStorage.getItem('passwordResetRequests');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [passwordResetRequests, setPasswordResetRequests] = useState([]);
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
@@ -50,6 +46,10 @@ export const AuthProvider = ({ children }) => {
             if (data.role === 'student') {
               await fetchStudentData(token);
             }
+            if (data.role === 'admin') {
+              const reqsRes = await fetch(`${API_URL}/admin/password-resets`, { headers: { Authorization: `Bearer ${token}` }});
+              if (reqsRes.ok) setPasswordResetRequests(await reqsRes.json());
+            }
           } else {
             throw new Error('Invalid token from backend');
           }
@@ -78,6 +78,10 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       if (data.user.role === 'student') {
         await fetchStudentData(data.token);
+      }
+      if (data.user.role === 'admin') {
+        const reqsRes = await fetch(`${API_URL}/admin/password-resets`, { headers: { Authorization: `Bearer ${data.token}` }});
+        if (reqsRes.ok) setPasswordResetRequests(await reqsRes.json());
       }
       return { success: true };
     } catch (err) {
@@ -228,22 +232,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const requestPasswordReset = async (email) => {
-    const savedUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
-    const userFound = savedUsers.find(u => u.email === email);
-    if (!userFound) {
-      throw new Error('User with this email not found.');
+    try {
+      const res = await fetch(`${API_URL}/auth/request-password-reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to request reset');
+      }
+      await sendPasswordResetEmail({ userEmail: email, requestDate: new Date().toLocaleDateString('en-IN') });
+    } catch (e) {
+      throw e;
     }
-    const existingReq = passwordResetRequests.find(r => r.email === email && r.status === 'pending');
-    if (existingReq) {
-      throw new Error('A password reset request is already pending for this email.');
-    }
-    const newReq = {
-      id: `pr_${Date.now()}`, userId: userFound.id, email: userFound.email, name: userFound.name, requestedDate: new Date().toISOString(), status: 'pending'
-    };
-    const updatedRequests = [newReq, ...passwordResetRequests];
-    setPasswordResetRequests(updatedRequests);
-    localStorage.setItem('passwordResetRequests', JSON.stringify(updatedRequests));
-    await sendPasswordResetEmail({ userEmail: email, requestDate: new Date().toLocaleDateString('en-IN') });
   };
 
   const resetUserPassword = async (requestId, email, newPassword) => {
@@ -251,14 +253,12 @@ export const AuthProvider = ({ children }) => {
       await fetch(`${API_URL}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, newPassword })
+        body: JSON.stringify({ email, newPassword, requestId })
       });
+      setPasswordResetRequests(passwordResetRequests.filter(req => req.id !== requestId));
     } catch (err) {
       console.warn('Backend reset failed');
     }
-    const updatedRequests = passwordResetRequests.filter(req => req.id !== requestId);
-    setPasswordResetRequests(updatedRequests);
-    localStorage.setItem('passwordResetRequests', JSON.stringify(updatedRequests));
   };
 
   return (

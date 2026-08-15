@@ -8,24 +8,16 @@ export const DataProvider = ({ children }) => {
   const [internships, setInternships] = useState([]);
 
   // Global Settings (UPI, QR Code, Fees)
-  const [settings, setSettings] = useState(() => {
-    const saved = localStorage.getItem('globalSettings');
-    if (saved) return JSON.parse(saved);
-    return {
-      internshipPaymentLink: 'https://razorpay.me/@skillzeno',
-      quizPaymentLink: 'https://razorpay.me/@skillzeno',
-      processingFee: '499.00',
-      quizProcessingFee: '199.00'
-    };
+  const [settings, setSettings] = useState({
+    internshipPaymentLink: 'https://razorpay.me/@skillzeno',
+    quizPaymentLink: 'https://razorpay.me/@skillzeno',
+    processingFee: '499.00',
+    quizProcessingFee: '199.00'
   });
 
   const [quizzes, setQuizzes] = useState([]);
 
-  const [verifiedCertificates, setVerifiedCertificates] = useState(() => {
-    const saved = localStorage.getItem('globalVerifiedCertificates');
-    if (saved) return JSON.parse(saved);
-    return [];
-  });
+  const [verifiedCertificates, setVerifiedCertificates] = useState([]);
 
   // Fetch data from backend on mount
   useEffect(() => {
@@ -36,6 +28,12 @@ export const DataProvider = ({ children }) => {
         
         const quizRes = await fetch(`${API_URL}/quizzes`);
         if (quizRes.ok) setQuizzes(await quizRes.json());
+
+        const settingsRes = await fetch(`${API_URL}/settings`);
+        if (settingsRes.ok) setSettings(await settingsRes.json());
+
+        const certRes = await fetch(`${API_URL}/certificates`);
+        if (certRes.ok) setVerifiedCertificates(await certRes.json());
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -43,13 +41,7 @@ export const DataProvider = ({ children }) => {
     fetchData();
   }, [API_URL]);
 
-  useEffect(() => {
-    localStorage.setItem('globalSettings', JSON.stringify(settings));
-  }, [settings]);
-
-  useEffect(() => {
-    localStorage.setItem('globalVerifiedCertificates', JSON.stringify(verifiedCertificates));
-  }, [verifiedCertificates]);
+  // Removed localStorage usage completely
 
   // Admin Actions
   const addInternship = async (data) => {
@@ -92,8 +84,17 @@ export const DataProvider = ({ children }) => {
     } catch (e) { console.error(e); alert("Error deleting internship"); }
   };
 
-  const updateSettings = (data) => {
-    setSettings({ ...settings, ...data });
+  const updateSettings = async (data) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/admin/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) setSettings(await res.json());
+      else alert("Failed to update settings");
+    } catch (e) { console.error(e); alert("Error updating settings"); }
   };
 
   const addQuiz = async (data) => {
@@ -136,12 +137,32 @@ export const DataProvider = ({ children }) => {
     } catch (e) { console.error(e); alert("Error deleting quiz"); }
   };
 
-  const addVerifiedCertificate = (data) => {
-    setVerifiedCertificates([{ ...data, id: `vc_${Date.now()}` }, ...verifiedCertificates]);
+  const addVerifiedCertificate = async (data) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/admin/certificates`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) setVerifiedCertificates([await res.json(), ...verifiedCertificates]);
+      else alert("Failed to add certificate");
+    } catch (e) { console.error(e); alert("Error adding certificate"); }
   };
 
-  const updateVerifiedCertificate = (id, data) => {
-    setVerifiedCertificates(verifiedCertificates.map(vc => vc.id === id ? { ...vc, ...data } : vc));
+  const updateVerifiedCertificate = async (id, data) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/admin/certificates/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setVerifiedCertificates(verifiedCertificates.map(vc => vc.id === id ? updated : vc));
+      } else alert("Failed to update certificate");
+    } catch (e) { console.error(e); alert("Error updating certificate"); }
   };
 
   return (

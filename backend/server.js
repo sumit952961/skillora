@@ -90,12 +90,30 @@ const quizSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
+const settingSchema = new mongoose.Schema({
+  internshipPaymentLink: { type: String, default: "https://razorpay.me/@skillzeno" },
+  quizPaymentLink: { type: String, default: "https://razorpay.me/@skillzeno" },
+  processingFee: { type: String, default: "499.00" },
+  quizProcessingFee: { type: String, default: "199.00" }
+}, { timestamps: true });
+
+const passwordResetRequestSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  email: { type: String, required: true },
+  name: { type: String, required: true },
+  requestedDate: { type: String, default: () => new Date().toISOString() },
+  status: { type: String, enum: ["pending", "resolved"], default: "pending" }
+}, { timestamps: true });
+
 const User = mongoose.model("User", userSchema);
 const Application = mongoose.model("Application", applicationSchema);
 const QuizApplication = mongoose.model("QuizApplication", quizApplicationSchema);
 const Certificate = mongoose.model("Certificate", certificateSchema);
 const Internship = mongoose.model("Internship", internshipSchema);
 const Quiz = mongoose.model("Quiz", quizSchema);
+const Setting = mongoose.model("Setting", settingSchema);
+const PasswordResetRequest = mongoose.model("PasswordResetRequest", passwordResetRequestSchema);
+
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
   .then(() => console.log("MongoDB Connected"))
@@ -153,8 +171,24 @@ app.post("/api/auth/reset-password", async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     user.password = await bcrypt.hash(req.body.newPassword, 10);
     await user.save();
+    if (req.body.requestId) {
+      await PasswordResetRequest.findByIdAndUpdate(req.body.requestId, { status: "resolved" });
+    }
     res.json({ message: "Password updated successfully" });
   } catch (e) { res.status(500).json({ message: "Failed to reset password" }); }
+});
+
+app.post("/api/auth/request-password-reset", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email.toLowerCase() });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const existing = await PasswordResetRequest.findOne({ email: user.email, status: "pending" });
+    if (existing) return res.status(400).json({ message: "A request is already pending" });
+    const reqDoc = await PasswordResetRequest.create({
+      userId: user._id, email: user.email, name: user.name
+    });
+    res.json({ message: "Password reset requested", request: { ...reqDoc.toObject(), id: reqDoc._id.toString() } });
+  } catch (e) { res.status(500).json({ message: "Failed to request reset" }); }
 });
 
 app.get("/api/auth/users", authenticateToken, async (req, res) => {
@@ -275,6 +309,52 @@ app.post("/api/quizzes/payment", authenticateToken, async (req, res) => {
 
 
 // ADMIN ROUTES
+app.get("/api/settings", async (req, res) => {
+  try {
+    let setting = await Setting.findOne();
+    if (!setting) setting = await Setting.create({});
+    res.json(setting);
+  } catch (e) { res.status(500).json({ message: "Failed to fetch settings" }); }
+});
+
+app.put("/api/admin/settings", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    let setting = await Setting.findOne();
+    if (!setting) setting = await Setting.create({});
+    setting = await Setting.findByIdAndUpdate(setting._id, req.body, { new: true });
+    res.json(setting);
+  } catch (e) { res.status(500).json({ message: "Failed to update settings" }); }
+});
+
+app.get("/api/admin/password-resets", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const requests = await PasswordResetRequest.find({ status: "pending" }).sort({ createdAt: -1 });
+    res.json(requests.map(r => ({ ...r.toObject(), id: r._id.toString() })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch requests" }); }
+});
+
+// CERTIFICATE ROUTES
+app.get("/api/certificates", async (req, res) => {
+  try {
+    const certificates = await Certificate.find().sort({ createdAt: -1 });
+    res.json(certificates.map(c => ({ ...c.toObject(), id: c._id.toString() })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch certificates" }); }
+});
+
+app.post("/api/admin/certificates", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const cert = await Certificate.create(req.body);
+    res.status(201).json({ ...cert.toObject(), id: cert._id.toString() });
+  } catch (e) { res.status(500).json({ message: "Failed to create certificate" }); }
+});
+
+app.put("/api/admin/certificates/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const cert = await Certificate.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ ...cert.toObject(), id: cert._id.toString() });
+  } catch (e) { res.status(500).json({ message: "Failed to update certificate" }); }
+});
+
 app.get("/api/admin/applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
     const apps = await Application.find();

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { Users, Briefcase, Settings, ArrowRight } from 'lucide-react';
@@ -7,8 +7,22 @@ import { Link } from 'react-router-dom';
 export default function AdminDashboard() {
   const { user } = useContext(AuthContext);
   const { internships } = useContext(DataContext);
-  const users = JSON.parse(localStorage.getItem('mockUsers') || '[]');
-  const studentCount = users.filter(u => u.role !== 'admin').length;
+  const [studentCount, setStudentCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+        const res = await fetch(`${API_URL}/auth/users`, { headers: { Authorization: `Bearer ${token}` }});
+        if (res.ok) {
+          const users = await res.json();
+          setStudentCount(users.filter(u => u.role !== 'admin').length);
+        }
+      } catch (err) { console.error('Failed to fetch users'); }
+    };
+    fetchUsers();
+  }, []);
 
   return (
     <div className="container fade-in">
