@@ -59,13 +59,24 @@ export default function InternshipDetail() {
       </div>
     );
   }
-
   return (
     <>
-      <div className="container fade-in">
-        {/* Back Navigation */}
-        <Link to="/internships" className="detail-back-link">
-          <ArrowLeft size={16} /> Back to Internships
+      <div className="container fade-in" style={{ position: 'relative' }}>
+        {/* Minimal Back Navigation */}
+        <Link to="/internships" style={{ 
+          display: 'inline-flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          background: 'var(--bg-secondary)',
+          color: 'var(--text-main)',
+          border: '1px solid var(--border-color)',
+          marginBottom: '16px',
+          textDecoration: 'none'
+        }}>
+          <ArrowLeft size={18} />
         </Link>
 
         {/* Header Section */}

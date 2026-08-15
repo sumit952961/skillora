@@ -123,32 +123,32 @@ export default function Navbar() {
           ) : (
             <>
               <li>
-                <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
                   <LayoutDashboard size={16} /> Dashboard
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/quiz" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <NavLink to="/quiz" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
                   <BookOpen size={16} /> Quiz
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/my-internships" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <NavLink to="/my-internships" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
                   <Briefcase size={16} /> My Internships
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/tasks" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <NavLink to="/tasks" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
                   <CheckCircle size={16} /> Tasks
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/certificates" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <NavLink to="/certificates" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
                   <Award size={16} /> Certificates
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/profile" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <NavLink to="/profile" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
                   <User size={16} /> Profile
                 </NavLink>
               </li>

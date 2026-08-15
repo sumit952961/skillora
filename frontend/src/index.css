@@ -347,3 +347,21 @@ footer {
   .nav-links a.btn { margin-top: 10px; text-align: center; }
   .user-dropdown-container { margin-top: auto; }
 }
+
+.tasks-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+.tasks-table {
+  min-width: 600px;
+  width: 100%;
+  border-collapse: collapse;
+}
+.tasks-table th, .tasks-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
