@@ -78,11 +78,10 @@ export default function TakeQuiz({ quiz, onBack }) {
   };
 
   const handlePayNow = async () => {
-    await processQuizPayment(quiz.id, {
-      method: 'Razorpay',
-      paymentDate: new Date().toISOString().split('T')[0],
-      status: 'Redirected'
-    });
+    localStorage.setItem('pendingPayment', JSON.stringify({
+      type: 'quiz',
+      quizId: quiz.id
+    }));
     
     const baseUrl = settings?.quizPaymentLink || 'https://razorpay.me/@skillzeno';
     window.location.href = baseUrl;

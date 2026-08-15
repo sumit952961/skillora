@@ -53,28 +53,11 @@ export default function Tasks() {
   };
 
   const handlePayNow = async () => {
-    // Save payment intent to context/backend (mark as finalSubmitted = true)
-    await processFinalSubmit(paymentModalData, {
-      method: 'Razorpay',
-      status: 'Redirected',
-      submittedOn: new Date().toISOString()
-    });
-
-    const internship = appliedInternships.find(
-      app => app.details.id === paymentModalData || app.internshipId === paymentModalData
-    );
-
-    // Send email without photo
-    await sendFinalSubmitEmail({
-      studentName: user?.name || 'N/A',
-      studentEmail: user?.email || 'N/A',
-      internshipTitle: internship?.details?.title || 'N/A',
-      internshipDomain: internship?.details?.domain || internship?.details?.type || 'N/A',
-      appliedDate: internship?.appliedDate || 'N/A',
-      transactionId: 'Razorpay',
-      paymentDate: new Date().toISOString().split("T")[0],
-      paymentScreenshotBase64: null 
-    });
+    // Store pending payment to process on success page
+    localStorage.setItem('pendingPayment', JSON.stringify({
+      type: 'internship',
+      appId: paymentModalData
+    }));
 
     // Open Razorpay link in same window to allow return
     const baseUrl = settings?.internshipPaymentLink || 'https://rzp.io/rzp/ddlyQEo';

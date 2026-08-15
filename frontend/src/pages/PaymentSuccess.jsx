@@ -1,9 +1,73 @@
-import React from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Loader } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
+import { sendFinalSubmitEmail } from '../utils/emailService';
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
+  const { user, processFinalSubmit, processQuizPayment, appliedInternships } = useContext(AuthContext);
+  const [verifying, setVerifying] = useState(true);
+
+  useEffect(() => {
+    const processPayment = async () => {
+      try {
+        const pending = localStorage.getItem('pendingPayment');
+        if (pending) {
+          const data = JSON.parse(pending);
+          
+          if (data.type === 'internship') {
+            await processFinalSubmit(data.appId, {
+              method: 'Razorpay',
+              status: 'Paid',
+              submittedOn: new Date().toISOString()
+            });
+
+            // Need to wait slightly for context to update or just find from existing state
+            const internship = appliedInternships.find(
+              app => app.details?.id === data.appId || app.internshipId === data.appId
+            );
+
+            await sendFinalSubmitEmail({
+              studentName: user?.name || 'N/A',
+              studentEmail: user?.email || 'N/A',
+              internshipTitle: internship?.details?.title || 'N/A',
+              internshipDomain: internship?.details?.domain || internship?.details?.type || 'N/A',
+              appliedDate: internship?.appliedDate || 'N/A',
+              transactionId: 'Razorpay',
+              paymentDate: new Date().toISOString().split("T")[0],
+              paymentScreenshotBase64: null 
+            });
+          } else if (data.type === 'quiz') {
+            await processQuizPayment(data.quizId, {
+              method: 'Razorpay',
+              paymentDate: new Date().toISOString().split('T')[0],
+              status: 'Paid'
+            });
+          }
+          
+          localStorage.removeItem('pendingPayment');
+        }
+      } catch (error) {
+        console.error("Error processing pending payment:", error);
+      } finally {
+        setVerifying(false);
+      }
+    };
+
+    processPayment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (verifying) {
+    return (
+      <div className="container fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center' }}>
+        <Loader size={48} className="spin" color="var(--primary)" style={{ marginBottom: '24px' }} />
+        <h2 style={{ fontSize: '1.8rem' }}>Verifying your payment...</h2>
+        <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>Please wait, do not close this page.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center' }}>
