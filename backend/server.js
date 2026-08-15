@@ -396,7 +396,7 @@ app.post("/api/admin/certificates", authenticateToken, authorizeAdmin, async (re
   try {
     const cert = await Certificate.create(req.body);
     res.status(201).json({ ...cert.toObject(), id: cert._id.toString() });
-  } catch (e) { res.status(500).json({ message: "Failed to create certificate" }); }
+  } catch (e) { res.status(500).json({ message: "Failed to create certificate", error: e.message }); }
 });
 
 app.put("/api/admin/certificates/:id", authenticateToken, authorizeAdmin, async (req, res) => {
@@ -412,7 +412,7 @@ app.get("/api/admin/applications", authenticateToken, authorizeAdmin, async (req
     const internships = await Internship.find();
     res.json(apps.map(app => ({ 
       ...app.toObject(), 
-      id: app.appNumber, 
+      id: app.appNumber || app._id.toString(), 
       details: internships.find(i => i._id.toString() === app.internshipId)?.toObject() || { title: "Archived Internship" } 
     })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
@@ -495,7 +495,7 @@ app.put("/api/admin/tasks/verify", authenticateToken, authorizeAdmin, async (req
 app.get("/api/admin/quiz-applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
     const apps = await QuizApplication.find();
-    res.json(apps.map(app => ({ ...app.toObject(), id: app.appNumber })));
+    res.json(apps.map(app => ({ ...app.toObject(), id: app.appNumber || app._id.toString() })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
 });
 

@@ -146,8 +146,11 @@ export const DataProvider = ({ children }) => {
         body: JSON.stringify(data)
       });
       if (res.ok) setVerifiedCertificates([await res.json(), ...verifiedCertificates]);
-      else alert("Failed to add certificate");
-    } catch (e) { console.error(e); alert("Error adding certificate"); }
+      else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(`Failed to add certificate: ${errorData.error || res.statusText}`);
+      }
+    } catch (e) { console.error(e); alert(`Error adding certificate: ${e.message}`); }
   };
 
   const updateVerifiedCertificate = async (id, data) => {
