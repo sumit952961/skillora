@@ -33,7 +33,7 @@ export default function Navbar() {
     <nav className="navbar-container">
       <div className="navbar">
         <Link to="/" className="nav-logo" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          <img src="https://plain-apac-prod-public.komododecks.com/202608/15/dLTEVqKrqGQSZzgf3yI9/image.png" alt="Skillzeno Logo" style={{ height: '110px', margin: '-15px 0' }} />
+          <img src="https://plain-apac-prod-public.komododecks.com/202608/15/dLTEVqKrqGQSZzgf3yI9/image.png" alt="Skillzeno Logo" style={{ height: '45px', objectFit: 'contain' }} />
         </Link>
 
         <div className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
