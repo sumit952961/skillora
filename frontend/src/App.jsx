@@ -206,15 +206,13 @@ function AppContent() {
         <hr className="footer-divider" />
         
         <div className="footer-trust-bar">
-          {/* Left: Trusted & Verified */}
-          <div className="trust-item">
-            <div className="trust-icon-wrapper">
-              <ShieldCheck size={20} />
-            </div>
-            <div className="trust-text">
-              <h4>Trusted & Verified</h4>
-              <p>Certificates • Transparency • Trust</p>
-            </div>
+          {/* Left: Trusted & Verified Image */}
+          <div className="trust-item" style={{ padding: '0', background: 'transparent', border: 'none' }}>
+            <img 
+              src="https://plain-apac-prod-public.komododecks.com/202608/15/Lh8Xjkz1xyQIxWFh4o7z/image.png" 
+              alt="Trusted and Verified"
+              style={{ height: '55px', width: 'auto', objectFit: 'contain' }}
+            />
           </div>
 
           {/* Middle: Copyright & Legal Links */}
