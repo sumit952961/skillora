@@ -113,7 +113,7 @@ export default function Home() {
       graphic: (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px', width: '100%', overflow: 'hidden' }}>
           <img 
-            src="https://kommodo.ai/i/3LeRCGw6I87K71JrPhDt" 
+            src="https://plain-apac-prod-public.komododecks.com/202608/15/3LeRCGw6I87K71JrPhDt/image.png" 
             alt="MSME Registered" 
             style={{ height: '140px', maxWidth: '100%', objectFit: 'contain', transform: 'scale(1.1)' }}
           />
