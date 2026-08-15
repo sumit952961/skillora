@@ -85,8 +85,7 @@ export default function TakeQuiz({ quiz, onBack }) {
     });
     
     const baseUrl = settings?.quizPaymentLink || 'https://razorpay.me/@skillzeno';
-    const amount = settings?.quizProcessingFee || '19';
-    window.location.href = `${baseUrl}?amount=${amount}`;
+    window.location.href = baseUrl;
   };
 
   const handleMaybeLater = () => {

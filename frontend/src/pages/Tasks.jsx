@@ -77,9 +77,8 @@ export default function Tasks() {
     });
 
     // Open Razorpay link in same window to allow return
-    const baseUrl = settings?.internshipPaymentLink || 'https://razorpay.me/@skillzeno';
-    const amount = settings?.processingFee || '99';
-    window.location.href = `${baseUrl}?amount=${amount}`;
+    const baseUrl = settings?.internshipPaymentLink || 'https://rzp.io/rzp/ddlyQEo';
+    window.location.href = baseUrl;
   };
 
   const handleMaybeLater = () => {
