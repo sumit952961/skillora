@@ -236,7 +236,7 @@ function AppContent() {
               <h4 style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 Udyam Registered <span className="check-badge">✓</span>
               </h4>
-              <p>Registered Business</p>
+              <p>Reg No: UDYAM-UP-75-0200760</p>
             </div>
           </div>
         </div>
