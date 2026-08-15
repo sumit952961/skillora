@@ -19,8 +19,8 @@ export default function AdminQuizCertificates() {
         
         const appsWithUsers = fetchedApps.map(app => ({
           ...app,
-          studentName: app.userId?.name || 'Unknown Student',
-          studentEmail: app.userId?.email || 'N/A',
+          studentName: app.studentName || 'Unknown Student',
+          studentEmail: app.studentEmail || 'N/A',
         })).sort((a, b) => new Date(b.takenDate) - new Date(a.takenDate));
         
         setAllAppsList(appsWithUsers);

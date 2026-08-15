@@ -25,7 +25,10 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const applicationSchema = new mongoose.Schema({
+  appNumber: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  studentName: { type: String, required: true },
+  studentEmail: { type: String, required: true },
   internshipId: { type: String, required: true },
   status: { type: String, default: "In Progress" },
   appliedDate: { type: String, default: () => new Date().toISOString().split("T")[0] },
@@ -37,7 +40,10 @@ const applicationSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const quizApplicationSchema = new mongoose.Schema({
+  appNumber: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  studentName: { type: String, required: true },
+  studentEmail: { type: String, required: true },
   quizId: { type: String, required: true },
   quizTitle: { type: String, required: true },
   score: { type: Number, required: true },
@@ -147,8 +153,15 @@ app.post("/api/internships/apply", authenticateToken, async (req, res) => {
   try {
     if (await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId }))
       return res.status(400).json({ message: "Already applied" });
-    const newApp = await Application.create({ userId: req.user.id, internshipId: req.body.internshipId, tasks: req.body.tasks || [] });
-    res.status(201).json({ message: "Applied successfully!", application: { ...newApp.toObject(), id: newApp._id.toString() } });
+    const newApp = await Application.create({ 
+      appNumber: req.body.appNumber || `APP-${Date.now()}`,
+      userId: req.user.id,
+      studentName: req.user.name,
+      studentEmail: req.user.email,
+      internshipId: req.body.internshipId, 
+      tasks: req.body.tasks || [] 
+    });
+    res.status(201).json({ message: "Applied successfully!", application: { ...newApp.toObject(), id: newApp.appNumber } });
   } catch (e) { res.status(500).json({ message: "Application failed", error: e.message }); }
 });
 
@@ -192,9 +205,18 @@ app.post("/api/quizzes/submit", authenticateToken, async (req, res) => {
       qApp.takenDate = new Date().toISOString().split("T")[0];
       await qApp.save();
     } else {
-      qApp = await QuizApplication.create({ userId: req.user.id, quizId: req.body.quizId, quizTitle: req.body.quizTitle, score: req.body.score, totalQuestions: req.body.totalQuestions });
+      qApp = await QuizApplication.create({ 
+        appNumber: req.body.appNumber || `QAPP-${Date.now()}`,
+        userId: req.user.id,
+        studentName: req.user.name,
+        studentEmail: req.user.email,
+        quizId: req.body.quizId, 
+        quizTitle: req.body.quizTitle, 
+        score: req.body.score, 
+        totalQuestions: req.body.totalQuestions 
+      });
     }
-    res.status(201).json({ message: "Quiz submitted!", application: { ...qApp.toObject(), id: qApp._id.toString() } });
+    res.status(201).json({ message: "Quiz submitted!", application: { ...qApp.toObject(), id: qApp.appNumber } });
   } catch (e) { res.status(500).json({ message: "Quiz submission failed", error: e.message }); }
 });
 
@@ -213,8 +235,8 @@ app.post("/api/quizzes/payment", authenticateToken, async (req, res) => {
 // ADMIN ROUTES
 app.get("/api/admin/applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const apps = await Application.find().populate("userId", "name email");
-    res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString(), details: internshipsDB.find(i => i.id === app.internshipId) })));
+    const apps = await Application.find();
+    res.json(apps.map(app => ({ ...app.toObject(), id: app.appNumber, details: internshipsDB.find(i => i.id === app.internshipId) })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
 });
 
@@ -244,8 +266,8 @@ app.put("/api/admin/tasks/verify", authenticateToken, authorizeAdmin, async (req
 
 app.get("/api/admin/quiz-applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const apps = await QuizApplication.find().populate("userId", "name email");
-    res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString() })));
+    const apps = await QuizApplication.find();
+    res.json(apps.map(app => ({ ...app.toObject(), id: app.appNumber })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
 });
 

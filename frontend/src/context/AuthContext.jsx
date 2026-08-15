@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
     setQuizApplications([]);
   };
 
-  const applyForInternship = async (internshipData) => {
+  const applyForInternship = async (internshipData, generatedAppId) => {
     if (appliedInternships.some(app => app.internshipId === internshipData.id)) {
       alert("You have already applied for this internship.");
       return;
@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }) => {
       const res = await fetch(`${API_URL}/internships/apply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ internshipId: internshipData.id, tasks: defaultTasks })
+        body: JSON.stringify({ internshipId: internshipData.id, appNumber: generatedAppId, tasks: defaultTasks })
       });
       if (res.ok) {
         const { application } = await res.json();
@@ -179,12 +179,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const submitQuiz = async (quizData, score) => {
+  const submitQuiz = async (quizData, score, customAppId) => {
     try {
       const res = await fetch(`${API_URL}/quizzes/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ quizId: quizData.id, quizTitle: quizData.title, score, totalQuestions: quizData.questions.length })
+        body: JSON.stringify({ quizId: quizData.id, quizTitle: quizData.title, score, totalQuestions: quizData.questions.length, appNumber: customAppId })
       });
       if (res.ok) {
         const { application } = await res.json();

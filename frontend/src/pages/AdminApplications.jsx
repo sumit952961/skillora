@@ -21,8 +21,8 @@ export default function AdminApplications() {
         
         const appsWithUsers = fetchedApps.map(app => ({
           ...app,
-          studentName: app.userId?.name || 'Unknown Student',
-          studentEmail: app.userId?.email || 'N/A',
+          studentName: app.studentName || 'Unknown Student',
+          studentEmail: app.studentEmail || 'N/A',
         })).sort((a, b) => b.id.localeCompare(a.id));
         
         setAllAppsList(appsWithUsers);
