@@ -226,7 +226,7 @@ export default function Home() {
               )}
 
               {/* Description details */}
-              <h3 className="illustration-title">
+              <h3 className="illustration-title" style={{ marginTop: carouselSlides[activeSlide].icon ? '0' : '40px' }}>
                 {carouselSlides[activeSlide].title}
               </h3>
               <p className="illustration-subtitle">
