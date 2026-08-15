@@ -77,7 +77,9 @@ export default function Tasks() {
     });
 
     // Open Razorpay link
-    window.open(settings?.internshipPaymentLink || 'https://razorpay.com', '_blank');
+    const baseUrl = settings?.internshipPaymentLink || 'https://razorpay.me/@skillzeno';
+    const amount = settings?.processingFee || '99';
+    window.open(`${baseUrl}?amount=${amount}`, '_blank');
     
     setPaymentModalData(null);
     alert('Aapko mail aa jayega certificate aur website se hi download kar sakte ho.');

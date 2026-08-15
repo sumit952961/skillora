@@ -84,7 +84,9 @@ export default function TakeQuiz({ quiz, onBack }) {
       status: 'Redirected'
     });
     
-    window.open(settings?.quizPaymentLink || 'https://razorpay.com', '_blank');
+    const baseUrl = settings?.quizPaymentLink || 'https://razorpay.me/@skillzeno';
+    const amount = settings?.quizProcessingFee || '19';
+    window.open(`${baseUrl}?amount=${amount}`, '_blank');
     
     setShowPaymentModal(false);
     onBack();
