@@ -30,8 +30,22 @@ const applicationSchema = new mongoose.Schema({
   status: { type: String, default: "In Progress" },
   appliedDate: { type: String, default: () => new Date().toISOString().split("T")[0] },
   finalSubmitted: { type: Boolean, default: false },
-  paymentInfo: { type: Object, default: null },
-  tasks: [{ id: String, title: String, status: { type: String, default: "Pending" }, submissionLink: { type: String, default: "" }, feedback: { type: String, default: "" } }]
+  paymentDetails: { type: Object, default: null },
+  tasks: [{ id: String, title: String, status: { type: String, default: "Pending" }, submissionLink: { type: String, default: "" }, feedback: { type: String, default: "" } }],
+  offerLetterUrl: { type: String, default: "" },
+  certificateUrl: { type: String, default: "" }
+}, { timestamps: true });
+
+const quizApplicationSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  quizId: { type: String, required: true },
+  quizTitle: { type: String, required: true },
+  score: { type: Number, required: true },
+  totalQuestions: { type: Number, required: true },
+  takenDate: { type: String, default: () => new Date().toISOString().split("T")[0] },
+  paymentSubmitted: { type: Boolean, default: false },
+  paymentDetails: { type: Object, default: null },
+  certificateUrl: { type: String, default: "" }
 }, { timestamps: true });
 
 const certificateSchema = new mongoose.Schema({
@@ -43,6 +57,7 @@ const certificateSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 const Application = mongoose.model("Application", applicationSchema);
+const QuizApplication = mongoose.model("QuizApplication", quizApplicationSchema);
 const Certificate = mongoose.model("Certificate", certificateSchema);
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillora")
@@ -58,6 +73,11 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+const authorizeAdmin = (req, res, next) => {
+  if (req.user.role !== "admin") return res.status(403).json({ message: "Admin access required" });
+  next();
+};
+
 app.post("/api/auth/register", async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -68,7 +88,7 @@ app.post("/api/auth/register", async (req, res) => {
     const newUser = await User.create({ name, email: email.toLowerCase(), password: hashedPassword, role: isAdmin ? "admin" : "student" });
     const token = jwt.sign({ id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role }, JWT_SECRET, { expiresIn: "7d" });
     res.status(201).json({ token, user: { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role } });
-  } catch (e) { res.status(500).json({ message: "Registration failed" }); }
+  } catch (e) { res.status(500).json({ message: "Registration failed", error: e.message }); }
 });
 
 app.post("/api/auth/login", async (req, res) => {
@@ -79,7 +99,7 @@ app.post("/api/auth/login", async (req, res) => {
     if (!(await bcrypt.compare(password, user.password))) return res.status(400).json({ message: "Incorrect password" });
     const token = jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
     res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
-  } catch (e) { res.status(500).json({ message: "Login failed" }); }
+  } catch (e) { res.status(500).json({ message: "Login failed", error: e.message }); }
 });
 
 app.get("/api/auth/profile", authenticateToken, async (req, res) => {
@@ -107,32 +127,40 @@ app.get("/api/auth/users", authenticateToken, async (req, res) => {
   } catch (e) { res.status(500).json({ message: "Failed to fetch users" }); }
 });
 
-app.get("/api/internships", (req, res) => res.json([
-  { id: "int1", title: "Frontend Web Developer (React)", company: "Skillora", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote" },
-  { id: "int2", title: "Backend Developer (Node.js/Express)", company: "Skillora", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote" },
-  { id: "int3", title: "Full Stack Web Developer (MERN)", company: "Skillora", duration: "6 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote" }
-]));
+// INTERNSHIP ROUTES
+const internshipsDB = [
+  { id: "int1", title: "Frontend Web Developer (React)", company: "Skillora", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Frontend" },
+  { id: "int2", title: "Backend Developer (Node.js/Express)", company: "Skillora", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Backend" },
+  { id: "int3", title: "Full Stack Web Developer (MERN)", company: "Skillora", duration: "6 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Full Stack" }
+];
+
+app.get("/api/internships", (req, res) => res.json(internshipsDB));
+
+app.get("/api/my-internships", authenticateToken, async (req, res) => {
+  try {
+    const apps = await Application.find({ userId: req.user.id });
+    res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString(), details: internshipsDB.find(i => i.id === app.internshipId) })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch internships" }); }
+});
 
 app.post("/api/internships/apply", authenticateToken, async (req, res) => {
   try {
     if (await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId }))
       return res.status(400).json({ message: "Already applied" });
-    const newApp = await Application.create({ userId: req.user.id, internshipId: req.body.internshipId,
-      tasks: [{ id: "t1", title: "Task 1: Standard Introduction Mockup" }, { id: "t2", title: "Task 2: API Integration & Logic" }, { id: "t3", title: "Task 3: Production Deployment" }] });
-    res.status(201).json({ message: "Applied successfully!", application: newApp });
-  } catch (e) { res.status(500).json({ message: "Application failed" }); }
+    const newApp = await Application.create({ userId: req.user.id, internshipId: req.body.internshipId, tasks: req.body.tasks || [] });
+    res.status(201).json({ message: "Applied successfully!", application: { ...newApp.toObject(), id: newApp._id.toString() } });
+  } catch (e) { res.status(500).json({ message: "Application failed", error: e.message }); }
 });
 
-app.get("/api/my-internships", authenticateToken, async (req, res) => {
+app.post("/api/internships/final-submit", authenticateToken, async (req, res) => {
   try {
-    const internships = [
-      { id: "int1", title: "Frontend Web Developer (React)", company: "Skillora", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote" },
-      { id: "int2", title: "Backend Developer (Node.js/Express)", company: "Skillora", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote" },
-      { id: "int3", title: "Full Stack Web Developer (MERN)", company: "Skillora", duration: "6 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote" }
-    ];
-    const apps = await Application.find({ userId: req.user.id });
-    res.json(apps.map(app => ({ ...app.toObject(), details: internships.find(i => i.id === app.internshipId) })));
-  } catch (e) { res.status(500).json({ message: "Failed to fetch internships" }); }
+    const app = await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId });
+    if (!app) return res.status(404).json({ message: "Application not found" });
+    app.finalSubmitted = true;
+    app.paymentDetails = req.body.paymentDetails;
+    await app.save();
+    res.json({ message: "Final submit successful!", application: { ...app.toObject(), id: app._id.toString() } });
+  } catch (e) { res.status(500).json({ message: "Final submit failed" }); }
 });
 
 app.post("/api/tasks/submit", authenticateToken, async (req, res) => {
@@ -147,18 +175,90 @@ app.post("/api/tasks/submit", authenticateToken, async (req, res) => {
   } catch (e) { res.status(500).json({ message: "Failed to submit task" }); }
 });
 
-app.get("/api/certificates/my", authenticateToken, async (req, res) => {
-  try { res.json(await Certificate.find({ userId: req.user.id })); }
-  catch (e) { res.status(500).json({ message: "Failed to fetch certificates" }); }
+// QUIZ ROUTES
+app.get("/api/my-quizzes", authenticateToken, async (req, res) => {
+  try {
+    const apps = await QuizApplication.find({ userId: req.user.id });
+    res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString() })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch quizzes" }); }
 });
 
-app.get("/api/certificates/verify/:hash", async (req, res) => {
+app.post("/api/quizzes/submit", authenticateToken, async (req, res) => {
   try {
-    const cert = await Certificate.findOne({ $or: [{ certificateNumber: req.params.hash.toUpperCase() }, { verificationHash: req.params.hash.toUpperCase() }] });
-    if (!cert) return res.status(404).json({ message: "Certificate not found." });
-    res.json(cert);
-  } catch (e) { res.status(500).json({ message: "Verification failed" }); }
+    let qApp = await QuizApplication.findOne({ userId: req.user.id, quizId: req.body.quizId });
+    if (qApp) {
+      qApp.score = req.body.score;
+      qApp.totalQuestions = req.body.totalQuestions;
+      qApp.takenDate = new Date().toISOString().split("T")[0];
+      await qApp.save();
+    } else {
+      qApp = await QuizApplication.create({ userId: req.user.id, quizId: req.body.quizId, quizTitle: req.body.quizTitle, score: req.body.score, totalQuestions: req.body.totalQuestions });
+    }
+    res.status(201).json({ message: "Quiz submitted!", application: { ...qApp.toObject(), id: qApp._id.toString() } });
+  } catch (e) { res.status(500).json({ message: "Quiz submission failed", error: e.message }); }
 });
+
+app.post("/api/quizzes/payment", authenticateToken, async (req, res) => {
+  try {
+    const qApp = await QuizApplication.findOne({ userId: req.user.id, quizId: req.body.quizId });
+    if (!qApp) return res.status(404).json({ message: "Quiz application not found" });
+    qApp.paymentSubmitted = true;
+    qApp.paymentDetails = req.body.paymentDetails;
+    await qApp.save();
+    res.json({ message: "Payment processed!", application: { ...qApp.toObject(), id: qApp._id.toString() } });
+  } catch (e) { res.status(500).json({ message: "Payment failed" }); }
+});
+
+
+// ADMIN ROUTES
+app.get("/api/admin/applications", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const apps = await Application.find();
+    res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString(), details: internshipsDB.find(i => i.id === app.internshipId) })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
+});
+
+app.put("/api/admin/applications/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const app = await Application.findById(req.params.id);
+    if (!app) return res.status(404).json({ message: "Application not found" });
+    if (req.body.offerLetterUrl !== undefined) app.offerLetterUrl = req.body.offerLetterUrl;
+    if (req.body.certificateUrl !== undefined) app.certificateUrl = req.body.certificateUrl;
+    await app.save();
+    res.json({ message: "Application updated", application: { ...app.toObject(), id: app._id.toString() } });
+  } catch (e) { res.status(500).json({ message: "Failed to update application" }); }
+});
+
+app.put("/api/admin/tasks/verify", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const app = await Application.findById(req.body.applicationId);
+    if (!app) return res.status(404).json({ message: "Application not found" });
+    const task = app.tasks.find(t => t.id === req.body.taskId);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+    task.status = req.body.status;
+    task.feedback = req.body.feedback;
+    await app.save();
+    res.json({ message: "Task verified", updatedTasks: app.tasks });
+  } catch (e) { res.status(500).json({ message: "Failed to verify task" }); }
+});
+
+app.get("/api/admin/quiz-applications", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const apps = await QuizApplication.find();
+    res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString() })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch quiz applications" }); }
+});
+
+app.put("/api/admin/quiz-applications/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const app = await QuizApplication.findById(req.params.id);
+    if (!app) return res.status(404).json({ message: "Quiz application not found" });
+    app.certificateUrl = req.body.certificateUrl;
+    await app.save();
+    res.json({ message: "Quiz certificate updated", application: { ...app.toObject(), id: app._id.toString() } });
+  } catch (e) { res.status(500).json({ message: "Failed to update quiz application" }); }
+});
+
 
 app.get("/api/dashboard/summary", authenticateToken, async (req, res) => {
   try {

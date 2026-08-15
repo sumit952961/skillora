@@ -4,74 +4,81 @@ import { DataContext } from '../context/DataContext';
 import { Upload, CheckCircle, Search, Trophy, ShieldCheck } from 'lucide-react';
 
 export default function AdminQuizCertificates() {
-  const { allQuizApplications, updateStudentQuizApplication } = useContext(AuthContext);
-  const { quizzes, addVerifiedCertificate, verifiedCertificates } = useContext(DataContext);
+  const { API_URL, token } = useContext(AuthContext);
+  const { addVerifiedCertificate, verifiedCertificates } = useContext(DataContext);
   const [users, setUsers] = useState({});
+  const [allAppsList, setAllAppsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
-        const res = await fetch(`${API_URL}/auth/users`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+  const fetchData = async () => {
+    try {
+      const usersRes = await fetch(`${API_URL}/auth/users`, { headers: { Authorization: `Bearer ${token}` } });
+      const appsRes = await fetch(`${API_URL}/admin/quiz-applications`, { headers: { Authorization: `Bearer ${token}` } });
+      
+      if (usersRes.ok && appsRes.ok) {
+        const fetchedUsers = await usersRes.json();
+        const fetchedApps = await appsRes.json();
         
-        if (res.ok) {
-          const fetchedUsers = await res.json();
-          const userMap = {};
-          fetchedUsers.forEach(u => {
-            userMap[u.id] = { name: u.name, email: u.email };
-          });
-          setUsers(userMap);
-        } else {
-          // Fallback to local storage
-          const savedUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
-          const userMap = {};
-          savedUsers.forEach(u => {
-            userMap[u.id] = { name: u.name, email: u.email };
-          });
-          setUsers(userMap);
-        }
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
+        const userMap = {};
+        fetchedUsers.forEach(u => { userMap[u.id] = { name: u.name, email: u.email }; });
+        setUsers(userMap);
+        
+        const appsWithUsers = fetchedApps.map(app => ({
+          ...app,
+          studentName: userMap[app.userId]?.name || 'Unknown Student',
+          studentEmail: userMap[app.userId]?.email || 'N/A',
+        })).sort((a, b) => new Date(b.takenDate) - new Date(a.takenDate));
+        
+        setAllAppsList(appsWithUsers);
       }
-    };
-    
-    loadUsers();
-
-    const handleStorageChange = (e) => {
-      if (e.key === 'mockUsers') {
-        loadUsers();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  const allAppsList = [];
-  Object.keys(allQuizApplications).forEach(userId => {
-    const apps = allQuizApplications[userId];
-    if (Array.isArray(apps)) {
-      apps.forEach(app => {
-        allAppsList.push({
-          userId,
-          studentName: users[userId]?.name || 'Unknown Student',
-          studentEmail: users[userId]?.email || 'N/A',
-          ...app
-        });
-      });
+    } catch (e) {
+      console.error("Failed to fetch admin data", e);
     }
-  });
+  };
 
-  allAppsList.sort((a, b) => new Date(b.takenDate) - new Date(a.takenDate));
+  useEffect(() => {
+    if (token) fetchData();
+  }, [token]);
 
   const filteredApps = allAppsList.filter(app => 
     app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     app.studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
     app.quizTitle.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleCertSubmit = async (appId, updates, app) => {
+    try {
+      const res = await fetch(`${API_URL}/admin/quiz-applications/${appId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(updates)
+      });
+      if (res.ok) {
+        alert('Certificate updated successfully!');
+        fetchData();
+        
+        // Add to verified certificates if not exists
+        if (updates.certificateUrl) {
+          const exists = verifiedCertificates.find(vc => vc.applicationId === appId);
+          if (!exists) {
+            addVerifiedCertificate({
+              applicationId: appId,
+              userName: app.studentName,
+              domain: 'Assessment',
+              title: app.quizTitle,
+              issueDate: new Date().toISOString().split('T')[0],
+              certificateNumber: '',
+              performanceRemarks: `Score: ${app.score}/${app.totalQuestions}`
+            });
+          }
+        }
+      } else {
+        alert('Failed to update');
+      }
+    } catch (e) {
+      alert("Failed to update certificates");
+    }
+  };
 
   return (
     <div className="container fade-in">
@@ -104,7 +111,7 @@ export default function AdminQuizCertificates() {
       ) : (
         <div style={{ display: 'grid', gap: '24px' }}>
           {filteredApps.map(app => (
-            <div key={`${app.userId}-${app.id}`} style={{ background: 'var(--bg-secondary)', padding: '24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+            <div key={app.id} style={{ background: 'var(--bg-secondary)', padding: '24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '24px' }}>
                 
                 {/* Student Info */}
@@ -151,50 +158,38 @@ export default function AdminQuizCertificates() {
 
                   <div style={{ background: 'var(--bg-primary)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                     <h4 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Upload size={18} color="var(--primary)" /> Quiz Certificate URL
+                      <Upload size={18} color="var(--primary)" /> Completion Certificate
                     </h4>
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      <input 
-                        type="url" 
-                        className="form-input" 
-                        placeholder={app.paymentSubmitted ? "https://drive.google.com/..." : "Requires Payment First"}
-                        defaultValue={app.certificateUrl || ''} 
-                        disabled={!app.paymentSubmitted}
-                        id={`cert-${app.id}`}
-                        style={{ opacity: !app.paymentSubmitted ? 0.6 : 1 }}
-                      />
-                      <button 
-                        disabled={!app.paymentSubmitted}
-                        onClick={() => {
-                          const val = document.getElementById(`cert-${app.id}`).value;
-                          if (val && !/^https?:\/\/.+$/.test(val)) {
-                            alert("Please enter a valid URL.");
-                            return;
-                          }
-                          updateStudentQuizApplication(app.userId, app.id, { certificateUrl: val });
-                          
-                          if (val) {
-                            const exists = verifiedCertificates.find(vc => vc.applicationId === app.id);
-                            if (!exists) {
-                              addVerifiedCertificate({
-                                applicationId: app.id,
-                                userName: users[app.userId]?.name || 'Unknown Student',
-                                domain: 'Quiz',
-                                title: app.quizTitle || 'Quiz Assessment',
-                                issueDate: new Date().toISOString().split('T')[0],
-                                certificateNumber: '',
-                                performanceRemarks: ''
-                              });
+                    
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label style={{ fontSize: '0.85rem' }}>Certificate URL</label>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <input 
+                          type="url" 
+                          className="form-input" 
+                          placeholder={app.paymentSubmitted ? "https://drive.google.com/..." : "Requires Payment Verify"}
+                          defaultValue={app.certificateUrl || ''} 
+                          id={`cert-${app.id}`}
+                          disabled={!app.paymentSubmitted}
+                          style={{ opacity: !app.paymentSubmitted ? 0.6 : 1 }}
+                        />
+                        <button 
+                          disabled={!app.paymentSubmitted}
+                          onClick={() => {
+                            const val = document.getElementById(`cert-${app.id}`).value;
+                            if (val && !/^https?:\/\/.+$/.test(val)) {
+                              alert("Please enter a valid URL.");
+                              return;
                             }
-                          }
-
-                          alert('Certificate updated!');
-                        }} 
-                        className="btn btn-outline" 
-                        style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}
-                      >
-                        Save
-                      </button>
+                            handleCertSubmit(app.id, { certificateUrl: val }, app);
+                          }} 
+                          className="btn btn-outline" 
+                          style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}
+                        >
+                          Save
+                        </button>
+                      </div>
+                      {!app.paymentSubmitted && <span style={{ fontSize: '0.75rem', color: 'var(--accent-warning)', marginTop: '4px' }}>Payment submission is required to unlock this field.</span>}
                     </div>
                   </div>
 

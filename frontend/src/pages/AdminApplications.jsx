@@ -1,116 +1,89 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
-import { FileText, CheckCircle2, Clock, Upload, X, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, CheckCircle2, Upload, X, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function AdminApplications() {
-  const { allApplications, updateStudentApplication, verifyTask } = useContext(AuthContext);
+  const { API_URL, token } = useContext(AuthContext);
   const { addVerifiedCertificate, verifiedCertificates } = useContext(DataContext);
   const [users, setUsers] = useState({});
-  const [showModal, setShowModal] = useState(false);
-  const [activeApp, setActiveApp] = useState(null);
+  const [allAppsList, setAllAppsList] = useState([]);
+  
   const [expandedAppId, setExpandedAppId] = useState(null);
-  
-  const [reviewModalData, setReviewModalData] = useState(null); // { userId, appId, task, feedbackText }
-  
-  const [certForm, setCertForm] = useState({
-    offerLetterUrl: '',
-    certificateUrl: ''
-  });
+  const [reviewModalData, setReviewModalData] = useState(null); // { appId, task, feedbackText }
+
+  const fetchData = async () => {
+    try {
+      const usersRes = await fetch(`${API_URL}/auth/users`, { headers: { Authorization: `Bearer ${token}` } });
+      const appsRes = await fetch(`${API_URL}/admin/applications`, { headers: { Authorization: `Bearer ${token}` } });
+      
+      if (usersRes.ok && appsRes.ok) {
+        const fetchedUsers = await usersRes.json();
+        const fetchedApps = await appsRes.json();
+        
+        const userMap = {};
+        fetchedUsers.forEach(u => { userMap[u.id] = { name: u.name, email: u.email }; });
+        setUsers(userMap);
+        
+        const appsWithUsers = fetchedApps.map(app => ({
+          ...app,
+          studentName: userMap[app.userId]?.name || 'Unknown Student',
+          studentEmail: userMap[app.userId]?.email || 'N/A',
+        })).sort((a, b) => b.id.localeCompare(a.id));
+        
+        setAllAppsList(appsWithUsers);
+      }
+    } catch (e) {
+      console.error("Failed to fetch admin data", e);
+    }
+  };
 
   useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
-        const res = await fetch(`${API_URL}/auth/users`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (res.ok) {
-          const fetchedUsers = await res.json();
-          const userMap = {};
-          fetchedUsers.forEach(u => {
-            userMap[u.id] = { name: u.name, email: u.email };
-          });
-          setUsers(userMap);
-        } else {
-          // Fallback to local storage
-          const savedUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
-          const userMap = {};
-          savedUsers.forEach(u => {
-            userMap[u.id] = { name: u.name, email: u.email };
-          });
-          setUsers(userMap);
-        }
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-      }
-    };
-    
-    loadUsers();
+    if (token) fetchData();
+  }, [token]);
 
-    const handleStorageChange = (e) => {
-      if (e.key === 'mockUsers') {
-        loadUsers();
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  const openCertModal = (userId, app) => {
-    setActiveApp({ userId, app });
-    setCertForm({
-      offerLetterUrl: app.offerLetterUrl || '',
-      certificateUrl: app.certificateUrl || ''
-    });
-    setShowModal(true);
-  };
-
-  const handleCertSubmit = (e) => {
-    e.preventDefault();
-    if (activeApp) {
-      updateStudentApplication(activeApp.userId, activeApp.app.id, {
-        offerLetterUrl: certForm.offerLetterUrl,
-        certificateUrl: certForm.certificateUrl
+  const handleCertSubmit = async (appId, updates) => {
+    try {
+      const res = await fetch(`${API_URL}/admin/applications/${appId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(updates)
       });
-      alert('Certificates updated successfully!');
-      setShowModal(false);
+      if (res.ok) {
+        alert('Application updated successfully!');
+        fetchData();
+      } else {
+        alert('Failed to update');
+      }
+    } catch (e) {
+      alert("Failed to update certificates");
     }
   };
 
-  const handleTaskReview = (status) => {
+  const handleTaskReview = async (status) => {
     if (!reviewModalData) return;
-    verifyTask(
-      reviewModalData.userId, 
-      reviewModalData.appId, 
-      reviewModalData.task.id, 
-      status, 
-      reviewModalData.feedbackText
-    );
-    alert(`Task has been ${status.toLowerCase()}!`);
-    setReviewModalData(null);
-  };
-
-  // Flatten applications into an array for easy rendering
-  const allAppsList = [];
-  Object.keys(allApplications).forEach(userId => {
-    const apps = allApplications[userId];
-    if (Array.isArray(apps)) {
-      apps.forEach(app => {
-        allAppsList.push({
-          userId,
-          studentName: users[userId]?.name || 'Unknown Student',
-          studentEmail: users[userId]?.email || 'N/A',
-          ...app
-        });
+    try {
+      const res = await fetch(`${API_URL}/admin/tasks/verify`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          applicationId: reviewModalData.appId,
+          taskId: reviewModalData.task.id,
+          status,
+          feedback: reviewModalData.feedbackText
+        })
       });
+      if (res.ok) {
+        alert(`Task has been ${status.toLowerCase()}!`);
+        setReviewModalData(null);
+        fetchData();
+      } else {
+        alert('Failed to verify task');
+      }
+    } catch (e) {
+      alert("Failed to verify task");
     }
-  });
-
-  // Sort by newest first
-  allAppsList.sort((a, b) => b.id.localeCompare(a.id));
+  };
 
   return (
     <div className="container fade-in">
@@ -130,7 +103,7 @@ export default function AdminApplications() {
             const totalTasks = app.tasks ? app.tasks.length : 0;
 
             return (
-              <div key={`${app.userId}-${app.id}`} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+              <div key={app.id} style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
                 
                 {/* Accordion Header */}
                 <div 
@@ -200,7 +173,7 @@ export default function AdminApplications() {
                               )}
                               {t.status === 'Submitted' && (
                                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-                                  <button onClick={() => setReviewModalData({ userId: app.userId, appId: app.id, task: t, feedbackText: 'Good job!' })} className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.8rem' }}>
+                                  <button onClick={() => setReviewModalData({ appId: app.id, task: t, feedbackText: 'Good job!' })} className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.8rem' }}>
                                     Review Task
                                   </button>
                                 </div>
@@ -248,8 +221,7 @@ export default function AdminApplications() {
                                   alert("Please enter a valid URL.");
                                   return;
                                 }
-                                updateStudentApplication(app.userId, app.id, { offerLetterUrl: val });
-                                alert('Offer Letter updated!');
+                                handleCertSubmit(app.id, { offerLetterUrl: val });
                               }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>Save</button>
                             </div>
                           </div>
@@ -273,7 +245,7 @@ export default function AdminApplications() {
                                     alert("Please enter a valid URL.");
                                     return;
                                   }
-                                  updateStudentApplication(app.userId, app.id, { certificateUrl: val });
+                                  handleCertSubmit(app.id, { certificateUrl: val });
                                   
                                   // Add to verified certificates if not exists
                                   if (val) {
@@ -281,7 +253,7 @@ export default function AdminApplications() {
                                     if (!exists) {
                                       addVerifiedCertificate({
                                         applicationId: app.id,
-                                        userName: users[app.userId]?.name || 'Unknown Student',
+                                        userName: app.studentName,
                                         domain: 'Internship',
                                         title: app.details?.title || 'Internship Program',
                                         issueDate: new Date().toISOString().split('T')[0],
@@ -290,8 +262,6 @@ export default function AdminApplications() {
                                       });
                                     }
                                   }
-
-                                  alert('Certificate updated!');
                                 }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>Save</button>
                             </div>
                             {!app.finalSubmitted && <span style={{ fontSize: '0.75rem', color: 'var(--accent-warning)', marginTop: '4px' }}>Final submit is required to unlock this field.</span>}

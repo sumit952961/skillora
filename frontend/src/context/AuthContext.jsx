@@ -4,7 +4,7 @@ import { sendApplicationEmail, sendPasswordResetEmail, sendQuizCompletionEmail }
 export const AuthContext = createContext();
 
 const mockHashPassword = (str) => {
-  return btoa(unescape(encodeURIComponent(str))); // simple base64 mock encryption
+  return btoa(unescape(encodeURIComponent(str)));
 };
 
 export const AuthProvider = ({ children }) => {
@@ -12,21 +12,9 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [loading, setLoading] = useState(true);
 
-  // Load applied internships scoped by user
-  const [allApplications, setAllApplications] = useState(() => {
-    const saved = localStorage.getItem('userApplications');
-    if (saved) return JSON.parse(saved);
-    const oldSaved = localStorage.getItem('appliedInternships');
-    if (oldSaved) return { 'admin_default_1': JSON.parse(oldSaved) };
-    return {};
-  });
-
-  // Load quiz applications scoped by user
-  const [allQuizApplications, setAllQuizApplications] = useState(() => {
-    const saved = localStorage.getItem('userQuizApplications');
-    if (saved) return JSON.parse(saved);
-    return {};
-  });
+  // Student specific data
+  const [appliedInternships, setAppliedInternships] = useState([]);
+  const [quizApplications, setQuizApplications] = useState([]);
 
   // Load password reset requests
   const [passwordResetRequests, setPasswordResetRequests] = useState(() => {
@@ -34,44 +22,20 @@ export const AuthProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Sync across tabs/windows in real-time
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'userApplications') {
-        const newData = JSON.parse(e.newValue || '{}');
-        setAllApplications(newData);
-      }
-      if (e.key === 'userQuizApplications') {
-        const newData = JSON.parse(e.newValue || '{}');
-        setAllQuizApplications(newData);
-      }
-      if (e.key === 'passwordResetRequests') {
-        const newData = JSON.parse(e.newValue || '[]');
-        setPasswordResetRequests(newData);
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  const appliedInternships = user ? (allApplications[user.id] || []) : [];
-  const quizApplications = user ? (allQuizApplications[user.id] || []) : [];
-
-  const updateApplicationsForUser = (newApps) => {
-    if (!user) return;
-    const updated = { ...allApplications, [user.id]: newApps };
-    setAllApplications(updated);
-    localStorage.setItem('userApplications', JSON.stringify(updated));
-  };
-
-  const updateQuizApplicationsForUser = (newApps) => {
-    if (!user) return;
-    const updated = { ...allQuizApplications, [user.id]: newApps };
-    setAllQuizApplications(updated);
-    localStorage.setItem('userQuizApplications', JSON.stringify(updated));
-  };
-
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+
+  const fetchStudentData = async (currentToken) => {
+    try {
+      const [internshipRes, quizRes] = await Promise.all([
+        fetch(`${API_URL}/my-internships`, { headers: { Authorization: `Bearer ${currentToken}` } }),
+        fetch(`${API_URL}/my-quizzes`, { headers: { Authorization: `Bearer ${currentToken}` } })
+      ]);
+      if (internshipRes.ok) setAppliedInternships(await internshipRes.json());
+      if (quizRes.ok) setQuizApplications(await quizRes.json());
+    } catch (err) {
+      console.warn('Failed to fetch student data:', err);
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -83,6 +47,9 @@ export const AuthProvider = ({ children }) => {
           if (res.ok) {
             const data = await res.json();
             setUser(data);
+            if (data.role === 'student') {
+              await fetchStudentData(token);
+            }
           } else {
             throw new Error('Invalid token from backend');
           }
@@ -109,6 +76,9 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', data.token);
       setToken(data.token);
       setUser(data.user);
+      if (data.user.role === 'student') {
+        await fetchStudentData(data.token);
+      }
       return { success: true };
     } catch (err) {
       throw err;
@@ -124,8 +94,6 @@ export const AuthProvider = ({ children }) => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Registration failed');
-      
-      // Do not auto-login
       return { success: true };
     } catch (err) {
       throw err;
@@ -136,190 +104,127 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     setToken('');
     setUser(null);
+    setAppliedInternships([]);
+    setQuizApplications([]);
   };
 
-  const applyForInternship = (internshipData, customAppId = null) => {
-    const prev = appliedInternships;
-    // Check if already applied
-    if (prev.some(app => app.details.id === internshipData.id)) {
+  const applyForInternship = async (internshipData) => {
+    if (appliedInternships.some(app => app.internshipId === internshipData.id)) {
       alert("You have already applied for this internship.");
       return;
     }
-
-    // Add new application with default tasks
-    const newApplication = {
-      id: customAppId || `app_${Date.now()}`,
-      internshipId: internshipData.id,
-      status: 'In Progress',
-      appliedDate: new Date().toISOString().split('T')[0],
-      finalSubmitted: false,
-      details: {
-        id: internshipData.id,
-        title: internshipData.title,
-        company: internshipData.company
-      },
-      tasks: (internshipData.tasks || []).map(t => ({
-        id: t.id,
-        title: t.title,
-        description: t.description,
-        status: 'Pending',
-        submissionLink: '',
-        feedback: ''
-      }))
-    };
-    updateApplicationsForUser([newApplication, ...prev]);
-
-    // Send email notification to admin
-    sendApplicationEmail({
-      studentName: user?.name || 'Unknown',
-      studentEmail: user?.email || 'Unknown',
-      internshipTitle: internshipData.title,
-      internshipDomain: internshipData.domain || internshipData.type || 'N/A',
-      appliedDate: newApplication.appliedDate
-    });
-  };
-
-  const submitTask = (internshipId, taskId, link) => {
-    const prev = appliedInternships;
-    const updated = prev.map(app => {
-      if (app.internshipId === internshipId || app.details.id === internshipId) {
-        return {
-          ...app,
-          tasks: app.tasks.map(t => {
-            if (t.id === taskId) {
-              return { ...t, status: 'Submitted', submissionLink: link, feedback: 'Under Review' };
-            }
-            return t;
-          })
-        };
-      }
-      return app;
-    });
-    updateApplicationsForUser(updated);
-  };
-
-  const processFinalSubmit = (internshipId, paymentDetails = null) => {
-    const prev = appliedInternships;
-    const updated = prev.map(app => {
-      if (app.internshipId === internshipId || app.details.id === internshipId) {
-        return { 
-          ...app, 
-          finalSubmitted: true,
-          paymentDetails: paymentDetails // Store transaction ID, date, screenshot
-        };
-      }
-      return app;
-    });
-    updateApplicationsForUser(updated);
-  };
-  const submitQuiz = (quizData, score, customAppId = null) => {
-    const prev = quizApplications;
-    // Overwrite previous attempt or create new one
-    const existingIndex = prev.findIndex(app => app.quizId === quizData.id);
-    const newAttempt = {
-      id: customAppId || `qapp_${Date.now()}`,
-      quizId: quizData.id,
-      quizTitle: quizData.title,
-      score: score,
-      totalQuestions: quizData.questions.length,
-      takenDate: new Date().toISOString().split('T')[0],
-      paymentSubmitted: false,
-      certificateUrl: ''
-    };
     
-    let updated;
-    if (existingIndex >= 0) {
-      updated = [...prev];
-      updated[existingIndex] = { ...updated[existingIndex], ...newAttempt, id: updated[existingIndex].id }; // preserve ID but update attempt
-    } else {
-      updated = [newAttempt, ...prev];
-    }
-    updateQuizApplicationsForUser(updated);
-  };
+    try {
+      const defaultTasks = (internshipData.tasks || []).map(t => ({
+        id: t.id, title: t.title, description: t.description, status: 'Pending', submissionLink: '', feedback: ''
+      }));
 
-  const processQuizPayment = (quizId, paymentDetails) => {
-    const prev = quizApplications;
-    let targetApp = null;
-    const updated = prev.map(app => {
-      if (app.quizId === quizId) {
-        targetApp = { 
-          ...app, 
-          paymentSubmitted: true,
-          paymentDetails: paymentDetails
-        };
-        return targetApp;
-      }
-      return app;
-    });
-    updateQuizApplicationsForUser(updated);
-
-    if (targetApp) {
-      sendQuizCompletionEmail({
-        studentName: user?.name || 'Unknown',
-        studentEmail: user?.email || 'Unknown',
-        quizTitle: targetApp.quizTitle,
-        score: targetApp.score,
-        submittedDate: new Date().toLocaleDateString('en-IN')
+      const res = await fetch(`${API_URL}/internships/apply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ internshipId: internshipData.id, tasks: defaultTasks })
       });
+      if (res.ok) {
+        const { application } = await res.json();
+        setAppliedInternships([ { ...application, details: internshipData }, ...appliedInternships ]);
+        
+        sendApplicationEmail({
+          studentName: user?.name || 'Unknown',
+          studentEmail: user?.email || 'Unknown',
+          internshipTitle: internshipData.title,
+          internshipDomain: internshipData.domain || internshipData.type || 'N/A',
+          appliedDate: application.appliedDate
+        });
+      } else {
+        const err = await res.json();
+        alert(err.message || 'Application failed');
+      }
+    } catch (e) {
+      alert("Failed to apply");
     }
   };
-  const updateStudentApplication = (targetUserId, applicationId, updates) => {
-    setAllApplications(prev => {
-      const userApps = prev[targetUserId] || [];
-      const updatedUserApps = userApps.map(app => {
-        if (app.id === applicationId) {
-          return { ...app, ...updates };
-        }
-        return app;
-      });
-      const newAllApps = { ...prev, [targetUserId]: updatedUserApps };
-      localStorage.setItem('userApplications', JSON.stringify(newAllApps));
-      return newAllApps;
-    });
-  };
 
-  const updateStudentQuizApplication = (targetUserId, applicationId, updates) => {
-    setAllQuizApplications(prev => {
-      const userApps = prev[targetUserId] || [];
-      const updatedUserApps = userApps.map(app => {
-        if (app.id === applicationId) {
-          return { ...app, ...updates };
-        }
-        return app;
+  const submitTask = async (internshipId, taskId, link) => {
+    try {
+      const res = await fetch(`${API_URL}/tasks/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ internshipId, taskId, submissionLink: link })
       });
-      const newAllApps = { ...prev, [targetUserId]: updatedUserApps };
-      localStorage.setItem('userQuizApplications', JSON.stringify(newAllApps));
-      return newAllApps;
-    });
-  };
-
-  const verifyTask = (targetUserId, applicationId, taskId, status, feedback) => {
-    setAllApplications(prev => {
-      const userApps = prev[targetUserId] || [];
-      const updatedUserApps = userApps.map(app => {
-        if (app.id === applicationId) {
-          return {
-            ...app,
-            tasks: app.tasks.map(t => {
-              if (t.id === taskId) {
-                return { ...t, status, feedback };
-              }
-              return t;
-            })
-          };
-        }
-        return app;
-      });
-      const newAllApps = { ...prev, [targetUserId]: updatedUserApps };
-      localStorage.setItem('userApplications', JSON.stringify(newAllApps));
-      
-      // If the currently logged in user is the target, also update their local state
-      if (user && user.id === targetUserId) {
-        setAppliedInternships(updatedUserApps);
+      if (res.ok) {
+        const { updatedTasks } = await res.json();
+        setAppliedInternships(prev => prev.map(app => 
+          app.internshipId === internshipId ? { ...app, tasks: updatedTasks } : app
+        ));
       }
-      
-      return newAllApps;
-    });
+    } catch (e) {
+      console.error("Failed to submit task", e);
+    }
+  };
+
+  const processFinalSubmit = async (internshipId, paymentDetails = null) => {
+    try {
+      const res = await fetch(`${API_URL}/internships/final-submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ internshipId, paymentDetails })
+      });
+      if (res.ok) {
+        setAppliedInternships(prev => prev.map(app => 
+          app.internshipId === internshipId ? { ...app, finalSubmitted: true, paymentDetails } : app
+        ));
+      }
+    } catch (e) {
+      console.error("Failed to submit final", e);
+    }
+  };
+
+  const submitQuiz = async (quizData, score) => {
+    try {
+      const res = await fetch(`${API_URL}/quizzes/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ quizId: quizData.id, quizTitle: quizData.title, score, totalQuestions: quizData.questions.length })
+      });
+      if (res.ok) {
+        const { application } = await res.json();
+        setQuizApplications(prev => {
+          const index = prev.findIndex(q => q.quizId === application.quizId);
+          if (index !== -1) {
+            const copy = [...prev];
+            copy[index] = application;
+            return copy;
+          }
+          return [application, ...prev];
+        });
+      }
+    } catch (e) {
+      console.error("Quiz submission failed", e);
+    }
+  };
+
+  const processQuizPayment = async (quizId, paymentDetails) => {
+    try {
+      const res = await fetch(`${API_URL}/quizzes/payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ quizId, paymentDetails })
+      });
+      if (res.ok) {
+        const { application } = await res.json();
+        setQuizApplications(prev => prev.map(app => app.quizId === quizId ? application : app));
+        
+        sendQuizCompletionEmail({
+          studentName: user?.name || 'Unknown',
+          studentEmail: user?.email || 'Unknown',
+          quizTitle: application.quizTitle,
+          score: application.score,
+          submittedDate: new Date().toLocaleDateString('en-IN')
+        });
+      }
+    } catch (e) {
+      console.error("Quiz payment failed", e);
+    }
   };
 
   const requestPasswordReset = async (email) => {
@@ -328,31 +233,17 @@ export const AuthProvider = ({ children }) => {
     if (!userFound) {
       throw new Error('User with this email not found.');
     }
-
-    // Check if there's already a pending request for this user
     const existingReq = passwordResetRequests.find(r => r.email === email && r.status === 'pending');
     if (existingReq) {
       throw new Error('A password reset request is already pending for this email.');
     }
-
     const newReq = {
-      id: `pr_${Date.now()}`,
-      userId: userFound.id,
-      email: userFound.email,
-      name: userFound.name,
-      requestedDate: new Date().toISOString(),
-      status: 'pending'
+      id: `pr_${Date.now()}`, userId: userFound.id, email: userFound.email, name: userFound.name, requestedDate: new Date().toISOString(), status: 'pending'
     };
-
     const updatedRequests = [newReq, ...passwordResetRequests];
     setPasswordResetRequests(updatedRequests);
     localStorage.setItem('passwordResetRequests', JSON.stringify(updatedRequests));
-
-    // Send email notification to admin
-    await sendPasswordResetEmail({
-      userEmail: email,
-      requestDate: new Date().toLocaleDateString('en-IN')
-    });
+    await sendPasswordResetEmail({ userEmail: email, requestDate: new Date().toLocaleDateString('en-IN') });
   };
 
   const resetUserPassword = async (requestId, email, newPassword) => {
@@ -363,17 +254,8 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, newPassword })
       });
     } catch (err) {
-      console.warn('Backend reset failed or unavailable, updating local only');
+      console.warn('Backend reset failed');
     }
-
-    const savedUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
-    const userIndex = savedUsers.findIndex(u => u.email === email);
-    
-    if (userIndex !== -1) {
-      savedUsers[userIndex].password = mockHashPassword(newPassword);
-      localStorage.setItem('mockUsers', JSON.stringify(savedUsers));
-    }
-
     const updatedRequests = passwordResetRequests.filter(req => req.id !== requestId);
     setPasswordResetRequests(updatedRequests);
     localStorage.setItem('passwordResetRequests', JSON.stringify(updatedRequests));
@@ -383,11 +265,10 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{ 
       user, token, login, register, logout, loading, 
       appliedInternships, applyForInternship, submitTask, 
-      processFinalSubmit, allApplications, updateStudentApplication,
-      verifyTask,
-      allQuizApplications, quizApplications, submitQuiz, processQuizPayment,
-      updateStudentQuizApplication,
-      passwordResetRequests, requestPasswordReset, resetUserPassword
+      processFinalSubmit, 
+      quizApplications, submitQuiz, processQuizPayment,
+      passwordResetRequests, requestPasswordReset, resetUserPassword,
+      API_URL
     }}>
       {children}
     </AuthContext.Provider>
