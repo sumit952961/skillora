@@ -59,11 +59,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const durations = [3000, 3000, 6000]; // Double time for the 3rd slide (6 seconds vs 3 seconds)
+    const timer = setTimeout(() => {
       setActiveSlide(prev => (prev + 1) % 3);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
+    }, durations[activeSlide]);
+    return () => clearTimeout(timer);
+  }, [activeSlide]);
 
   const carouselSlides = [
     {
@@ -106,19 +107,17 @@ export default function Home() {
       )
     },
     {
-      title: "Career Acceleration",
-      subtitle: "Open doors to high-paying job opportunities with verified project portfolios.",
-      icon: <Zap size={22} />,
+      title: "Govt. of India Recognized",
+      subtitle: "Proudly registered under MSME.",
+      icon: <ShieldCheck size={22} />,
       graphic: (
-        <svg width="220" height="150" viewBox="65 25 110 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M120 30c10 20 25 45 25 65 0 15-10 25-25 25s-25-10-25-25c0-20 15-45 25-65z" fill="#4f46e5" />
-          <path d="M120 50c5 15 12 30 12 45 0 8-5 15-12 15s-12-7-12-15c0-15 7-30 12-45z" fill="#a5b4fc" />
-          <path d="M95 95c-15 5-25 20-25 20l15 5 10-25z" fill="#312e81" />
-          <path d="M145 95c15 5 25 20 25 20l-15 5-10-25z" fill="#312e81" />
-          <path d="M115 125l5 15 5-15-5 5-5-5z" fill="#fbbf24" />
-          <circle cx="70" cy="50" r="4" fill="#38bdf8" />
-          <circle cx="170" cy="60" r="5" fill="#a5b4fc" />
-        </svg>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px', width: '100%' }}>
+          <img 
+            src="https://banner2.cleanpng.com/20180501/she/kisspng-ministry-of-micro-small-and-medium-enterprises-go-5ae8c47c8568e1.2689004815252040925465.jpg" 
+            alt="MSME Registered" 
+            style={{ maxHeight: '110px', maxWidth: '100%', objectFit: 'contain' }}
+          />
+        </div>
       )
     }
   ];
