@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('userQuizApplications', JSON.stringify(updated));
   };
 
-  const API_URL = import.meta.env.VITE_API_URL || 'https://api.skillora.com/api';
+  const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
   useEffect(() => {
     const fetchProfile = async () => {

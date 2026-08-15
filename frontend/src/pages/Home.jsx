@@ -49,7 +49,7 @@ export default function Home() {
 
   const featuredInternships = internships.slice(0, 3);
 
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
   useEffect(() => {
     const timer = setInterval(() => {

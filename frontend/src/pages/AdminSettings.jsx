@@ -5,8 +5,8 @@ import { Save } from 'lucide-react';
 export default function AdminSettings() {
   const { settings, updateSettings } = useContext(DataContext);
   const [formData, setFormData] = useState({
-    internshipQrCode: settings.internshipQrCode || '',
-    quizQrCode: settings.quizQrCode || '',
+    internshipPaymentLink: settings.internshipPaymentLink || '',
+    quizPaymentLink: settings.quizPaymentLink || '',
     processingFee: settings.processingFee || '',
     quizProcessingFee: settings.quizProcessingFee || ''
   });
@@ -30,27 +30,27 @@ export default function AdminSettings() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
           <div className="form-group">
-            <label>Internship QR Code Image URL</label>
+            <label>Internship Payment Link (Razorpay)</label>
             <input 
-              type="text" 
+              type="url" 
               className="form-input" 
-              placeholder="https://example.com/internship-qr-code.png"
-              value={formData.internshipQrCode} 
-              onChange={e => setFormData({...formData, internshipQrCode: e.target.value})} 
+              placeholder="https://rzp.io/l/..."
+              value={formData.internshipPaymentLink} 
+              onChange={e => setFormData({...formData, internshipPaymentLink: e.target.value})} 
             />
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '6px' }}>QR Code for Internship Final Submissions.</p>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '6px' }}>External link for Internship Final Submissions.</p>
           </div>
 
           <div className="form-group">
-            <label>Quiz QR Code Image URL</label>
+            <label>Quiz Payment Link (Razorpay)</label>
             <input 
-              type="text" 
+              type="url" 
               className="form-input" 
-              placeholder="https://example.com/quiz-qr-code.png"
-              value={formData.quizQrCode} 
-              onChange={e => setFormData({...formData, quizQrCode: e.target.value})} 
+              placeholder="https://rzp.io/l/..."
+              value={formData.quizPaymentLink} 
+              onChange={e => setFormData({...formData, quizPaymentLink: e.target.value})} 
             />
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '6px' }}>QR Code for Quiz Certificate Downloads.</p>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '6px' }}>External link for Quiz Certificate Downloads.</p>
           </div>
 
           <div className="form-group">

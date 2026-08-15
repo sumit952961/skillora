@@ -17,12 +17,8 @@ export default function Tasks() {
   const [submitLink, setSubmitLink] = useState('');
   const [activeTask, setActiveTask] = useState(null);
   const [paymentModalData, setPaymentModalData] = useState(null);
-  const [transactionId, setTransactionId] = useState('');
-  const [paymentDate, setPaymentDate] = useState('');
-  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
-  const [paymentScreenshotPreview, setPaymentScreenshotPreview] = useState(null);
 
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
   useEffect(() => {
     // If a filter is applied via URL, only show that specific internship
@@ -56,23 +52,11 @@ export default function Tasks() {
     }
   };
 
-  const handleScreenshotChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setPaymentScreenshot(file);
-    const reader = new FileReader();
-    reader.onloadend = () => setPaymentScreenshotPreview(reader.result);
-    reader.readAsDataURL(file);
-  };
-
-  const handleFinalSubmitPayment = (e) => {
-    e.preventDefault();
-    
-    // Save payment details to context
+  const handlePayNow = () => {
+    // Save payment intent to context/backend (mark as finalSubmitted = true)
     processFinalSubmit(paymentModalData, {
-      transactionId: transactionId,
-      paymentDate: paymentDate,
-      screenshot: paymentScreenshotPreview || null,
+      method: 'Razorpay',
+      status: 'Redirected',
       submittedOn: new Date().toISOString()
     });
 
@@ -80,24 +64,28 @@ export default function Tasks() {
       app => app.details.id === paymentModalData || app.internshipId === paymentModalData
     );
 
-    // Send email with details but NO photo
+    // Send email without photo
     sendFinalSubmitEmail({
       studentName: user?.name || 'N/A',
       studentEmail: user?.email || 'N/A',
       internshipTitle: internship?.details?.title || 'N/A',
       internshipDomain: internship?.details?.domain || internship?.details?.type || 'N/A',
       appliedDate: internship?.appliedDate || 'N/A',
-      transactionId: transactionId,
-      paymentDate: paymentDate,
-      paymentScreenshotBase64: null // Pass null to avoid large base64 payload
+      transactionId: 'Razorpay',
+      paymentDate: new Date().toISOString().split("T")[0],
+      paymentScreenshotBase64: null 
     });
 
+    // Open Razorpay link
+    window.open(settings?.internshipPaymentLink || 'https://razorpay.com', '_blank');
+    
     setPaymentModalData(null);
-    setTransactionId('');
-    setPaymentDate('');
-    setPaymentScreenshot(null);
-    setPaymentScreenshotPreview(null);
-    alert('Final Submission Complete! Details have been sent to Admin for verification. Certificate will be available soon.');
+    alert('Within 24 hours you will receive an email, or you can download your certificate directly from the website.');
+  };
+
+  const handleMaybeLater = () => {
+    setPaymentModalData(null);
+  };
   };
 
   if (loading) {
@@ -280,90 +268,63 @@ export default function Tasks() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.4)',
+          backgroundColor: 'rgba(0,0,0,0.6)',
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000,
-          overflowY: 'auto',
-          padding: '80px 20px 40px'
+          padding: '20px'
         }}>
           <div style={{
-            background: 'var(--bg-secondary)',
-            padding: '32px',
-            borderRadius: 'var(--radius-lg)',
+            background: '#fff',
+            padding: '40px 32px',
+            borderRadius: '24px',
             width: '100%',
-            maxWidth: '500px',
-            boxShadow: 'var(--shadow-lg)'
+            maxWidth: '450px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            textAlign: 'center',
+            position: 'relative'
           }}>
-            <h3 style={{ marginBottom: '8px' }}>Final Submit & Verification</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '20px' }}>
-              Scan the QR code or use the UPI ID below to pay the processing fee.
+            <button 
+              onClick={handleMaybeLater}
+              style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#888' }}
+            >
+              ✕
+            </button>
+            <h2 style={{ marginBottom: '12px', fontSize: '1.5rem', fontWeight: '800', color: '#111' }}>Unlock This Certificate</h2>
+            <p style={{ color: '#555', fontSize: '0.95rem', marginBottom: '24px', lineHeight: '1.5' }}>
+              Unlock your verified completion certificate & premium benefits instantly.
             </p>
 
-            <div style={{ textAlign: 'center', marginBottom: '24px', background: 'var(--bg-primary)', padding: '24px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-              {/* Conditional QR Code */}
-              {settings?.qrCodeImage ? (
-                <div style={{ width: '150px', margin: '0 auto 16px auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <img src={settings.qrCodeImage} alt="QR Code" style={{ maxWidth: '100%', borderRadius: '8px', border: '1px solid #ccc' }} />
-                </div>
-              ) : (
-                <div style={{ width: '150px', height: '150px', margin: '0 auto 16px auto', background: '#fff', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px' }}>
-                  <span style={{ color: '#000', fontWeight: 'bold' }}>QR CODE</span>
-                </div>
-              )}
-              <p style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '4px' }}>UPI ID: {settings?.upiId || 'skillora@upi'}</p>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Processing Fee: ₹{settings?.processingFee || '499.00'}</p>
+            <div style={{ background: '#f8f9ff', padding: '24px', borderRadius: '16px', marginBottom: '24px', border: '1px solid #eef0ff' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
+                <span style={{ fontSize: '1rem', color: '#666' }}>Amount to pay</span>
+                <span style={{ fontSize: '2rem', fontWeight: '800', color: '#111' }}>₹{settings?.processingFee || '499'}</span>
+              </div>
+              <p style={{ color: '#555', fontSize: '0.85rem', lineHeight: '1.5', marginBottom: '12px' }}>
+                Verified certificate download, verified link access, and letter of recommendation.
+              </p>
+              <div style={{ display: 'inline-block', background: '#e8fff0', color: '#0d9f45', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600' }}>
+                ✨ Premium offer just for you! ✨
+              </div>
             </div>
 
-            <form onSubmit={handleFinalSubmitPayment}>
-              <div className="form-group">
-                <label>Transaction ID / UTR</label>
-                <input 
-                  type="text" 
-                  required 
-                  className="form-input" 
-                  placeholder="e.g. 123456789012"
-                  value={transactionId}
-                  onChange={e => setTransactionId(e.target.value)}
-                />
-              </div>
-              
-              <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                  <label>Name</label>
-                  <input type="text" required className="form-input" placeholder="Your Name" defaultValue={user?.name || ''} />
-                </div>
-                <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                  <label>Date of Payment</label>
-                  <input type="date" required className="form-input" value={paymentDate} onChange={e => setPaymentDate(e.target.value)} />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Payment Screenshot <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>(Required)</span></label>
-                <input 
-                  type="file" 
-                  required
-                  accept="image/*"
-                  className="form-input"
-                  style={{ padding: '8px' }}
-                  onChange={handleScreenshotChange}
-                />
-                {paymentScreenshotPreview && (
-                  <img src={paymentScreenshotPreview} alt="Payment Screenshot" style={{ width: '100%', maxHeight: '150px', objectFit: 'contain', marginTop: '10px', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
-                )}
-              </div>
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => { setPaymentModalData(null); setPaymentScreenshotPreview(null); }} className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <CheckCircle size={14} /> Submit Details
-                </button>
-              </div>
-            </form>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button 
+                onClick={handlePayNow}
+                className="btn btn-primary" 
+                style={{ flex: 1, padding: '14px', fontSize: '1rem', fontWeight: '600', borderRadius: '12px', background: '#5d5fef', border: 'none' }}
+              >
+                Pay Now
+              </button>
+              <button 
+                onClick={handleMaybeLater}
+                className="btn btn-outline" 
+                style={{ flex: 1, padding: '14px', fontSize: '1rem', fontWeight: '600', borderRadius: '12px', borderColor: '#eee', color: '#555' }}
+              >
+                Maybe Later
+              </button>
+            </div>
           </div>
         </div>
       )}

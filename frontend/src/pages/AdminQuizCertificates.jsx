@@ -119,15 +119,9 @@ export default function AdminQuizCertificates() {
                     {app.paymentSubmitted ? (
                       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                         <div style={{ flex: 1 }}>
-                          <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}><strong>Transaction ID:</strong> {app.paymentDetails?.transactionId}</p>
+                          <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}><strong>Method:</strong> {app.paymentDetails?.method || 'Razorpay'}</p>
+                          <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}><strong>Status:</strong> {app.paymentDetails?.status || 'Paid / Redirected'}</p>
                           <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}><strong>Date:</strong> {app.paymentDetails?.paymentDate}</p>
-                        </div>
-                        <div>
-                          {app.paymentDetails?.screenshot ? (
-                            <img src={app.paymentDetails.screenshot} alt="Payment Proof" style={{ maxWidth: '100%', maxHeight: '120px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                          ) : (
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>No screenshot uploaded.</p>
-                          )}
                         </div>
                       </div>
                     ) : (

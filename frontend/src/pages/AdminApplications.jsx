@@ -197,18 +197,10 @@ export default function AdminApplications() {
                         <h4 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <ShieldCheck size={18} color="var(--accent-success)" /> Final Submission & Payment
                         </h4>
-                        <div style={{ padding: '16px', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                          <div>
-                            <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}><strong>Transaction ID:</strong> {app.paymentDetails?.transactionId || 'N/A'}</p>
-                            <p style={{ margin: '0', fontSize: '0.9rem' }}><strong>Payment Date:</strong> {app.paymentDetails?.paymentDate || 'N/A'}</p>
-                          </div>
-                          <div>
-                            {app.paymentDetails?.screenshot ? (
-                              <img src={app.paymentDetails.screenshot} alt="Payment Proof" style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                            ) : (
-                              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>No screenshot uploaded.</p>
-                            )}
-                          </div>
+                        <div style={{ padding: '16px', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                          <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}><strong>Method:</strong> {app.paymentDetails?.method || 'Razorpay'}</p>
+                          <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}><strong>Status:</strong> {app.paymentDetails?.status || 'Paid / Redirected'}</p>
+                          <p style={{ margin: '0', fontSize: '0.9rem' }}><strong>Payment Date:</strong> {app.paymentDetails?.paymentDate || app.paymentDetails?.submittedOn ? new Date(app.paymentDetails.submittedOn).toLocaleDateString() : 'N/A'}</p>
                         </div>
                       </div>
                     )}

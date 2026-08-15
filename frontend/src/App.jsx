@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, Link } from 'react-router-dom'
 import { AuthProvider, AuthContext } from './context/AuthContext'
 import { DataProvider } from './context/DataContext'
 import Navbar from './components/Navbar'
@@ -168,9 +168,9 @@ function AppContent() {
           <div className="footer-col">
             <h4 className="footer-title">Career Sectors</h4>
             <ul className="footer-links">
-              <li><a href="/internships">Frontend React Development</a></li>
-              <li><a href="/internships">Backend API Engineering</a></li>
-              <li><a href="/internships">Full Stack MERN Systems</a></li>
+              <li><Link to="/internships">Frontend React Development</Link></li>
+              <li><Link to="/internships">Backend API Engineering</Link></li>
+              <li><Link to="/internships">Full Stack MERN Systems</Link></li>
             </ul>
           </div>
 
@@ -178,10 +178,10 @@ function AppContent() {
           <div className="footer-col">
             <h4 className="footer-title">Resources</h4>
             <ul className="footer-links">
-              <li><a href="/internships">Internship Programs</a></li>
-              <li><a href="/verify">Verification Portal</a></li>
-              <li><a href="/quiz">Interactive Quiz Test</a></li>
-              <li><a href="/about">About Programs</a></li>
+              <li><Link to="/internships">Internship Programs</Link></li>
+              <li><Link to="/verify">Verification Portal</Link></li>
+              <li><Link to="/quiz">Interactive Quiz Test</Link></li>
+              <li><Link to="/about">About Programs</Link></li>
             </ul>
           </div>
 

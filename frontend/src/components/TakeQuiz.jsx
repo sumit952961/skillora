@@ -17,8 +17,6 @@ export default function TakeQuiz({ quiz, onBack }) {
   const [timeLeft, setTimeLeft] = useState(quiz.timeLimit * 60);
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [transactionId, setTransactionId] = useState('');
-  const [paymentScreenshotPreview, setPaymentScreenshotPreview] = useState(null);
 
   // Check if student already attempted
   const existingApp = quizApplications.find(a => a.quizId === quiz.id);
@@ -79,64 +77,25 @@ export default function TakeQuiz({ quiz, onBack }) {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  const handleScreenshotChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    // Compress image to avoid localStorage QuotaExceededError
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        
-        const MAX_DIMENSION = 800;
-        if (width > height && width > MAX_DIMENSION) {
-          height *= MAX_DIMENSION / width;
-          width = MAX_DIMENSION;
-        } else if (height > MAX_DIMENSION) {
-          width *= MAX_DIMENSION / height;
-          height = MAX_DIMENSION;
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        // Compress as JPEG
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-        setPaymentScreenshotPreview(compressedDataUrl);
-      };
-      img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handlePaymentSubmit = (e) => {
-    e.preventDefault();
-    if (!transactionId.trim() || !paymentScreenshotPreview) {
-      alert("Please provide both Transaction ID and Screenshot.");
-      return;
-    }
+  const handlePayNow = () => {
     processQuizPayment(quiz.id, {
-      transactionId,
+      method: 'Razorpay',
       paymentDate: new Date().toISOString().split('T')[0],
-      screenshot: paymentScreenshotPreview
+      status: 'Redirected'
     });
     
-    // Close modal first
-    setShowPaymentModal(false);
+    window.open(settings?.quizPaymentLink || 'https://razorpay.com', '_blank');
     
-    // Immediately return to grid
+    setShowPaymentModal(false);
     onBack();
 
-    // Show alert AFTER UI has updated
     setTimeout(() => {
-      alert('Your payment details have been submitted. Your certificate will be sent via email within 24 hours or you can download it from the website once approved by admin.');
+      alert('Within 24 hours you will receive an email, or you can download your certificate directly from the website.');
     }, 100);
+  };
+
+  const handleMaybeLater = () => {
+    setShowPaymentModal(false);
   };
 
   if (!hasStarted) {
@@ -243,35 +202,56 @@ export default function TakeQuiz({ quiz, onBack }) {
         {/* Payment Modal */}
         {showPaymentModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', zIndex: 1000, overflowY: 'auto' }}>
-            <div style={{ background: 'var(--bg-secondary)', width: '100%', maxWidth: '500px', borderRadius: 'var(--radius-lg)', padding: '32px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <h3 style={{ fontSize: '1.25rem' }}>Certificate Processing</h3>
-                <button onClick={() => setShowPaymentModal(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={20} /></button>
+            <div style={{
+              background: '#fff',
+              padding: '40px 32px',
+              borderRadius: '24px',
+              width: '100%',
+              maxWidth: '450px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              textAlign: 'center',
+              position: 'relative'
+            }}>
+              <button 
+                onClick={handleMaybeLater}
+                style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#888' }}
+              >
+                ✕
+              </button>
+              <h2 style={{ marginBottom: '12px', fontSize: '1.5rem', fontWeight: '800', color: '#111' }}>Unlock This Certificate</h2>
+              <p style={{ color: '#555', fontSize: '0.95rem', marginBottom: '24px', lineHeight: '1.5' }}>
+                Unlock your verified completion certificate & premium benefits instantly.
+              </p>
+
+              <div style={{ background: '#f8f9ff', padding: '24px', borderRadius: '16px', marginBottom: '24px', border: '1px solid #eef0ff' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
+                  <span style={{ fontSize: '1rem', color: '#666' }}>Amount to pay</span>
+                  <span style={{ fontSize: '2rem', fontWeight: '800', color: '#111' }}>₹{settings?.quizProcessingFee || '199'}</span>
+                </div>
+                <p style={{ color: '#555', fontSize: '0.85rem', lineHeight: '1.5', marginBottom: '12px' }}>
+                  Verified certificate download, verified link access, and letter of recommendation.
+                </p>
+                <div style={{ display: 'inline-block', background: '#e8fff0', color: '#0d9f45', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600' }}>
+                  ✨ Premium offer just for you! ✨
+                </div>
               </div>
 
-              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>Scan the QR code below to pay <strong>₹{settings.quizProcessingFee || '199.00'}</strong></p>
-                {settings.quizQrCode ? (
-                  <img src={settings.quizQrCode} alt="Payment QR" style={{ width: '200px', height: '200px', objectFit: 'contain', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '10px', background: '#fff' }} />
-                ) : (
-                  <div style={{ width: '200px', height: '200px', margin: '0 auto', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', border: '1px dashed var(--border-color)' }}>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>QR Code not set by Admin</p>
-                  </div>
-                )}
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                <button 
+                  onClick={handlePayNow}
+                  className="btn btn-primary" 
+                  style={{ flex: 1, padding: '14px', fontSize: '1rem', fontWeight: '600', borderRadius: '12px', background: '#5d5fef', border: 'none' }}
+                >
+                  Pay Now
+                </button>
+                <button 
+                  onClick={handleMaybeLater}
+                  className="btn btn-outline" 
+                  style={{ flex: 1, padding: '14px', fontSize: '1rem', fontWeight: '600', borderRadius: '12px', borderColor: '#eee', color: '#555' }}
+                >
+                  Maybe Later
+                </button>
               </div>
-
-              <form onSubmit={handlePaymentSubmit}>
-                <div className="form-group">
-                  <label>Transaction ID / UTR</label>
-                  <input required type="text" className="form-input" placeholder="Enter 12-digit UTR number" value={transactionId} onChange={e => setTransactionId(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label>Upload Payment Screenshot</label>
-                  <input required type="file" accept="image/*" className="form-input" onChange={handleScreenshotChange} />
-                </div>
-                
-                <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '16px' }}>Submit Details</button>
-              </form>
             </div>
           </div>
         )}

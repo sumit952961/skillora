@@ -39,8 +39,8 @@ export const DataProvider = ({ children }) => {
     const saved = localStorage.getItem('globalSettings');
     if (saved) return JSON.parse(saved);
     return {
-      internshipQrCode: '',
-      quizQrCode: '',
+      internshipPaymentLink: 'https://razorpay.me/@skillora',
+      quizPaymentLink: 'https://razorpay.me/@skillora',
       processingFee: '499.00',
       quizProcessingFee: '199.00'
     };
