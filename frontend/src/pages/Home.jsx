@@ -59,7 +59,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const durations = [3000, 3000, 6000]; // Double time for the 3rd slide (6 seconds vs 3 seconds)
+    const durations = [6000, 3000, 3000]; // Double time for the 1st slide (MSME)
     const timer = setTimeout(() => {
       setActiveSlide(prev => (prev + 1) % 3);
     }, durations[activeSlide]);
@@ -67,6 +67,20 @@ export default function Home() {
   }, [activeSlide]);
 
   const carouselSlides = [
+    {
+      title: "Govt. of India Recognized",
+      subtitle: "Proudly registered under MSME (Reg No: UDYAM-UP-75-0200760).",
+      icon: null,
+      graphic: (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', height: '190px', width: '100%', overflow: 'visible', paddingTop: '10px' }}>
+          <img 
+            src="https://plain-apac-prod-public.komododecks.com/202608/15/3LeRCGw6I87K71JrPhDt/image.png" 
+            alt="MSME Registered" 
+            style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain', transform: 'scale(1.1)' }}
+          />
+        </div>
+      )
+    },
     {
       title: "Real-World Experience",
       subtitle: "Learn by working on practical projects and industry-relevant tasks.",
@@ -104,20 +118,6 @@ export default function Home() {
           <line x1="65" y1="65" x2="105" y2="65" stroke="#cbd5e1" strokeWidth="4" strokeLinecap="round" />
           <line x1="65" y1="115" x2="175" y2="115" stroke="#cbd5e1" strokeWidth="4" strokeLinecap="round" />
         </svg>
-      )
-    },
-    {
-      title: "Govt. of India Recognized",
-      subtitle: "Proudly registered under MSME (Reg No: UDYAM-UP-75-0200760).",
-      icon: null,
-      graphic: (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '220px', width: '100%', overflow: 'hidden' }}>
-          <img 
-            src="https://plain-apac-prod-public.komododecks.com/202608/15/3LeRCGw6I87K71JrPhDt/image.png" 
-            alt="MSME Registered" 
-            style={{ height: '200px', maxWidth: '100%', objectFit: 'contain', transform: 'scale(1.25)' }}
-          />
-        </div>
       )
     }
   ];
