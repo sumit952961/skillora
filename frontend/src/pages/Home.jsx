@@ -108,14 +108,14 @@ export default function Home() {
     },
     {
       title: "Govt. of India Recognized",
-      subtitle: "Proudly registered under MSME.",
+      subtitle: "Proudly registered under MSME (Reg No: UDYAM-UP-75-0200760).",
       icon: <ShieldCheck size={22} />,
       graphic: (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px', width: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '150px', width: '100%', overflow: 'hidden' }}>
           <img 
-            src="https://banner2.cleanpng.com/20180501/she/kisspng-ministry-of-micro-small-and-medium-enterprises-go-5ae8c47c8568e1.2689004815252040925465.jpg" 
+            src="https://kommodo.ai/i/3LeRCGw6I87K71JrPhDt" 
             alt="MSME Registered" 
-            style={{ maxHeight: '110px', maxWidth: '100%', objectFit: 'contain' }}
+            style={{ height: '140px', maxWidth: '100%', objectFit: 'contain', transform: 'scale(1.1)' }}
           />
         </div>
       )
