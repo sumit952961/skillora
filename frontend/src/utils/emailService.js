@@ -11,7 +11,7 @@ export async function sendApplicationEmail({ studentName, studentEmail, internsh
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `🎓 New Internship Application - ${studentName}`,
-        from_name: 'Skillora Portal',
+        from_name: 'Skillzeno Portal',
         'Student Name': studentName,
         'Student Email': studentEmail,
         'Internship': internshipTitle,
@@ -38,7 +38,7 @@ export async function sendFinalSubmitEmail({ studentName, studentEmail, internsh
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `✅ Final Submission + Payment - ${studentName}`,
-        from_name: 'Skillora Portal',
+        from_name: 'Skillzeno Portal',
         'Student Name': studentName,
         'Student Email': studentEmail,
         'Internship': internshipTitle,
@@ -66,7 +66,7 @@ export async function sendPasswordResetEmail({ userEmail, requestDate }) {
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `🔒 Password Reset Request - ${userEmail}`,
-        from_name: 'Skillora Portal',
+        from_name: 'Skillzeno Portal',
         'User Email': userEmail,
         'Requested On': requestDate,
         'Message': 'A user has requested a password reset. Please log in to the admin dashboard to set a new password for this user.',
@@ -88,7 +88,7 @@ export async function sendQuizCompletionEmail({ studentName, studentEmail, quizT
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `🏆 Quiz Final Submission - ${studentName}`,
-        from_name: 'Skillora Portal',
+        from_name: 'Skillzeno Portal',
         'Student Name': studentName,
         'Student Email': studentEmail,
         'Quiz Title': quizTitle,
@@ -113,7 +113,7 @@ export async function sendContactEmail({ name, email, message }) {
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `📩 New Contact Form Message - ${name}`,
-        from_name: 'Skillora Portal',
+        from_name: 'Skillzeno Portal',
         'Visitor Name': name,
         'Visitor Email': email,
         'Message': message,

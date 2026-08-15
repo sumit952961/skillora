@@ -143,7 +143,7 @@ function AppContent() {
           {/* Column 1: Brand Info */}
           <div className="footer-col">
             <div className="footer-logo" style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="https://plain-apac-prod-public.komododecks.com/202608/15/qawgcaBGcokEqf4C321X/image.png" alt="Skillora Logo" style={{ height: '80px', margin: '-10px 0' }} />
+              <img src="https://plain-apac-prod-public.komododecks.com/202608/15/qawgcaBGcokEqf4C321X/image.png" alt="Skillzeno Logo" style={{ height: '80px', margin: '-10px 0' }} />
             </div>
             <p className="footer-desc">
               Bridging the gap between theory and industry experience. Build production-grade software and claim verifiable credentials.
@@ -195,7 +195,7 @@ function AppContent() {
               </li>
               <li>
                 <Mail size={18} className="contact-icon" />
-                <a href="mailto:hello.skillora2026@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>hello.skillora2026@gmail.com</a>
+                <a href="mailto:hello.skillzeno2026@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>hello.skillzeno2026@gmail.com</a>
               </li>
             </ul>
           </div>
@@ -217,7 +217,7 @@ function AppContent() {
 
           {/* Middle: Copyright & Legal Links */}
           <div className="trust-center">
-            <p>© 2026 Skillora. All rights reserved.</p>
+            <p>© 2026 Skillzeno. All rights reserved.</p>
             <div className="legal-links">
               <a href="#policy" onClick={(e) => { e.preventDefault(); setActivePolicy('privacy'); }}>Privacy Policy</a>
               <span>|</span>
@@ -255,7 +255,7 @@ function PolicyModal({ policy, onClose }) {
       content: (
         <>
           <p><strong>Effective Date:</strong> August 14, 2026</p>
-          <p>Skillora Learning Systems respects your privacy and is committed to protecting the information you provide while using our website and services. For any privacy-related questions, contact us at <a href="mailto:hello.skillora2026@gmail.com">hello.skillora2026@gmail.com</a>.</p>
+          <p>Skillzeno Learning Systems respects your privacy and is committed to protecting the information you provide while using our website and services. For any privacy-related questions, contact us at <a href="mailto:hello.skillzeno2026@gmail.com">hello.skillzeno2026@gmail.com</a>.</p>
           
           <h4>1. Information We Collect</h4>
           <p>We may collect information such as your name, email address, phone number, academic/professional details, account information, internship applications, project submissions, quiz results, and certificate details.</p>
@@ -275,7 +275,7 @@ function PolicyModal({ policy, onClose }) {
           <p>We do not sell your personal information. Information may be shared with trusted service providers when necessary to operate our services, process payments, maintain security, or comply with applicable laws.</p>
           
           <h4>4. Certificate Verification</h4>
-          <p>Certificates issued by Skillora may be verified through a unique certificate ID or verification link. Limited information may be displayed for verification purposes.</p>
+          <p>Certificates issued by Skillzeno may be verified through a unique certificate ID or verification link. Limited information may be displayed for verification purposes.</p>
           
           <h4>5. Data Security</h4>
           <p>We take reasonable measures to protect your information from unauthorized access, misuse, or disclosure.</p>
@@ -287,7 +287,7 @@ function PolicyModal({ policy, onClose }) {
           <p>We may update this Privacy Policy when necessary. Any changes will be posted on this page with an updated effective date.</p>
           
           <h4>8. Contact Us</h4>
-          <p>Skillora Learning Systems<br />Email: <a href="mailto:hello.skillora2026@gmail.com">hello.skillora2026@gmail.com</a></p>
+          <p>Skillzeno Learning Systems<br />Email: <a href="mailto:hello.skillzeno2026@gmail.com">hello.skillzeno2026@gmail.com</a></p>
         </>
       )
     },
@@ -296,28 +296,28 @@ function PolicyModal({ policy, onClose }) {
       content: (
         <>
           <p><strong>Effective Date:</strong> August 14, 2026</p>
-          <p>By using Skillora, you agree to follow these Terms &amp; Conditions.</p>
+          <p>By using Skillzeno, you agree to follow these Terms &amp; Conditions.</p>
           
           <h4>1. Platform Usage</h4>
-          <p>Skillora provides educational, project-based internship programs and related services. Users must provide accurate information and use the platform lawfully.</p>
+          <p>Skillzeno provides educational, project-based internship programs and related services. Users must provide accurate information and use the platform lawfully.</p>
           
           <h4>2. Original Work &amp; AI Use</h4>
           <p>Users must submit their own work. AI-generated content, code, or automated solutions must not be submitted as original work unless specifically permitted for that task. Plagiarism or false submissions may result in task rejection, account suspension, or certificate cancellation.</p>
           
           <h4>3. Internship &amp; Certificates</h4>
-          <p>Certificates are issued only after fulfilling the applicable internship requirements. Skillora may withhold or revoke certificates obtained through fraudulent or prohibited activities. Certificates may include a unique verification ID or link.</p>
+          <p>Certificates are issued only after fulfilling the applicable internship requirements. Skillzeno may withhold or revoke certificates obtained through fraudulent or prohibited activities. Certificates may include a unique verification ID or link.</p>
           
           <h4>4. Payments &amp; Refunds</h4>
           <p>Applicable fees will be displayed before payment. Refunds, where applicable, are subject to our Refund Policy.</p>
           
           <h4>5. Account &amp; Platform</h4>
-          <p>Skillora may suspend accounts that violate these Terms or misuse the platform. We may update, modify, or discontinue features when necessary.</p>
+          <p>Skillzeno may suspend accounts that violate these Terms or misuse the platform. We may update, modify, or discontinue features when necessary.</p>
           
           <h4>6. Changes</h4>
-          <p>These Terms may be updated from time to time. Continued use of Skillora after updates constitutes acceptance of the revised Terms.</p>
+          <p>These Terms may be updated from time to time. Continued use of Skillzeno after updates constitutes acceptance of the revised Terms.</p>
           
           <h4>7. Contact</h4>
-          <p>Skillora Learning Systems<br />Email: <a href="mailto:hello.skillora2026@gmail.com">hello.skillora2026@gmail.com</a></p>
+          <p>Skillzeno Learning Systems<br />Email: <a href="mailto:hello.skillzeno2026@gmail.com">hello.skillzeno2026@gmail.com</a></p>
         </>
       )
     },
@@ -326,7 +326,7 @@ function PolicyModal({ policy, onClose }) {
       content: (
         <>
           <p><strong>Effective Date:</strong> August 14, 2026</p>
-          <p>Skillora aims to provide a clear and transparent experience for all users.</p>
+          <p>Skillzeno aims to provide a clear and transparent experience for all users.</p>
           
           <h4>1. Refund Requests</h4>
           <p>Refund requests may be submitted within 7 calendar days of the transaction, subject to the eligibility conditions below.</p>
@@ -341,7 +341,7 @@ function PolicyModal({ policy, onClose }) {
           <p>Approved refunds will be processed to the original payment method. Processing time may vary depending on the payment provider or bank.</p>
           
           <h4>5. Contact</h4>
-          <p>For refund-related queries: <a href="mailto:hello.skillora2026@gmail.com">hello.skillora2026@gmail.com</a></p>
+          <p>For refund-related queries: <a href="mailto:hello.skillzeno2026@gmail.com">hello.skillzeno2026@gmail.com</a></p>
         </>
       )
     }

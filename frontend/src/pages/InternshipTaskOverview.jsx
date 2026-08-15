@@ -66,7 +66,7 @@ export default function InternshipTaskOverview() {
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
               <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>1.</span>
-              <span>Share your internship status on <strong style={{ color: 'var(--text-main)' }}>LinkedIn</strong>, tagging @Skillora.</span>
+              <span>Share your internship status on <strong style={{ color: 'var(--text-main)' }}>LinkedIn</strong>, tagging @Skillzeno.</span>
             </li>
             <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
               <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>2.</span>
@@ -74,7 +74,7 @@ export default function InternshipTaskOverview() {
             </li>
             <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
               <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>3.</span>
-              <span>Upload your completed tasks to a public GitHub repository named exactly: <br /><code style={{ background: 'var(--bg-hover)', padding: '4px 8px', borderRadius: '4px', marginTop: '6px', display: 'inline-block', fontSize: '0.85rem' }}>Skillora-Internship-Tasks</code>.</span>
+              <span>Upload your completed tasks to a public GitHub repository named exactly: <br /><code style={{ background: 'var(--bg-hover)', padding: '4px 8px', borderRadius: '4px', marginTop: '6px', display: 'inline-block', fontSize: '0.85rem' }}>Skillzeno-Internship-Tasks</code>.</span>
             </li>
             <li style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
               <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>4.</span>

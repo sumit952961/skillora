@@ -8,7 +8,7 @@ export default function AdminInternships() {
   const [editId, setEditId] = useState(null);
   
   const initialForm = {
-    title: '', company: 'Skillora', department: '', domain: 'DEVELOPMENT', duration: '3 Months', stipend: 'Unpaid (Certificate + LOR)', type: 'Remote', mode: 'Full-Time', description: '', overview: '', responsibilities: '', requirements: '', skillsLearned: '', perks: '',
+    title: '', company: 'Skillzeno', department: '', domain: 'DEVELOPMENT', duration: '3 Months', stipend: 'Unpaid (Certificate + LOR)', type: 'Remote', mode: 'Full-Time', description: '', overview: '', responsibilities: '', requirements: '', skillsLearned: '', perks: '',
     tasks: [{ id: `t_${Date.now()}_1`, title: 'Task 1: ', description: '' }]
   };
   const [formData, setFormData] = useState(initialForm);

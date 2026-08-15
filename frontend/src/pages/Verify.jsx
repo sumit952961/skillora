@@ -52,7 +52,7 @@ export default function Verify() {
       <div className="section-title-wrapper">
 
         <h1 className="section-title">Certificate Verification</h1>
-        <p className="section-subtitle">Instantly verify the authenticity of credentials issued by Skillora using the unique Verification ID.</p>
+        <p className="section-subtitle">Instantly verify the authenticity of credentials issued by Skillzeno using the unique Verification ID.</p>
       </div>
 
       <form onSubmit={handleSearch} className="search-box-wrapper">

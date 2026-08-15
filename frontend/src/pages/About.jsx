@@ -8,7 +8,7 @@ export default function About() {
 
         <h1 className="section-title" style={{ fontSize: '2.5rem', marginTop: '12px' }}>Empowering Future Tech Leaders</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginTop: '16px', lineHeight: '1.7' }}>
-          Skillora is a state-of-the-art educational and professional portal designed to offer high-quality learning materials, hands-on project experience, and verified credential distribution.
+          Skillzeno is a state-of-the-art educational and professional portal designed to offer high-quality learning materials, hands-on project experience, and verified credential distribution.
         </p>
       </div>
 

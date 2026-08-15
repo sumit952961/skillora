@@ -15,7 +15,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "secretkey";
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => res.json({ message: "Skillora API is running successfully!" }));
+app.get("/", (req, res) => res.json({ message: "Skillzeno API is running successfully!" }));
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -66,7 +66,7 @@ const Application = mongoose.model("Application", applicationSchema);
 const QuizApplication = mongoose.model("QuizApplication", quizApplicationSchema);
 const Certificate = mongoose.model("Certificate", certificateSchema);
 
-mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillora")
+mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.error("MongoDB failed:", err.message));
 
@@ -135,9 +135,9 @@ app.get("/api/auth/users", authenticateToken, async (req, res) => {
 
 // INTERNSHIP ROUTES
 const internshipsDB = [
-  { id: "int1", title: "Frontend Web Developer (React)", company: "Skillora", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Frontend" },
-  { id: "int2", title: "Backend Developer (Node.js/Express)", company: "Skillora", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Backend" },
-  { id: "int3", title: "Full Stack Web Developer (MERN)", company: "Skillora", duration: "6 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Full Stack" }
+  { id: "int1", title: "Frontend Web Developer (React)", company: "Skillzeno", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Frontend" },
+  { id: "int2", title: "Backend Developer (Node.js/Express)", company: "Skillzeno", duration: "3 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Backend" },
+  { id: "int3", title: "Full Stack Web Developer (MERN)", company: "Skillzeno", duration: "6 Months", stipend: "Unpaid (Certificate + LOR)", type: "Remote", domain: "Full Stack" }
 ];
 
 app.get("/api/internships", (req, res) => res.json(internshipsDB));
@@ -305,7 +305,7 @@ app.post("/api/send-email", async (req, res) => {
     html = `<div style="font-family:Arial;padding:24px"><h2>Final Submission Received</h2><p><b>Name:</b> ${studentName}</p><p><b>Internship:</b> ${internshipTitle}</p><p><b>Payment:</b> ${paymentNote}</p></div>`;
   } else return res.status(400).json({ message: "Invalid type." });
   try {
-    await transporter.sendMail({ from: `"Skillora" <${gmailUser}>`, to: gmailUser, subject, html });
+    await transporter.sendMail({ from: `"Skillzeno" <${gmailUser}>`, to: gmailUser, subject, html });
     res.json({ success: true });
   } catch (err) { res.status(500).json({ message: "Email failed", error: err.message }); }
 });

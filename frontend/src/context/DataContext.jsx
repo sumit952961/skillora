@@ -11,7 +11,7 @@ export const DataProvider = ({ children }) => {
       {
         id: 'int1',
         title: 'Frontend Web Developer (React)',
-        company: 'Skillora',
+        company: 'Skillzeno',
         department: 'Engineering / Frontend',
         duration: '3 Months',
         stipend: 'Unpaid (Certificate + LOR)',
@@ -39,8 +39,8 @@ export const DataProvider = ({ children }) => {
     const saved = localStorage.getItem('globalSettings');
     if (saved) return JSON.parse(saved);
     return {
-      internshipPaymentLink: 'https://razorpay.me/@skillora',
-      quizPaymentLink: 'https://razorpay.me/@skillora',
+      internshipPaymentLink: 'https://razorpay.me/@skillzeno',
+      quizPaymentLink: 'https://razorpay.me/@skillzeno',
       processingFee: '499.00',
       quizProcessingFee: '199.00'
     };

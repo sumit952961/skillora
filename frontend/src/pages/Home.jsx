@@ -146,7 +146,7 @@ export default function Home() {
         <div className="hero-left">
           <span className="hero-badge">⚡ Certified Learning & Career Support</span>
           <h1 className="hero-title">
-            Elevate Your Career with Skillora Internships
+            Elevate Your Career with Skillzeno Internships
           </h1>
           <p className="hero-subtitle">
             Apply to curated virtual internships, challenge yourself with modern skills quiz tests, and receive cryptographically verified blockchain-ready certificates.
@@ -340,7 +340,7 @@ export default function Home() {
       {/* Features Section */}
       <section style={{ marginTop: '100px' }}>
         <div className="section-title-wrapper">
-          <h2 className="section-title">Why Choose Skillora?</h2>
+          <h2 className="section-title">Why Choose Skillzeno?</h2>
           <p className="section-subtitle">We bridge the gap between academic learning and industry standards through real-world task-based internships.</p>
         </div>
 
@@ -391,7 +391,7 @@ export default function Home() {
                 name: "Aarav Sharma",
                 role: "Frontend Developer Intern",
                 location: "Bengaluru, Karnataka",
-                review: "The React internship track at Skillora was a turning point for me. Building real-world projects helped me clear my developer rounds easily!",
+                review: "The React internship track at Skillzeno was a turning point for me. Building real-world projects helped me clear my developer rounds easily!",
                 rating: 5,
                 initials: "AS",
                 gradient: "linear-gradient(135deg, #6366f1, #a855f7)"
