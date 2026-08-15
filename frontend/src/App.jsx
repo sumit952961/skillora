@@ -143,7 +143,7 @@ function AppContent() {
           {/* Column 1: Brand Info */}
           <div className="footer-col">
             <div className="footer-logo" style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="https://plain-apac-prod-public.komododecks.com/202608/15/qawgcaBGcokEqf4C321X/image.png" alt="Skillzeno Logo" style={{ height: '80px', margin: '-10px 0' }} />
+              <img src="https://plain-apac-prod-public.komododecks.com/202608/15/dLTEVqKrqGQSZzgf3yI9/image.png" alt="Skillzeno Logo" style={{ height: '80px', margin: '-10px 0' }} />
             </div>
             <p className="footer-desc">
               Bridging the gap between theory and industry experience. Build production-grade software and claim verifiable credentials.
