@@ -75,8 +75,8 @@ app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user || !(await bcrypt.compare(password, user.password)))
-      return res.status(400).json({ message: "Invalid credentials" });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!(await bcrypt.compare(password, user.password))) return res.status(400).json({ message: "Incorrect password" });
     const token = jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
     res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (e) { res.status(500).json({ message: "Login failed" }); }
