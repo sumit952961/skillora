@@ -78,6 +78,27 @@ export default function AdminSettings() {
           </button>
         </form>
       </div>
+      <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--accent-danger)', maxWidth: '600px', marginTop: '40px' }}>
+        <h3 style={{ marginBottom: '16px', color: 'var(--accent-danger)' }}>Danger Zone</h3>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
+          This will permanently delete all student internship applications and quiz submissions from the system. Use this only for resetting test data.
+        </p>
+        <button 
+          onClick={() => {
+            if (window.confirm("Are you ABSOLUTELY sure you want to delete all student applications? This cannot be undone!")) {
+              localStorage.removeItem('userApplications');
+              localStorage.removeItem('userQuizApplications');
+              localStorage.removeItem('verifiedCertificates');
+              alert("All student applications have been cleared.");
+              window.location.reload();
+            }
+          }}
+          className="btn btn-outline" 
+          style={{ borderColor: 'var(--accent-danger)', color: 'var(--accent-danger)' }}
+        >
+          Clear All Student Applications
+        </button>
+      </div>
     </div>
   );
 }
