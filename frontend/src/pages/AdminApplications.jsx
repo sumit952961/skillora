@@ -19,13 +19,33 @@ export default function AdminApplications() {
   });
 
   useEffect(() => {
-    const loadUsers = () => {
-      const savedUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
-      const userMap = {};
-      savedUsers.forEach(u => {
-        userMap[u.id] = { name: u.name, email: u.email };
-      });
-      setUsers(userMap);
+    const loadUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+        const res = await fetch(`${API_URL}/auth/users`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+          const fetchedUsers = await res.json();
+          const userMap = {};
+          fetchedUsers.forEach(u => {
+            userMap[u.id] = { name: u.name, email: u.email };
+          });
+          setUsers(userMap);
+        } else {
+          // Fallback to local storage
+          const savedUsers = JSON.parse(localStorage.getItem('mockUsers') || '[]');
+          const userMap = {};
+          savedUsers.forEach(u => {
+            userMap[u.id] = { name: u.name, email: u.email };
+          });
+          setUsers(userMap);
+        }
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+      }
     };
     
     loadUsers();
