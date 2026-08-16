@@ -209,7 +209,7 @@ app.post("/api/auth/request-password-reset", async (req, res) => {
 
 app.get("/api/auth/users", authenticateToken, async (req, res) => {
   try {
-    const users = await User.find().sort({ createdAt: -1 }).select("-password");
+    const users = await User.find().sort({ _id: -1 }).select("-password");
     res.json(users.map(u => ({ id: u._id, name: u.name, email: u.email, role: u.role })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch users" }); }
 });
@@ -217,14 +217,14 @@ app.get("/api/auth/users", authenticateToken, async (req, res) => {
 // INTERNSHIP ROUTES
 app.get("/api/internships", async (req, res) => {
   try {
-    const internships = await Internship.find().sort({ createdAt: -1 });
+    const internships = await Internship.find().sort({ _id: -1 });
     res.json(internships.map(i => ({ ...i.toObject(), id: i._id.toString() })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch internships" }); }
 });
 
 app.get("/api/my-internships", authenticateToken, async (req, res) => {
   try {
-    const apps = await Application.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    const apps = await Application.find({ userId: req.user.id }).sort({ _id: -1 });
     const internships = await Internship.find();
     res.json(apps.map(app => ({ 
       ...app.toObject(), 
@@ -295,14 +295,14 @@ app.post("/api/tasks/submit", authenticateToken, async (req, res) => {
 // QUIZ ROUTES
 app.get("/api/quizzes", async (req, res) => {
   try {
-    const quizzes = await Quiz.find().sort({ createdAt: -1 });
+    const quizzes = await Quiz.find().sort({ _id: -1 });
     res.json(quizzes.map(q => ({ ...q.toObject(), id: q._id.toString() })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch quizzes" }); }
 });
 
 app.get("/api/my-quizzes", authenticateToken, async (req, res) => {
   try {
-    const apps = await QuizApplication.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    const apps = await QuizApplication.find({ userId: req.user.id }).sort({ _id: -1 });
     res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString() })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch quizzes" }); }
 });
@@ -379,7 +379,7 @@ app.put("/api/admin/settings", authenticateToken, authorizeAdmin, async (req, re
 
 app.get("/api/admin/password-resets", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const requests = await PasswordResetRequest.find({ status: "pending" }).sort({ createdAt: -1 });
+    const requests = await PasswordResetRequest.find({ status: "pending" }).sort({ _id: -1 });
     res.json(requests.map(r => ({ ...r.toObject(), id: r._id.toString() })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch requests" }); }
 });
@@ -387,7 +387,7 @@ app.get("/api/admin/password-resets", authenticateToken, authorizeAdmin, async (
 // CERTIFICATE ROUTES
 app.get("/api/certificates", async (req, res) => {
   try {
-    const certificates = await Certificate.find().sort({ createdAt: -1 });
+    const certificates = await Certificate.find().sort({ _id: -1 });
     res.json(certificates.map(c => ({ ...c.toObject(), id: c._id.toString() })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch certificates" }); }
 });
@@ -408,7 +408,7 @@ app.put("/api/admin/certificates/:id", authenticateToken, authorizeAdmin, async 
 
 app.get("/api/admin/applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const apps = await Application.find().sort({ createdAt: -1 });
+    const apps = await Application.find().sort({ _id: -1 });
     const internships = await Internship.find();
     res.json(apps.map(app => ({ 
       ...app.toObject(), 
@@ -494,7 +494,7 @@ app.put("/api/admin/tasks/verify", authenticateToken, authorizeAdmin, async (req
 
 app.get("/api/admin/quiz-applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const apps = await QuizApplication.find().sort({ createdAt: -1 });
+    const apps = await QuizApplication.find().sort({ _id: -1 });
     res.json(apps.map(app => ({ ...app.toObject(), id: app.appNumber || app._id.toString() })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
 });

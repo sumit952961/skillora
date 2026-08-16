@@ -23,7 +23,7 @@ export default function AdminApplications() {
           ...app,
           studentName: app.studentName || 'Unknown Student',
           studentEmail: app.studentEmail || 'N/A',
-        })).sort((a, b) => b.id.localeCompare(a.id));
+        }));
         
         setAllAppsList(appsWithUsers);
       }

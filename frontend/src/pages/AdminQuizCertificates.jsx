@@ -21,7 +21,7 @@ export default function AdminQuizCertificates() {
           ...app,
           studentName: app.studentName || 'Unknown Student',
           studentEmail: app.studentEmail || 'N/A',
-        })).sort((a, b) => new Date(b.takenDate) - new Date(a.takenDate));
+        }));
         
         setAllAppsList(appsWithUsers);
       }
