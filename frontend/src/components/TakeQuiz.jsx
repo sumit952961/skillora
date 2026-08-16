@@ -158,6 +158,9 @@ export default function TakeQuiz({ quiz, onBack }) {
           localStorage.setItem('pendingPayment', JSON.stringify({
             type: 'quiz',
             quizId: quiz.id,
+            quizTitle: quiz.title,
+            studentName: user?.name || '',
+            studentEmail: user?.email || '',
             verificationData: response
           }));
           window.location.href = '/payment-success';

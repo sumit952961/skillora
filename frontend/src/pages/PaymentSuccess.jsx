@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Loader } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
-import { sendFinalSubmitEmail } from '../utils/emailService';
+import { sendFinalSubmitEmail, sendQuizCompletionEmail } from '../utils/emailService';
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
@@ -25,8 +25,8 @@ export default function PaymentSuccess() {
 
             if (success) {
               await sendFinalSubmitEmail({
-                studentName: user?.name || 'N/A',
-                studentEmail: user?.email || 'N/A',
+                studentName: data.studentName || user?.name || 'N/A',
+                studentEmail: data.studentEmail || user?.email || 'N/A',
                 internshipTitle: data.internshipTitle || 'N/A',
                 internshipDomain: data.internshipDomain || 'N/A',
                 appliedDate: data.appliedDate || 'N/A',
@@ -46,6 +46,13 @@ export default function PaymentSuccess() {
             }, data.verificationData);
             
             if (success) {
+              await sendQuizCompletionEmail({
+                studentName: data.studentName || user?.name || 'N/A',
+                studentEmail: data.studentEmail || user?.email || 'N/A',
+                quizTitle: data.quizTitle || 'N/A',
+                score: 'See Dashboard',
+                submittedDate: new Date().toLocaleDateString('en-IN')
+              });
               localStorage.removeItem('pendingPayment');
             } else {
               alert("Payment verification failed. Please contact admin.");

@@ -75,6 +75,8 @@ export default function Tasks() {
           localStorage.setItem('pendingPayment', JSON.stringify({
             type: 'internship',
             appId: appId,
+            studentName: user?.name || '',
+            studentEmail: user?.email || '',
             internshipTitle: paymentModalData.details?.title || 'Internship Program',
             internshipDomain: paymentModalData.details?.domain || paymentModalData.details?.type || 'N/A',
             appliedDate: paymentModalData.appliedDate || 'N/A',
