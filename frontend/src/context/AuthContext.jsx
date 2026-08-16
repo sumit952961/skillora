@@ -242,9 +242,12 @@ export const AuthProvider = ({ children }) => {
           score: application.score,
           submittedDate: new Date().toLocaleDateString('en-IN')
         });
+        return true;
       }
+      return false;
     } catch (e) {
       console.error("Quiz payment failed", e);
+      return false;
     }
   };
 
