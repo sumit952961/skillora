@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, CheckCircle, Download, CreditCard, X, Trophy, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Clock, CheckCircle, Download, CreditCard, X, Trophy, ShieldCheck, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function TakeQuiz({ quiz, onBack }) {
   const { user, token, submitQuiz, processQuizPayment, quizApplications } = useContext(AuthContext);
@@ -13,9 +13,11 @@ export default function TakeQuiz({ quiz, onBack }) {
   const [hasStarted, setHasStarted] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOpt, setSelectedOpt] = useState(null);
+  const [userAnswers, setUserAnswers] = useState({});
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [timeLeft, setTimeLeft] = useState(quiz.timeLimit * 60);
+  const [timeWarningShown, setTimeWarningShown] = useState(false);
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
@@ -38,12 +40,36 @@ export default function TakeQuiz({ quiz, onBack }) {
       timer = setInterval(() => {
         setTimeLeft(prev => prev - 1);
       }, 1000);
-    } else if (timeLeft === 0 && !isFinished) {
+      
+      if (timeLeft === 30 && !timeWarningShown) {
+        setTimeWarningShown(true);
+      }
+    } else if (timeLeft === 0 && !isFinished && hasStarted) {
+      alert("⏰ Your time is up! The quiz has been automatically submitted.");
       setIsFinished(true);
-      submitQuiz(quiz, score, sessionAppId);
+      
+      // Merge current selection into answers and calculate final score
+      const finalAnswers = { ...userAnswers, [currentIdx]: selectedOpt };
+      let finalScore = 0;
+      quiz.questions.forEach((q, idx) => {
+        if (finalAnswers[idx] === q.answer) finalScore += 1;
+      });
+      setScore(finalScore);
+      submitQuiz(quiz, finalScore, sessionAppId);
     }
     return () => clearInterval(timer);
-  }, [hasStarted, isFinished, timeLeft, score, submitQuiz, quiz, sessionAppId]);
+  }, [hasStarted, isFinished, timeLeft, timeWarningShown, selectedOpt, currentIdx, userAnswers, submitQuiz, quiz, sessionAppId]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasStarted && !isFinished) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasStarted, isFinished]);
 
   const handleStart = () => {
     if (!user) {
@@ -57,18 +83,30 @@ export default function TakeQuiz({ quiz, onBack }) {
   };
 
   const handleNext = () => {
-    let currentScore = score;
-    if (selectedOpt === quiz.questions[currentIdx].answer) {
-      currentScore += 1;
-      setScore(currentScore);
-    }
+    const updatedAnswers = { ...userAnswers, [currentIdx]: selectedOpt };
+    setUserAnswers(updatedAnswers);
     
     if (currentIdx + 1 < quiz.questions.length) {
       setCurrentIdx(prev => prev + 1);
-      setSelectedOpt(null);
+      setSelectedOpt(userAnswers[currentIdx + 1] || null);
     } else {
       setIsFinished(true);
-      submitQuiz(quiz, currentScore, sessionAppId);
+      
+      // Calculate final score
+      let finalScore = 0;
+      quiz.questions.forEach((q, idx) => {
+        if (updatedAnswers[idx] === q.answer) finalScore += 1;
+      });
+      setScore(finalScore);
+      submitQuiz(quiz, finalScore, sessionAppId);
+    }
+  };
+
+  const handlePrev = () => {
+    setUserAnswers(prev => ({ ...prev, [currentIdx]: selectedOpt }));
+    if (currentIdx > 0) {
+      setCurrentIdx(prev => prev - 1);
+      setSelectedOpt(userAnswers[currentIdx - 1] || null);
     }
   };
 
@@ -130,7 +168,14 @@ export default function TakeQuiz({ quiz, onBack }) {
   if (!hasStarted) {
     return (
       <div className="container fade-in">
-        <button onClick={onBack} className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
+        <button onClick={() => {
+          if (hasStarted && !isFinished) {
+            const confirmed = window.confirm('⚠️ Warning: If you go back, your quiz progress will be lost and you will have to start from the beginning. Are you sure?');
+            if (confirmed) onBack();
+          } else {
+            onBack();
+          }
+        }} className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '32px' }}>
           <ArrowLeft size={16} /> Back to Quizzes
         </button>
 
@@ -296,10 +341,38 @@ export default function TakeQuiz({ quiz, onBack }) {
             <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>Question {currentIdx + 1} of {quiz.questions.length}</span>
             <span style={{ fontSize: '0.8rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} /> App No: {sessionAppId}</span>
           </div>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: timeLeft <= 60 ? 'var(--accent-danger)' : 'var(--primary)' }}>
+          <span style={{ 
+            display: 'flex', alignItems: 'center', gap: '6px', 
+            color: timeLeft <= 30 ? '#fff' : timeLeft <= 60 ? 'var(--accent-danger)' : 'var(--primary)',
+            background: timeLeft <= 30 ? 'var(--accent-danger)' : 'transparent',
+            padding: timeLeft <= 30 ? '6px 14px' : '0',
+            borderRadius: timeLeft <= 30 ? '8px' : '0',
+            fontWeight: timeLeft <= 30 ? '700' : '400',
+            animation: timeLeft <= 30 ? 'pulse 1s infinite' : 'none'
+          }}>
+            {timeLeft <= 30 && <AlertTriangle size={16} />}
             <Clock size={16} /> {formatTime(timeLeft)}
           </span>
         </div>
+
+        {timeWarningShown && timeLeft <= 30 && timeLeft > 0 && (
+          <div style={{ 
+            background: 'linear-gradient(135deg, #fff5f5, #ffe0e0)', 
+            border: '1px solid #fca5a5', 
+            padding: '12px 20px', 
+            borderRadius: '12px', 
+            marginBottom: '24px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px',
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            color: '#b91c1c'
+          }}>
+            <AlertTriangle size={18} />
+            ⏰ Hurry up! Only {timeLeft} seconds remaining. The quiz will auto-submit when time runs out.
+          </div>
+        )}
 
         <h3 style={{ fontSize: '1.35rem', marginBottom: '32px', lineHeight: '1.5' }}>
           {quiz.questions[currentIdx].question}
@@ -317,13 +390,23 @@ export default function TakeQuiz({ quiz, onBack }) {
           ))}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '40px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px' }}>
+          <button 
+            className="btn btn-outline" 
+            disabled={currentIdx === 0}
+            onClick={handlePrev}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', opacity: currentIdx === 0 ? 0.4 : 1 }}
+          >
+            <ChevronLeft size={16} /> Previous
+          </button>
           <button 
             className="btn btn-primary" 
             disabled={selectedOpt === null}
             onClick={handleNext}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
           >
             {currentIdx + 1 === quiz.questions.length ? 'Submit Quiz' : 'Next Question'}
+            {currentIdx + 1 < quiz.questions.length && <ChevronRight size={16} />}
           </button>
         </div>
       </div>
