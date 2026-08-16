@@ -56,8 +56,10 @@ export default function InternshipApplyFlow({ internship, isOpen, onClose, onApp
       return alert("Please enter a valid LinkedIn URL.");
     }
 
-    const resumeError = validateURL(formData.resumeLink);
-    if (resumeError) return alert("Please enter a valid URL for your resume.");
+    if (formData.resumeLink.trim() !== '') {
+      const resumeError = validateURL(formData.resumeLink);
+      if (resumeError) return alert("Please enter a valid URL for your resume.");
+    }
 
     setSubmitting(true);
     // Simulate API call – replace with real endpoint later
