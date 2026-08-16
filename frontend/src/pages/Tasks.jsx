@@ -55,10 +55,11 @@ export default function Tasks() {
   const handlePayNow = async () => {
     try {
       const amount = settings?.processingFee || 99;
+      const appId = paymentModalData.internshipId;
       const orderRes = await fetch(`${API_URL}/payment/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ amount, receipt: `app_${paymentModalData}` })
+        body: JSON.stringify({ amount, receipt: `app_${appId}` })
       });
       const order = await orderRes.json();
 
@@ -73,7 +74,10 @@ export default function Tasks() {
           // Temporarily store pending payment to allow PaymentSuccess to show success
           localStorage.setItem('pendingPayment', JSON.stringify({
             type: 'internship',
-            appId: paymentModalData,
+            appId: appId,
+            internshipTitle: paymentModalData.details?.title || 'Internship Program',
+            internshipDomain: paymentModalData.details?.domain || paymentModalData.details?.type || 'N/A',
+            appliedDate: paymentModalData.appliedDate || 'N/A',
             verificationData: response
           }));
           window.location.href = '/payment-success';
@@ -207,7 +211,7 @@ export default function Tasks() {
                   </div>
                   {!program.finalSubmitted && (
                     <button 
-                      onClick={() => program.tasks.every(t => t.status === 'Approved') ? setPaymentModalData(program.internshipId) : null} 
+                      onClick={() => program.tasks.every(t => t.status === 'Approved') ? setPaymentModalData(program) : null} 
                       className={`btn ${program.tasks.every(t => t.status === 'Approved') ? 'btn-primary' : 'btn-outline'}`}
                       style={{ 
                         display: 'flex', 

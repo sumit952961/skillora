@@ -24,16 +24,12 @@ export default function PaymentSuccess() {
             }, data.verificationData);
 
             if (success) {
-              const internship = appliedInternships.find(
-                app => app.details?.id === data.appId || app.internshipId === data.appId
-              );
-
               await sendFinalSubmitEmail({
                 studentName: user?.name || 'N/A',
                 studentEmail: user?.email || 'N/A',
-                internshipTitle: internship?.details?.title || 'N/A',
-                internshipDomain: internship?.details?.domain || internship?.details?.type || 'N/A',
-                appliedDate: internship?.appliedDate || 'N/A',
+                internshipTitle: data.internshipTitle || 'N/A',
+                internshipDomain: data.internshipDomain || 'N/A',
+                appliedDate: data.appliedDate || 'N/A',
                 transactionId: data.verificationData?.razorpay_payment_id || 'Razorpay',
                 paymentDate: new Date().toISOString().split("T")[0],
                 paymentScreenshotBase64: null 
