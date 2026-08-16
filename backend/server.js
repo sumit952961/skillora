@@ -258,22 +258,26 @@ app.post("/api/internships/final-submit", authenticateToken, async (req, res) =>
     app.paymentDetails = req.body.paymentDetails;
     await app.save();
 
-    const internship = await Internship.findById(app.internshipId);
-    if (internship) {
-      const existingCert = await Certificate.findOne({ applicationId: app.appNumber });
-      if (!existingCert) {
-        await Certificate.create({
-          userId: req.user.id,
-          userName: req.user.name,
-          internshipTitle: internship.title,
-          domain: internship.domain,
-          title: internship.title,
-          issueDate: new Date().toISOString().split("T")[0],
-          applicationId: app.appNumber,
-          certificateNumber: `PENDING-${app.appNumber}`,
-          performanceRemarks: ""
-        });
+    try {
+      const internship = await Internship.findById(app.internshipId);
+      if (internship) {
+        const existingCert = await Certificate.findOne({ applicationId: app.appNumber });
+        if (!existingCert) {
+          await Certificate.create({
+            userId: req.user.id,
+            userName: req.user.name || "Student",
+            internshipTitle: internship.title,
+            domain: internship.domain || internship.type || "N/A",
+            title: internship.title,
+            issueDate: new Date().toISOString().split("T")[0],
+            applicationId: app.appNumber,
+            certificateNumber: `PENDING-${app.appNumber}`,
+            performanceRemarks: ""
+          });
+        }
       }
+    } catch (certError) {
+      console.error("Failed to create pending certificate:", certError);
     }
 
     res.json({ message: "Final submit successful!", application: { ...app.toObject(), id: app._id.toString() } });
@@ -339,19 +343,23 @@ app.post("/api/quizzes/payment", authenticateToken, async (req, res) => {
     qApp.paymentDetails = req.body.paymentDetails;
     await qApp.save();
 
-    const existingCert = await Certificate.findOne({ applicationId: qApp.appNumber });
-    if (!existingCert) {
-      await Certificate.create({
-        userId: req.user.id,
-        userName: req.user.name,
-        internshipTitle: qApp.quizTitle,
-        domain: "Quiz",
-        title: qApp.quizTitle,
-        issueDate: new Date().toISOString().split("T")[0],
-        applicationId: qApp.appNumber,
-        certificateNumber: `PENDING-${qApp.appNumber}`,
-        performanceRemarks: ""
-      });
+    try {
+      const existingCert = await Certificate.findOne({ applicationId: qApp.appNumber });
+      if (!existingCert) {
+        await Certificate.create({
+          userId: req.user.id,
+          userName: req.user.name || "Student",
+          internshipTitle: qApp.quizTitle,
+          domain: "Quiz",
+          title: qApp.quizTitle,
+          issueDate: new Date().toISOString().split("T")[0],
+          applicationId: qApp.appNumber,
+          certificateNumber: `PENDING-Q-${qApp.appNumber}`,
+          performanceRemarks: `Score: ${qApp.score}/${qApp.totalQuestions}`
+        });
+      }
+    } catch (certError) {
+      console.error("Failed to create pending quiz certificate:", certError);
     }
 
     res.json({ message: "Payment processed!", application: { ...qApp.toObject(), id: qApp._id.toString() } });

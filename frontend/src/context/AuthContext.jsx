@@ -177,9 +177,12 @@ export const AuthProvider = ({ children }) => {
         setAppliedInternships(prev => prev.map(app => 
           app.internshipId === internshipId ? { ...app, finalSubmitted: true, paymentDetails } : app
         ));
+        return true;
       }
+      return false;
     } catch (e) {
       console.error("Failed to submit final", e);
+      return false;
     }
   };
 
