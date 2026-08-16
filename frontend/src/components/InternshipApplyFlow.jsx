@@ -146,8 +146,8 @@ export default function InternshipApplyFlow({ internship, isOpen, onClose, onApp
                 <input type="url" name="linkedIn" required value={formData.linkedIn} onChange={handleChange} />
               </div>
               <div className="form-group">
-                <label>Resume Link (Google Drive / PDF)</label>
-                <input type="url" name="resumeLink" required value={formData.resumeLink} onChange={handleChange} />
+                <label>Resume/CV Link (optional)</label>
+                <input type="url" name="resumeLink" value={formData.resumeLink} onChange={handleChange} />
               </div>
               <div className="form-group">
                 <label>Cover Letter (optional)</label>
