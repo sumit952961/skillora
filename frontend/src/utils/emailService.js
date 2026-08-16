@@ -7,7 +7,7 @@ export async function sendApplicationEmail({ studentName, studentEmail, internsh
   try {
     const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `🎓 New Internship Application - ${studentName}`,
@@ -34,7 +34,7 @@ export async function sendFinalSubmitEmail({ studentName, studentEmail, internsh
   try {
     const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `✅ Final Submission + Payment - ${studentName}`,
@@ -62,7 +62,7 @@ export async function sendPasswordResetEmail({ userEmail, requestDate }) {
   try {
     const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `🔒 Password Reset Request - ${userEmail}`,
@@ -84,7 +84,7 @@ export async function sendQuizCompletionEmail({ studentName, studentEmail, quizT
   try {
     const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `🏆 Quiz Final Submission - ${studentName}`,
@@ -109,7 +109,7 @@ export async function sendContactEmail({ name, email, message }) {
   try {
     const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `📩 New Contact Form Message - ${name}`,
