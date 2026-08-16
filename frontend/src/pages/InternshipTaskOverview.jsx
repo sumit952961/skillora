@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { DataContext } from '../context/DataContext';
-import { ArrowRight, CheckCircle2, FileText, Info, Award, ChevronDown, ChevronUp, CheckSquare } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
+import { ArrowRight, CheckCircle2, FileText, Info, Award, ChevronDown, ChevronUp, CheckSquare, Lock } from 'lucide-react';
 
 export default function InternshipTaskOverview() {
   const { id } = useParams();
@@ -9,7 +10,11 @@ export default function InternshipTaskOverview() {
   const [loading, setLoading] = useState(true);
 
   const { internships } = useContext(DataContext);
+  const { appliedInternships } = useContext(AuthContext);
   const [expandedTasks, setExpandedTasks] = useState({});
+
+  const application = appliedInternships?.find(app => app.internshipId === id);
+  const hasOfferLetter = !!application?.offerLetterUrl;
 
   useEffect(() => {
     // Fetch from context
@@ -88,54 +93,65 @@ export default function InternshipTaskOverview() {
         </div>
 
         {/* Tasks Section */}
-        {details.tasks && details.tasks.length > 0 && (
-          <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-main)' }}>
-              <CheckSquare size={20} color="var(--primary)" /> Internship Tasks
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {details.tasks.map((task, idx) => {
-                const isExpanded = expandedTasks[task.id || idx];
-                const previewText = task.description?.length > 60 ? task.description.substring(0, 60) + '...' : task.description;
-
-                return (
-                  <div key={task.id || idx} style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '16px', background: 'var(--bg-primary)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
-                      <div style={{ flex: 1 }}>
-                        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.05rem', color: 'var(--text-main)' }}>
-                          {task.title || `Task ${idx + 1}`}
-                        </h4>
-                        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
-                          {isExpanded ? task.description : previewText}
-                        </p>
-                      </div>
-                      {task.description?.length > 60 && (
-                        <button
-                          onClick={() => toggleTask(task.id || idx)}
-                          className="btn btn-outline"
-                          style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}
-                        >
-                          {isExpanded ? (
-                            <>See Less <ChevronUp size={14} /></>
-                          ) : (
-                            <>See More <ChevronDown size={14} /></>
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+        <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-main)' }}>
+            <CheckSquare size={20} color="var(--primary)" /> Internship Tasks
+          </h3>
+          
+          {!hasOfferLetter ? (
+            <div style={{ padding: '32px', textAlign: 'center', background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', border: '1px dashed var(--border-color)' }}>
+              <Lock size={32} style={{ color: 'var(--primary)', marginBottom: '12px' }} />
+              <h4 style={{ margin: '0 0 8px 0', color: 'var(--text-main)', fontSize: '1.1rem' }}>Tasks are currently locked</h4>
+              <p style={{ margin: 0, color: 'var(--text-muted)' }}>Tasks will be unlocked and provided here immediately after the admin issues your official Offer Letter.</p>
             </div>
-          </div>
-        )}
+          ) : (
+            details.tasks && details.tasks.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {details.tasks.map((task, idx) => {
+                  const isExpanded = expandedTasks[task.id || idx];
+                  const previewText = task.description?.length > 60 ? task.description.substring(0, 60) + '...' : task.description;
+
+                  return (
+                    <div key={task.id || idx} style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '16px', background: 'var(--bg-primary)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+                        <div style={{ flex: 1 }}>
+                          <h4 style={{ margin: '0 0 8px 0', fontSize: '1.05rem', color: 'var(--text-main)' }}>
+                            {task.title || `Task ${idx + 1}`}
+                          </h4>
+                          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
+                            {isExpanded ? task.description : previewText}
+                          </p>
+                        </div>
+                        {task.description?.length > 60 && (
+                          <button
+                            onClick={() => toggleTask(task.id || idx)}
+                            className="btn btn-outline"
+                            style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}
+                          >
+                            {isExpanded ? (
+                              <>See Less <ChevronUp size={14} /></>
+                            ) : (
+                              <>See More <ChevronDown size={14} /></>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )
+          )}
+        </div>
 
         {/* Call to Action */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
-          <Link to={`/tasks?internshipId=${id}`} className="btn btn-primary" style={{ padding: '16px 36px', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: 'var(--shadow-md)' }}>
-            View Task <ArrowRight size={20} />
-          </Link>
-        </div>
+        {hasOfferLetter && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+            <Link to={`/tasks?internshipId=${id}`} className="btn btn-primary" style={{ padding: '16px 36px', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: 'var(--shadow-md)' }}>
+              View Task <ArrowRight size={20} />
+            </Link>
+          </div>
+        )}
 
       </div>
     </div>
