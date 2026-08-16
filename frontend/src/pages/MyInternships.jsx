@@ -60,7 +60,7 @@ export default function MyInternships() {
                   <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={14} /> App No: {app.id}</span>
                 </div>
               </div>
-              <Link to={`/my-internships/${app.details?.id || 'int1'}`} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
+              <Link to={`/my-internships/${app.internshipId}`} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
                 View Overview <ChevronRight size={16} />
               </Link>
             </div>
