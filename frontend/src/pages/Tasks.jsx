@@ -85,101 +85,111 @@ export default function Tasks() {
             {program.details?.title} - <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{program.details?.company}</span>
           </h3>
 
-          <div className="tasks-table-wrapper">
-            <table className="tasks-table">
-              <thead>
-                <tr>
-                  <th>Task Title</th>
-                  <th>Status</th>
-                  <th>Submission Link</th>
-                  <th>Instructor Feedback</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {program.tasks?.map(task => (
-                  <tr key={task.id}>
-                    <td data-label="Task Title" style={{ fontWeight: '600', fontSize: '0.9rem' }}>{task.title}</td>
-                    <td data-label="Status">
-                      <span className={`status-chip ${
-                        task.status === 'Approved' ? 'status-approved' : 
-                        task.status === 'Submitted' ? 'status-review' : 'status-pending'
-                      }`}>
-                        {task.status}
-                      </span>
-                    </td>
-                    <td data-label="Submission Link">
-                      {task.submissionLink ? (
-                        <a href={task.submissionLink} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', fontSize: '0.85rem' }}>
-                          <LinkIcon size={14} /> Repository Link
-                        </a>
-                      ) : (
-                        <span style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>Not Submitted</span>
-                      )}
-                    </td>
-                    <td data-label="Instructor Feedback" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      {task.feedback || 'No feedback yet'}
-                    </td>
-                    <td data-label="Action">
-                      {task.status !== 'Approved' && task.status !== 'Submitted' ? (
-                        <button 
-                          onClick={() => setActiveTask({ internshipId: program.internshipId, taskId: task.id, title: task.title })} 
-                          className="btn btn-primary" 
-                          style={{ padding: '6px 12px', fontSize: '0.8rem' }}
-                        >
-                          Submit Task
-                        </button>
-                      ) : (
-                        <span style={{ color: 'var(--accent-success)', fontSize: '0.8rem', fontWeight: '600' }}>Locked</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Final Submit Banner */}
-          {program.tasks && program.tasks.length > 0 && program.tasks.every(t => t.status === 'Submitted' || t.status === 'Approved') && (
-            <div style={{
-              marginTop: '16px',
-              padding: '20px',
-              background: program.finalSubmitted ? 'var(--accent-success-light)' : 'var(--bg-secondary)',
-              border: `1px solid ${program.finalSubmitted ? 'var(--accent-success)' : 'var(--border-color)'}`,
-              borderRadius: 'var(--radius-md)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <div>
-                <h4 style={{ fontSize: '1rem', color: program.finalSubmitted ? 'var(--accent-success)' : 'var(--text-main)', marginBottom: '4px' }}>
-                  {program.finalSubmitted ? 'Final Submission Complete' : 'All Tasks Submitted!'}
-                </h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  {program.finalSubmitted 
-                    ? 'Your submission has been finalized. After completion period, your certificate will be sent to your respective mail and uploaded to the site.' 
-                    : (program.tasks.every(t => t.status === 'Approved') 
-                        ? 'Admin has approved all your tasks. You can now proceed with final submission.' 
-                        : 'Admin is reviewing your tasks. Final submission will unlock after all tasks are approved.')}
-                </p>
-              </div>
-              {!program.finalSubmitted && (
-                <button 
-                  onClick={() => program.tasks.every(t => t.status === 'Approved') ? setPaymentModalData(program.internshipId) : null} 
-                  className={`btn ${program.tasks.every(t => t.status === 'Approved') ? 'btn-primary' : 'btn-outline'}`}
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px',
-                    opacity: program.tasks.every(t => t.status === 'Approved') ? 1 : 0.5,
-                    cursor: program.tasks.every(t => t.status === 'Approved') ? 'pointer' : 'not-allowed'
-                  }}
-                  disabled={!program.tasks.every(t => t.status === 'Approved')}
-                >
-                  <CheckCircle size={16} /> Final Submit
-                </button>
-              )}
+          {!program.offerLetterUrl ? (
+            <div style={{ padding: '32px', textAlign: 'center', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1px dashed var(--border-color)', marginBottom: '24px' }}>
+              <AlertCircle size={32} style={{ color: 'var(--primary)', marginBottom: '12px' }} />
+              <h4 style={{ margin: '0 0 8px 0', color: 'var(--text-main)', fontSize: '1.1rem' }}>Tasks are currently locked</h4>
+              <p style={{ margin: 0, color: 'var(--text-muted)' }}>Tasks will be unlocked and provided here immediately after the admin issues your official Offer Letter.</p>
             </div>
+          ) : (
+            <>
+              <div className="tasks-table-wrapper">
+                <table className="tasks-table">
+                  <thead>
+                    <tr>
+                      <th>Task Title</th>
+                      <th>Status</th>
+                      <th>Submission Link</th>
+                      <th>Instructor Feedback</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {program.tasks?.map(task => (
+                      <tr key={task.id}>
+                        <td data-label="Task Title" style={{ fontWeight: '600', fontSize: '0.9rem' }}>{task.title}</td>
+                        <td data-label="Status">
+                          <span className={`status-chip ${
+                            task.status === 'Approved' ? 'status-approved' : 
+                            task.status === 'Submitted' ? 'status-review' : 'status-pending'
+                          }`}>
+                            {task.status}
+                          </span>
+                        </td>
+                        <td data-label="Submission Link">
+                          {task.submissionLink ? (
+                            <a href={task.submissionLink} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', fontSize: '0.85rem' }}>
+                              <LinkIcon size={14} /> Repository Link
+                            </a>
+                          ) : (
+                            <span style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>Not Submitted</span>
+                          )}
+                        </td>
+                        <td data-label="Instructor Feedback" style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                          {task.feedback || 'No feedback yet'}
+                        </td>
+                        <td data-label="Action">
+                          {task.status !== 'Approved' && task.status !== 'Submitted' ? (
+                            <button 
+                              onClick={() => setActiveTask({ internshipId: program.internshipId, taskId: task.id, title: task.title })} 
+                              className="btn btn-primary" 
+                              style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                            >
+                              Submit Task
+                            </button>
+                          ) : (
+                            <span style={{ color: 'var(--accent-success)', fontSize: '0.8rem', fontWeight: '600' }}>Locked</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Final Submit Banner */}
+              {program.tasks && program.tasks.length > 0 && program.tasks.every(t => t.status === 'Submitted' || t.status === 'Approved') && (
+                <div style={{
+                  marginTop: '16px',
+                  padding: '20px',
+                  background: program.finalSubmitted ? 'var(--accent-success-light)' : 'var(--bg-secondary)',
+                  border: `1px solid ${program.finalSubmitted ? 'var(--accent-success)' : 'var(--border-color)'}`,
+                  borderRadius: 'var(--radius-md)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <h4 style={{ fontSize: '1rem', color: program.finalSubmitted ? 'var(--accent-success)' : 'var(--text-main)', marginBottom: '4px' }}>
+                      {program.finalSubmitted ? 'Final Submission Complete' : 'All Tasks Submitted!'}
+                    </h4>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      {program.finalSubmitted 
+                        ? 'Your submission has been finalized. After completion period, your certificate will be sent to your respective mail and uploaded to the site.' 
+                        : (program.tasks.every(t => t.status === 'Approved') 
+                            ? 'Admin has approved all your tasks. You can now proceed with final submission.' 
+                            : 'Admin is reviewing your tasks. Final submission will unlock after all tasks are approved.')}
+                    </p>
+                  </div>
+                  {!program.finalSubmitted && (
+                    <button 
+                      onClick={() => program.tasks.every(t => t.status === 'Approved') ? setPaymentModalData(program.internshipId) : null} 
+                      className={`btn ${program.tasks.every(t => t.status === 'Approved') ? 'btn-primary' : 'btn-outline'}`}
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '8px',
+                        opacity: program.tasks.every(t => t.status === 'Approved') ? 1 : 0.5,
+                        cursor: program.tasks.every(t => t.status === 'Approved') ? 'pointer' : 'not-allowed'
+                      }}
+                      disabled={!program.tasks.every(t => t.status === 'Approved')}
+                    >
+                      <CheckCircle size={16} /> Final Submit
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
           )}
 
         </div>
