@@ -105,7 +105,7 @@ export default function InternshipTaskOverview() {
                         <h4 style={{ margin: '0 0 8px 0', fontSize: '1.05rem', color: 'var(--text-main)' }}>
                           {task.title || `Task ${idx + 1}`}
                         </h4>
-                        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
                           {isExpanded ? task.description : previewText}
                         </p>
                       </div>
