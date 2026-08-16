@@ -164,8 +164,16 @@ export const DataProvider = ({ children }) => {
       if (res.ok) {
         const updated = await res.json();
         setVerifiedCertificates(verifiedCertificates.map(vc => vc.id === id ? updated : vc));
-      } else alert("Failed to update certificate");
-    } catch (e) { console.error(e); alert("Error updating certificate"); }
+        return true;
+      } else {
+        alert("Failed to update certificate");
+        return false;
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error updating certificate");
+      return false;
+    }
   };
 
   return (

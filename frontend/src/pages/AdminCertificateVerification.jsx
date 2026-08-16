@@ -40,7 +40,7 @@ export default function AdminCertificateVerification() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {filtered.map(cert => {
-            const isCompleted = !!(cert.certificateNumber && !cert.certificateNumber.startsWith('PENDING-') && cert.performanceRemarks);
+            const isCompleted = !!(cert.certificateNumber && !cert.certificateNumber.startsWith('PENDING-'));
             return (
               <div key={cert.id} style={{ 
                 background: 'var(--bg-secondary)', 
@@ -94,14 +94,16 @@ export default function AdminCertificateVerification() {
                   
                   <div>
                     <button 
-                      onClick={() => {
+                      onClick={async () => {
                         const num = document.getElementById(`certNum-${cert.id}`).value;
                         const remarks = document.getElementById(`remarks-${cert.id}`).value;
-                        updateVerifiedCertificate(cert.id, {
+                        const success = await updateVerifiedCertificate(cert.id, {
                           certificateNumber: num,
                           performanceRemarks: remarks
                         });
-                        alert('Verification details saved successfully!');
+                        if (success) {
+                          alert('Verification details saved successfully!');
+                        }
                       }} 
                       className="btn btn-primary"
                     >
