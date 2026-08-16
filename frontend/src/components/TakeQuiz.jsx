@@ -88,7 +88,7 @@ export default function TakeQuiz({ quiz, onBack }) {
     
     if (currentIdx + 1 < quiz.questions.length) {
       setCurrentIdx(prev => prev + 1);
-      setSelectedOpt(userAnswers[currentIdx + 1] || null);
+      setSelectedOpt(userAnswers[currentIdx + 1] !== undefined ? userAnswers[currentIdx + 1] : null);
     } else {
       setIsFinished(true);
       
@@ -106,7 +106,7 @@ export default function TakeQuiz({ quiz, onBack }) {
     setUserAnswers(prev => ({ ...prev, [currentIdx]: selectedOpt }));
     if (currentIdx > 0) {
       setCurrentIdx(prev => prev - 1);
-      setSelectedOpt(userAnswers[currentIdx - 1] || null);
+      setSelectedOpt(userAnswers[currentIdx - 1] !== undefined ? userAnswers[currentIdx - 1] : null);
     }
   };
 
