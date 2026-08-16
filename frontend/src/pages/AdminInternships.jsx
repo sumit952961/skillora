@@ -166,6 +166,11 @@ export default function AdminInternships() {
                 <textarea required className="form-input" rows="3" value={formData.requirements} onChange={e => setFormData({...formData, requirements: e.target.value})}></textarea>
               </div>
 
+              <div className="form-group">
+                <label>What You'll Get / Perks (One per line)</label>
+                <textarea required className="form-input" rows="3" placeholder="Certificate of Completion&#10;Letter of Recommendation&#10;Live Project Experience" value={formData.perks} onChange={e => setFormData({...formData, perks: e.target.value})}></textarea>
+              </div>
+
               <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h3 style={{ fontSize: '1.2rem' }}>Internship Tasks</h3>
