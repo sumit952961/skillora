@@ -5,12 +5,19 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
+import Razorpay from "razorpay";
+import crypto from "crypto";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "secretkey";
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_dummykey',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummysecret'
+});
 
 app.use(cors());
 app.use(express.json());
@@ -250,10 +257,36 @@ app.post("/api/internships/apply", authenticateToken, async (req, res) => {
   } catch (e) { res.status(500).json({ message: "Application failed", error: e.message }); }
 });
 
+app.post("/api/payment/create-order", authenticateToken, async (req, res) => {
+  try {
+    const { amount, receipt } = req.body;
+    const options = {
+      amount: amount * 100, // Razorpay works in paise
+      currency: "INR",
+      receipt: receipt
+    };
+    const order = await razorpay.orders.create(options);
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to create order", error: error.message });
+  }
+});
+
 app.post("/api/internships/final-submit", authenticateToken, async (req, res) => {
   try {
     const app = await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId });
     if (!app) return res.status(404).json({ message: "Application not found" });
+
+    // Verify Signature if provided
+    if (req.body.razorpay_payment_id && req.body.razorpay_order_id && req.body.razorpay_signature) {
+      const generated_signature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || 'dummysecret')
+        .update(req.body.razorpay_order_id + "|" + req.body.razorpay_payment_id)
+        .digest("hex");
+      if (generated_signature !== req.body.razorpay_signature) {
+        return res.status(400).json({ message: "Invalid payment signature" });
+      }
+    }
+
     app.finalSubmitted = true;
     app.paymentDetails = req.body.paymentDetails;
     await app.save();
@@ -339,6 +372,17 @@ app.post("/api/quizzes/payment", authenticateToken, async (req, res) => {
   try {
     const qApp = await QuizApplication.findOne({ userId: req.user.id, quizId: req.body.quizId });
     if (!qApp) return res.status(404).json({ message: "Quiz application not found" });
+
+    // Verify Signature if provided
+    if (req.body.razorpay_payment_id && req.body.razorpay_order_id && req.body.razorpay_signature) {
+      const generated_signature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || 'dummysecret')
+        .update(req.body.razorpay_order_id + "|" + req.body.razorpay_payment_id)
+        .digest("hex");
+      if (generated_signature !== req.body.razorpay_signature) {
+        return res.status(400).json({ message: "Invalid payment signature" });
+      }
+    }
+
     qApp.paymentSubmitted = true;
     qApp.paymentDetails = req.body.paymentDetails;
     await qApp.save();

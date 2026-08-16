@@ -17,36 +17,44 @@ export default function PaymentSuccess() {
           const data = JSON.parse(pending);
           
           if (data.type === 'internship') {
-            await processFinalSubmit(data.appId, {
+            const success = await processFinalSubmit(data.appId, {
               method: 'Razorpay',
               status: 'Paid',
               submittedOn: new Date().toISOString()
-            });
+            }, data.verificationData);
 
-            // Need to wait slightly for context to update or just find from existing state
-            const internship = appliedInternships.find(
-              app => app.details?.id === data.appId || app.internshipId === data.appId
-            );
+            if (success) {
+              const internship = appliedInternships.find(
+                app => app.details?.id === data.appId || app.internshipId === data.appId
+              );
 
-            await sendFinalSubmitEmail({
-              studentName: user?.name || 'N/A',
-              studentEmail: user?.email || 'N/A',
-              internshipTitle: internship?.details?.title || 'N/A',
-              internshipDomain: internship?.details?.domain || internship?.details?.type || 'N/A',
-              appliedDate: internship?.appliedDate || 'N/A',
-              transactionId: 'Razorpay',
-              paymentDate: new Date().toISOString().split("T")[0],
-              paymentScreenshotBase64: null 
-            });
+              await sendFinalSubmitEmail({
+                studentName: user?.name || 'N/A',
+                studentEmail: user?.email || 'N/A',
+                internshipTitle: internship?.details?.title || 'N/A',
+                internshipDomain: internship?.details?.domain || internship?.details?.type || 'N/A',
+                appliedDate: internship?.appliedDate || 'N/A',
+                transactionId: data.verificationData?.razorpay_payment_id || 'Razorpay',
+                paymentDate: new Date().toISOString().split("T")[0],
+                paymentScreenshotBase64: null 
+              });
+              localStorage.removeItem('pendingPayment');
+            } else {
+              alert("Payment verification failed. Please contact admin.");
+            }
           } else if (data.type === 'quiz') {
-            await processQuizPayment(data.quizId, {
+            const success = await processQuizPayment(data.quizId, {
               method: 'Razorpay',
               paymentDate: new Date().toISOString().split('T')[0],
               status: 'Paid'
-            });
+            }, data.verificationData);
+            
+            if (success) {
+              localStorage.removeItem('pendingPayment');
+            } else {
+              alert("Payment verification failed. Please contact admin.");
+            }
           }
-          
-          localStorage.removeItem('pendingPayment');
         }
       } catch (error) {
         console.error("Error processing pending payment:", error);

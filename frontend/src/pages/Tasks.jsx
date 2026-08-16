@@ -53,15 +53,49 @@ export default function Tasks() {
   };
 
   const handlePayNow = async () => {
-    // Store pending payment to process on success page
-    localStorage.setItem('pendingPayment', JSON.stringify({
-      type: 'internship',
-      appId: paymentModalData
-    }));
+    try {
+      const amount = settings?.processingFee || 99;
+      const orderRes = await fetch(`${API_URL}/payment/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ amount, receipt: `app_${paymentModalData}` })
+      });
+      const order = await orderRes.json();
 
-    // Open Razorpay link in same window to allow return
-    const baseUrl = settings?.internshipPaymentLink || 'https://rzp.io/rzp/ddlyQEo';
-    window.location.href = baseUrl;
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_dummykey',
+        amount: order.amount,
+        currency: order.currency,
+        name: "Skillzeno",
+        description: "Internship Certificate Fee",
+        order_id: order.id,
+        handler: function (response) {
+          // Temporarily store pending payment to allow PaymentSuccess to show success
+          localStorage.setItem('pendingPayment', JSON.stringify({
+            type: 'internship',
+            appId: paymentModalData,
+            verificationData: response
+          }));
+          window.location.href = '/payment-success';
+        },
+        prefill: {
+          name: user?.name,
+          email: user?.email
+        },
+        theme: {
+          color: "#4f46e5"
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        alert("Payment Failed. Reason: " + response.error.description);
+      });
+      rzp.open();
+    } catch (err) {
+      alert("Failed to initialize payment gateway.");
+      console.error(err);
+    }
   };
 
   const handleMaybeLater = () => {

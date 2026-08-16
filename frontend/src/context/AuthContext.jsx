@@ -166,12 +166,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const processFinalSubmit = async (internshipId, paymentDetails = null) => {
+  const processFinalSubmit = async (internshipId, paymentDetails = null, verificationData = null) => {
     try {
+      const bodyPayload = { internshipId, paymentDetails };
+      if (verificationData) {
+        bodyPayload.razorpay_order_id = verificationData.razorpay_order_id;
+        bodyPayload.razorpay_payment_id = verificationData.razorpay_payment_id;
+        bodyPayload.razorpay_signature = verificationData.razorpay_signature;
+      }
+      
       const res = await fetch(`${API_URL}/internships/final-submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ internshipId, paymentDetails })
+        body: JSON.stringify(bodyPayload)
       });
       if (res.ok) {
         setAppliedInternships(prev => prev.map(app => 
@@ -210,12 +217,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const processQuizPayment = async (quizId, paymentDetails) => {
+  const processQuizPayment = async (quizId, paymentDetails, verificationData = null) => {
     try {
+      const bodyPayload = { quizId, paymentDetails };
+      if (verificationData) {
+        bodyPayload.razorpay_order_id = verificationData.razorpay_order_id;
+        bodyPayload.razorpay_payment_id = verificationData.razorpay_payment_id;
+        bodyPayload.razorpay_signature = verificationData.razorpay_signature;
+      }
+
       const res = await fetch(`${API_URL}/quizzes/payment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ quizId, paymentDetails })
+        body: JSON.stringify(bodyPayload)
       });
       if (res.ok) {
         const { application } = await res.json();

@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, CheckCircle, Download, CreditCard, X, Trophy, ShieldCheck } from 'lucide-react';
 
 export default function TakeQuiz({ quiz, onBack }) {
-  const { user, submitQuiz, processQuizPayment, quizApplications } = useContext(AuthContext);
+  const { user, token, submitQuiz, processQuizPayment, quizApplications } = useContext(AuthContext);
   const { settings } = useContext(DataContext);
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
   
   const [hasStarted, setHasStarted] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -78,13 +79,48 @@ export default function TakeQuiz({ quiz, onBack }) {
   };
 
   const handlePayNow = async () => {
-    localStorage.setItem('pendingPayment', JSON.stringify({
-      type: 'quiz',
-      quizId: quiz.id
-    }));
-    
-    const baseUrl = settings?.quizPaymentLink || 'https://razorpay.me/@skillzeno';
-    window.location.href = baseUrl;
+    try {
+      const amount = settings?.quizProcessingFee || 19;
+      const orderRes = await fetch(`${API_URL}/payment/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ amount, receipt: `quiz_${quiz.id}` })
+      });
+      const order = await orderRes.json();
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_dummykey',
+        amount: order.amount,
+        currency: order.currency,
+        name: "Skillzeno",
+        description: "Quiz Certificate Fee",
+        order_id: order.id,
+        handler: function (response) {
+          localStorage.setItem('pendingPayment', JSON.stringify({
+            type: 'quiz',
+            quizId: quiz.id,
+            verificationData: response
+          }));
+          window.location.href = '/payment-success';
+        },
+        prefill: {
+          name: user?.name,
+          email: user?.email
+        },
+        theme: {
+          color: "#4f46e5"
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        alert("Payment Failed. Reason: " + response.error.description);
+      });
+      rzp.open();
+    } catch (err) {
+      alert("Failed to initialize payment gateway.");
+      console.error(err);
+    }
   };
 
   const handleMaybeLater = () => {
