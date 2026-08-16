@@ -67,9 +67,30 @@ export default function TakeQuiz({ quiz, onBack }) {
         e.returnValue = '';
       }
     };
+    
+    const handlePopState = (e) => {
+      if (hasStarted && !isFinished) {
+        const confirmed = window.confirm('⚠️ Warning: If you go back, your quiz progress will be lost. Are you sure?');
+        if (!confirmed) {
+          window.history.pushState(null, '', window.location.href);
+        } else {
+          onBack();
+        }
+      }
+    };
+
     window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasStarted, isFinished]);
+    
+    if (hasStarted && !isFinished) {
+      window.history.pushState(null, '', window.location.href);
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [hasStarted, isFinished, onBack]);
 
   const handleStart = () => {
     if (!user) {
