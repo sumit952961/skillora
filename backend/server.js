@@ -446,6 +446,16 @@ app.get("/api/certificates", async (req, res) => {
 
 app.post("/api/admin/certificates", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
+    if (req.body.certificateNumber || req.body.applicationId) {
+      const query = [];
+      if (req.body.certificateNumber) query.push({ certificateNumber: req.body.certificateNumber });
+      if (req.body.applicationId) query.push({ applicationId: req.body.applicationId });
+      
+      const existing = await Certificate.findOne({ $or: query });
+      if (existing) {
+        return res.status(200).json({ ...existing.toObject(), id: existing._id.toString() });
+      }
+    }
     const cert = await Certificate.create(req.body);
     res.status(201).json({ ...cert.toObject(), id: cert._id.toString() });
   } catch (e) { res.status(500).json({ message: "Failed to create certificate", error: e.message }); }
