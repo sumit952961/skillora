@@ -30,7 +30,7 @@ export default function Quiz() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
         {quizzes.map(quiz => (
-          <div key={quiz.id} className="premium-internship-card">
+          <div key={quiz.id} className="premium-internship-card" style={{ minHeight: 'auto', justifyContent: 'space-between' }}>
             <h3 style={{ fontSize: '1.25rem', marginBottom: '12px' }}>{quiz.title}</h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {quiz.description}
