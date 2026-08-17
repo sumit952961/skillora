@@ -1,11 +1,13 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const APP_NAME = process.env.APP_NAME || "SkillZeno";
 const APP_URL = process.env.APP_URL || "https://skillora.vercel.app";
 const LOGIN_URL = `${APP_URL}/login`;
-const FROM_ADDRESS = `${APP_NAME} <skillzeno26@gmail.com>`;
+
+const SENDER_EMAIL = "skillzeno26@gmail.com";
+const SENDER_NAME = APP_NAME;
 
 const baseTemplate = (content) => `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
@@ -23,21 +25,29 @@ const baseTemplate = (content) => `
 `;
 
 const sendEmail = async ({ to, subject, html }) => {
-  if (!RESEND_API_KEY) {
-    console.error("RESEND_API_KEY is not set — email not sent.");
+  if (!BREVO_API_KEY) {
+    console.error("BREVO_API_KEY is not set — email not sent.");
     return;
   }
-  const res = await fetch("https://api.resend.com/emails", {
+  
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${RESEND_API_KEY}`,
+      "api-key": BREVO_API_KEY,
       "Content-Type": "application/json",
+      "accept": "application/json"
     },
-    body: JSON.stringify({ from: FROM_ADDRESS, to, subject, html }),
+    body: JSON.stringify({
+      sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+      to: [{ email: to }],
+      subject: subject,
+      htmlContent: html
+    }),
   });
+  
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Resend API error (${res.status}): ${err}`);
+    throw new Error(`Brevo API error (${res.status}): ${err}`);
   }
 };
 
