@@ -1,19 +1,11 @@
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
-
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const APP_NAME = process.env.APP_NAME || "SkillZeno";
-const APP_URL = process.env.APP_URL || "http://localhost:5173";
+const APP_URL = process.env.APP_URL || "https://skillora.vercel.app";
 const LOGIN_URL = `${APP_URL}/login`;
+const FROM_ADDRESS = `${APP_NAME} <skillzeno26@gmail.com>`;
 
 const baseTemplate = (content) => `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
@@ -30,6 +22,25 @@ const baseTemplate = (content) => `
 </div>
 `;
 
+const sendEmail = async ({ to, subject, html }) => {
+  if (!RESEND_API_KEY) {
+    console.error("RESEND_API_KEY is not set — email not sent.");
+    return;
+  }
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from: FROM_ADDRESS, to, subject, html }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Resend API error (${res.status}): ${err}`);
+  }
+};
+
 export const sendWelcomeEmail = async (name, email) => {
   const content = `
     <h2 style="color:#1f2937;margin-top:0;">Welcome to ${APP_NAME}, ${name}! 🎉</h2>
@@ -39,8 +50,7 @@ export const sendWelcomeEmail = async (name, email) => {
       <a href="${LOGIN_URL}" style="background:#4f46e5;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold;display:inline-block;">Login to Your Account</a>
     </div>
   `;
-  await transporter.sendMail({
-    from: `"${APP_NAME}" <${process.env.GMAIL_USER}>`,
+  await sendEmail({
     to: email,
     subject: `🎉 Welcome to ${APP_NAME}!`,
     html: baseTemplate(content),
@@ -62,8 +72,7 @@ export const sendLoginNotification = async (name, email) => {
       <a href="${LOGIN_URL}" style="background:#4f46e5;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold;display:inline-block;">Go to My Account</a>
     </div>
   `;
-  await transporter.sendMail({
-    from: `"${APP_NAME}" <${process.env.GMAIL_USER}>`,
+  await sendEmail({
     to: email,
     subject: `🔐 New Login to Your ${APP_NAME} Account`,
     html: baseTemplate(content),
@@ -81,8 +90,7 @@ export const sendPasswordResetOTP = async (name, email, otp) => {
     <p>This OTP will expire in 10 minutes. For security reasons, do not share this code with anyone.</p>
     <p style="font-size:14px;color:#6b7280;margin-top:24px;">If you didn't request this, please ignore this email or contact support.</p>
   `;
-  await transporter.sendMail({
-    from: `"${APP_NAME}" <${process.env.GMAIL_USER}>`,
+  await sendEmail({
     to: email,
     subject: `Your ${APP_NAME} Password Reset OTP`,
     html: baseTemplate(content),
@@ -101,8 +109,7 @@ export const sendPasswordResetConfirmation = async (name, email) => {
     </div>
     <p style="font-size:14px;color:#6b7280;">If you did not perform this action, please contact our support team immediately.</p>
   `;
-  await transporter.sendMail({
-    from: `"${APP_NAME}" <${process.env.GMAIL_USER}>`,
+  await sendEmail({
     to: email,
     subject: `🎉 Your ${APP_NAME} Password Has Been Updated`,
     html: baseTemplate(content),
@@ -117,8 +124,7 @@ export const sendPasswordChangeConfirmation = async (name, email) => {
     <p>You have successfully changed the password for your ${APP_NAME} profile on <strong>${time}</strong>.</p>
     <p style="font-size:14px;color:#6b7280;margin-top:24px;">Security Notice: If you did not make this change, please contact us immediately to secure your account.</p>
   `;
-  await transporter.sendMail({
-    from: `"${APP_NAME}" <${process.env.GMAIL_USER}>`,
+  await sendEmail({
     to: email,
     subject: `Your ${APP_NAME} Profile Password Was Changed`,
     html: baseTemplate(content),
