@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation } from "./emailService.js";
 
 dotenv.config();
 
@@ -28,7 +29,8 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ["student", "admin"], default: "student" }
+  role: { type: String, enum: ["student", "admin"], default: "student" },
+  tokenVersion: { type: Number, default: 0 }
 }, { timestamps: true });
 
 const applicationSchema = new mongoose.Schema({
@@ -112,6 +114,13 @@ const passwordResetRequestSchema = new mongoose.Schema({
   status: { type: String, enum: ["pending", "resolved"], default: "pending" }
 }, { timestamps: true });
 
+const otpSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  otp: { type: String, required: true },
+  expiresAt: { type: Date, required: true },
+  attempts: { type: Number, default: 0 }
+}, { timestamps: true });
+
 const User = mongoose.model("User", userSchema);
 const Application = mongoose.model("Application", applicationSchema);
 const QuizApplication = mongoose.model("QuizApplication", quizApplicationSchema);
@@ -120,6 +129,7 @@ const Internship = mongoose.model("Internship", internshipSchema);
 const Quiz = mongoose.model("Quiz", quizSchema);
 const Setting = mongoose.model("Setting", settingSchema);
 const PasswordResetRequest = mongoose.model("PasswordResetRequest", passwordResetRequestSchema);
+const OTP = mongoose.model("OTP", otpSchema);
 
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
@@ -142,13 +152,26 @@ mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
   })
   .catch(err => console.error("MongoDB failed:", err.message));
 
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Access Token Required" });
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ message: "Token Invalid or Expired" });
-    req.user = user; next();
-  });
+  let decoded;
+  try {
+    decoded = jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    return res.status(403).json({ message: "Token Invalid or Expired" });
+  }
+  try {
+    const dbUser = await User.findById(decoded.id).select("tokenVersion role");
+    if (!dbUser) return res.status(403).json({ message: "User no longer exists" });
+    if (decoded.tokenVersion !== dbUser.tokenVersion) {
+      return res.status(401).json({ message: "Session expired. Please log in again." });
+    }
+    req.user = decoded;
+    next();
+  } catch (e) {
+    res.status(500).json({ message: "Authentication error" });
+  }
 };
 
 const authorizeAdmin = (req, res, next) => {
@@ -164,7 +187,10 @@ app.post("/api/auth/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const isAdmin = process.env.ADMIN_EMAIL && email.trim().toLowerCase() === process.env.ADMIN_EMAIL.trim().toLowerCase();
     const newUser = await User.create({ name, email: email.toLowerCase(), password: hashedPassword, role: isAdmin ? "admin" : "student" });
-    const token = jwt.sign({ id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role, tokenVersion: newUser.tokenVersion }, JWT_SECRET, { expiresIn: "7d" });
+    
+    sendWelcomeEmail(newUser.name, newUser.email);
+
     res.status(201).json({ token, user: { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role } });
   } catch (e) { res.status(500).json({ message: "Registration failed", error: e.message }); }
 });
@@ -175,7 +201,10 @@ app.post("/api/auth/login", async (req, res) => {
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) return res.status(404).json({ message: "User not found" });
     if (!(await bcrypt.compare(password, user.password))) return res.status(400).json({ message: "Incorrect password" });
-    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role, tokenVersion: user.tokenVersion }, JWT_SECRET, { expiresIn: "7d" });
+    
+    sendLoginNotification(user.name, user.email);
+
     res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (e) { res.status(500).json({ message: "Login failed", error: e.message }); }
 });
@@ -186,6 +215,28 @@ app.get("/api/auth/profile", authenticateToken, async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({ id: user._id, name: user.name, email: user.email, role: user.role });
   } catch (e) { res.status(500).json({ message: "Failed to fetch profile" }); }
+});
+
+app.post("/api/auth/change-password", authenticateToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!(await bcrypt.compare(currentPassword, user.password))) {
+      return res.status(400).json({ message: "Incorrect current password" });
+    }
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.tokenVersion = (user.tokenVersion || 0) + 1; // Invalidate all other sessions
+    await user.save();
+    // Re-issue a fresh token for the current device so it stays logged in
+    const newToken = jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role, tokenVersion: user.tokenVersion }, JWT_SECRET, { expiresIn: "7d" });
+    
+    sendPasswordChangeConfirmation(user.name, user.email);
+
+    res.json({ message: "Password changed successfully", token: newToken });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to change password", error: e.message });
+  }
 });
 
 app.post("/api/auth/reset-password", async (req, res) => {
@@ -212,6 +263,78 @@ app.post("/api/auth/request-password-reset", async (req, res) => {
     });
     res.json({ message: "Password reset requested", request: { ...reqDoc.toObject(), id: reqDoc._id.toString() } });
   } catch (e) { res.status(500).json({ message: "Failed to request reset" }); }
+});
+
+app.post("/api/auth/send-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60000); // 10 minutes
+
+    await OTP.deleteMany({ email: user.email });
+    await OTP.create({ email: user.email, otp, expiresAt });
+
+    await sendPasswordResetOTP(user.name, user.email, otp);
+
+    res.json({ message: "OTP sent successfully" });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to send OTP", error: e.message });
+  }
+});
+
+app.post("/api/auth/verify-otp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const otpRecord = await OTP.findOne({ email: email.toLowerCase() });
+
+    if (!otpRecord) return res.status(400).json({ message: "No OTP found or it has expired" });
+    if (otpRecord.attempts >= 5) {
+      await OTP.deleteMany({ email: email.toLowerCase() });
+      return res.status(400).json({ message: "Too many failed attempts. Please request a new OTP." });
+    }
+    if (new Date() > otpRecord.expiresAt) {
+      await OTP.deleteMany({ email: email.toLowerCase() });
+      return res.status(400).json({ message: "OTP has expired. Please request a new one." });
+    }
+    if (otpRecord.otp !== otp) {
+      otpRecord.attempts += 1;
+      await otpRecord.save();
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    res.json({ message: "OTP verified successfully" });
+  } catch (e) {
+    res.status(500).json({ message: "Verification failed", error: e.message });
+  }
+});
+
+app.post("/api/auth/reset-password-otp", async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    const otpRecord = await OTP.findOne({ email: email.toLowerCase() });
+
+    if (!otpRecord || otpRecord.otp !== otp || new Date() > otpRecord.expiresAt || otpRecord.attempts >= 5) {
+       return res.status(400).json({ message: "Invalid or expired session. Please request a new OTP." });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.tokenVersion = (user.tokenVersion || 0) + 1; // Invalidate all existing sessions
+    await user.save();
+    
+    await OTP.deleteMany({ email: user.email });
+
+    sendPasswordResetConfirmation(user.name, user.email);
+
+    res.json({ message: "Password updated successfully" });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to reset password", error: e.message });
+  }
 });
 
 app.get("/api/auth/users", authenticateToken, async (req, res) => {

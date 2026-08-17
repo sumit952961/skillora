@@ -281,6 +281,84 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const sendOtp = async (email) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to send OTP');
+      }
+      return true;
+    } catch (e) {
+      throw e;
+    }
+  };
+
+  const verifyOtp = async (email, otp) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Invalid OTP');
+      }
+      return true;
+    } catch (e) {
+      throw e;
+    }
+  };
+
+  const resetPasswordWithOtp = async (email, otp, newPassword) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/reset-password-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, newPassword })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to reset password');
+      }
+      return true;
+    } catch (e) {
+      throw e;
+    }
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/change-password`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to change password');
+      }
+      const data = await res.json();
+      // Backend issues a fresh token after incrementing tokenVersion.
+      // Store it so Device A remains logged in; all other devices are invalidated.
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        setToken(data.token);
+      }
+      return true;
+    } catch (e) {
+      throw e;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, token, login, register, logout, loading, 
@@ -288,6 +366,7 @@ export const AuthProvider = ({ children }) => {
       processFinalSubmit, 
       quizApplications, submitQuiz, processQuizPayment,
       passwordResetRequests, requestPasswordReset, resetUserPassword,
+      sendOtp, verifyOtp, resetPasswordWithOtp, changePassword,
       API_URL
     }}>
       {children}
