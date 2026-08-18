@@ -32,3 +32,48 @@ img, video, canvas, svg {
   max-width: 100% !important;
   height: auto;
 }
+
+
+/* ============================================================
+   MOBILE RESPONSIVE FIX — Contact Page
+   Issue: gridTemplateColumns '1fr 1.5fr' does not stack on mobile.
+   Fix: Stack columns vertically on small screens.
+   JSX hooks: .contact-grid, .contact-info-panel, .contact-form-panel (Contact.jsx)
+   To revert: Delete this section + remove the classNames from Contact.jsx.
+   ============================================================ */
+@media (max-width: 768px) {
+  .contact-grid {
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    gap: 24px !important;
+  }
+
+  .contact-info-panel,
+  .contact-form-panel {
+    width: 100% !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+  }
+}
+
+
+/* ============================================================
+   MOBILE RESPONSIVE FIX — InternshipTaskOverview — Task Cards
+   Issue: flex row with space-between causes "See More" button 
+          to overflow or push content on narrow screens.
+   Fix: Stack task card header content vertically on mobile.
+   JSX hooks: .task-card-header (InternshipTaskOverview.jsx)
+   To revert: Delete this section + remove the className from InternshipTaskOverview.jsx.
+   ============================================================ */
+@media (max-width: 600px) {
+  .task-card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .task-card-header > button {
+    align-self: flex-start !important;
+    flex-shrink: unset !important;
+  }
+}

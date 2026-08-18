@@ -38,9 +38,10 @@ export default function Contact() {
         <p className="section-subtitle">Have questions about our internship programs or certificate verification? Let us know!</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', marginTop: '40px' }}>
+      {/* Mobile Responsive Fix: className='contact-grid' targets this in responsive-fix.css */}
+      <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', marginTop: '40px' }}>
         {/* Contact Info */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className="contact-info-panel" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', padding: '24px', borderRadius: 'var(--radius-lg)' }}>
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '16px' }}>
               <div className="feature-icon-wrapper"><Mail size={20} /></div>
@@ -70,8 +71,8 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* Contact Form */}
-        <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', padding: '32px', borderRadius: 'var(--radius-lg)' }}>
+        {/* Contact Form - Mobile Responsive Fix: className='contact-form-panel' */}
+        <div className="contact-form-panel" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', padding: '32px', borderRadius: 'var(--radius-lg)' }}>
           {error && (
             <div style={{ background: 'var(--accent-danger-light)', color: 'var(--accent-danger)', padding: '12px 16px', borderRadius: 'var(--radius-md)', marginBottom: '20px', fontWeight: '600' }}>
               {error}

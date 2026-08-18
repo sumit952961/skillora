@@ -113,7 +113,8 @@ export default function InternshipTaskOverview() {
 
                   return (
                     <div key={task.id || idx} style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '16px', background: 'var(--bg-primary)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+                    {/* Mobile Responsive Fix: className='task-card-header' targets this in responsive-fix.css */}
+                    <div className="task-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
                         <div style={{ flex: 1 }}>
                           <h4 style={{ margin: '0 0 8px 0', fontSize: '1.05rem', color: 'var(--text-main)' }}>
                             {task.title || `Task ${idx + 1}`}
