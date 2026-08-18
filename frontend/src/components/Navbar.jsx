@@ -49,9 +49,12 @@ export default function Navbar() {
               <li><NavLink to="/verify" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Verify Certificate</NavLink></li>
               <li><NavLink to="/about" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>About</NavLink></li>
               <li><NavLink to="/contact" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Contact</NavLink></li>
-              <li style={{ marginLeft: '12px' }}>
-                <Link to="/login" className="btn btn-primary" style={{ padding: '8px 18px', fontSize: '0.9rem' }} onClick={() => setIsMobileMenuOpen(false)}>
-                  Login
+              <li style={{ marginLeft: '12px', display: 'flex', gap: '8px' }}>
+                <Link to="/login" className="btn btn-outline" style={{ padding: '8px 18px', fontSize: '0.9rem' }} onClick={() => setIsMobileMenuOpen(false)}>
+                  Sign In
+                </Link>
+                <Link to="/register" className="btn btn-primary" style={{ padding: '8px 18px', fontSize: '0.9rem' }} onClick={() => setIsMobileMenuOpen(false)}>
+                  Sign Up
                 </Link>
               </li>
             </>

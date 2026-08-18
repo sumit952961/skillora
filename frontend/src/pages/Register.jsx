@@ -9,7 +9,9 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -23,6 +25,10 @@ export default function Register() {
 
     const emailError = validateEmail(email);
     if (emailError) return setError(emailError);
+
+    if (password !== confirmPassword) {
+      return setError('Passwords do not match.');
+    }
 
     const passwordError = validateStrongPassword(password);
     if (passwordError) return setError(passwordError);
@@ -68,14 +74,21 @@ export default function Register() {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
+          <div className="form-group" style={{ position: 'relative' }}>
+            <label>Confirm Password</label>
+            <input type={showConfirmPassword ? "text" : "password"} required className="form-input" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+            <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ position: 'absolute', right: '12px', top: '38px', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '16px' }}>
             <UserPlus size={18} /> Sign Up
           </button>
         </form>
 
         <p style={{ marginTop: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          Already have an account? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>Login</Link>
+          Already have an account? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>Sign In</Link>
         </p>
       </div>
     </div>

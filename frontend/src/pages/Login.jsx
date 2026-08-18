@@ -43,7 +43,13 @@ export default function Login() {
         }
       }
     } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      const errMsg = err.message || '';
+      if (errMsg.toLowerCase().includes('user not found')) {
+        setError('No account found with this email. Please create an account first.');
+        setTimeout(() => navigate('/register'), 2000);
+      } else {
+        setError(errMsg || 'Login failed. Please check your credentials.');
+      }
     }
   };
 
@@ -143,7 +149,7 @@ export default function Login() {
         </form>
 
         <p style={{ marginTop: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          Don't have an account? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>Register</Link>
+          Don't have an account? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>Sign Up</Link>
         </p>
       </div>
 
