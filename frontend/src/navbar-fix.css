@@ -1,0 +1,35 @@
+/* 
+   Navbar Responsive Fixes 
+   (Specially for 13.6" displays and medium laptop screens between 993px to 1366px)
+   You can safely delete this file and remove its import from Navbar.jsx if you don't like it.
+*/
+
+/* Force nav links to never break into two lines */
+.nav-links a {
+  white-space: nowrap !important;
+}
+
+/* Adjust spacing and sizing for medium laptop screens so everything fits in one row cleanly */
+@media (max-width: 1366px) and (min-width: 993px) {
+  /* Reduce gap between list items */
+  .nav-links {
+    gap: 4px !important;
+  }
+  
+  /* Reduce padding and slightly reduce font size for links */
+  .nav-links a {
+    padding: 8px 10px !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Adjust Sign In / Sign Up buttons */
+  .nav-links a.btn {
+    padding: 8px 14px !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Slightly reduce logo height to give more breathing room */
+  .nav-logo img {
+    height: 55px !important;
+  }
+}
