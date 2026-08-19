@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { DataContext } from '../context/DataContext';
 import { BookOpen, Clock, ArrowRight, HelpCircle } from 'lucide-react';
 import TakeQuiz from '../components/TakeQuiz';
+import SEO from '../components/SEO';
 
 export default function Quiz() {
   const { quizzes } = useContext(DataContext);
@@ -22,6 +23,12 @@ export default function Quiz() {
   }
 
   return (
+    <>
+    <SEO 
+      title="Skill Quizzes | Skillzeno" 
+      description="Test your knowledge with Skillzeno's curated multi-topic assessments. Practice and prepare for real-world tech interviews." 
+      canonical="/quiz"
+    />
     <div className="container fade-in">
       <div className="section-title-wrapper" style={{ textAlign: 'left', marginBottom: '40px' }}>
         <h1 className="section-title">Available Quizzes</h1>
@@ -58,5 +65,6 @@ export default function Quiz() {
         )}
       </div>
     </div>
+    </>
   );
 }

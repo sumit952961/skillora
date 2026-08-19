@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
-import { Award, Users, Star, Briefcase, MapPin, Clock, ArrowRight, Code, Bookmark, Building2, ShieldCheck, Database, Atom, Box, Layers } from 'lucide-react';
+import { Award, Users, Star, Briefcase, Clock, ArrowRight, Code, Bookmark, ShieldCheck, Database, Atom, Box, Layers } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
@@ -39,7 +39,6 @@ function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
 }
 
 export default function Dashboard() {
-  const { user } = useContext(AuthContext);
   const { internships } = useContext(DataContext);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

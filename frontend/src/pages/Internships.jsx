@@ -3,6 +3,7 @@ import { DataContext } from '../context/DataContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { Briefcase, MapPin, Clock, ArrowRight, Code, Bookmark, Building2, ShieldCheck, Database, Atom, Box, Layers } from 'lucide-react';
+import SEO from '../components/SEO';
 
 
 export default function Internships() {
@@ -37,6 +38,26 @@ export default function Internships() {
 
   return (
     <>
+    <SEO 
+      title="Virtual Internships | Skillzeno" 
+      description="Apply for premium virtual internships at Skillzeno. Work on real-world projects, learn modern technologies, and earn verifiable certificates." 
+      canonical="/internships"
+      schema={{
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://skillzeno.in"
+        },{
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Internships",
+          "item": "https://skillzeno.in/internships"
+        }]
+      }}
+    />
     <div className="container fade-in">
       <div className="section-title-wrapper">
 

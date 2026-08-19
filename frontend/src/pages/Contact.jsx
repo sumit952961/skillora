@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { validateName, validateEmail } from '../utils/validation';
 import { sendContactEmail } from '../utils/emailService';
+import SEO from '../components/SEO';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -31,6 +32,12 @@ export default function Contact() {
   };
 
   return (
+    <>
+    <SEO 
+      title="Contact Us | Skillzeno" 
+      description="Get in touch with Skillzeno for support, inquiries, or business partnerships. We are here to help." 
+      canonical="/contact"
+    />
     <div className="container fade-in">
       <div className="section-title-wrapper">
 
@@ -103,5 +110,6 @@ export default function Contact() {
         </div>
       </div>
     </div>
+    </>
   );
 }

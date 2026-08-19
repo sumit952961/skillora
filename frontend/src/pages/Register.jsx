@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { UserPlus, Eye, EyeOff } from 'lucide-react';
 
 import { validateName, validateEmail, validateStrongPassword } from '../utils/validation';
+import SEO from '../components/SEO';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -45,6 +46,8 @@ export default function Register() {
   };
 
   return (
+    <>
+    <SEO noindex={true} title="Register | Skillzeno" />
     <div className="auth-wrapper fade-in">
       <div className="auth-card">
         <div className="auth-header">
@@ -92,5 +95,6 @@ export default function Register() {
         </p>
       </div>
     </div>
+    </>
   );
 }

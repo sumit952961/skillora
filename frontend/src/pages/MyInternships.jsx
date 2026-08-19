@@ -4,11 +4,10 @@ import { Link } from 'react-router-dom';
 import { Calendar, Briefcase, ChevronRight, ShieldCheck } from 'lucide-react';
 
 export default function MyInternships() {
-  const { token, appliedInternships } = useContext(AuthContext);
+  const { appliedInternships } = useContext(AuthContext);
   const [myInternships, setMyInternships] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
   useEffect(() => {
     const fetchMyInternships = async () => {

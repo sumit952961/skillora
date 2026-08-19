@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { LogIn, Eye, EyeOff } from 'lucide-react';
 
 import { validateEmail, validateStrongPassword } from '../utils/validation';
+import SEO from '../components/SEO';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -112,6 +113,8 @@ export default function Login() {
   };
 
   return (
+    <>
+    <SEO noindex={true} title="Login | Skillzeno" />
     <div className="auth-wrapper fade-in">
       <div className="auth-card">
         <div className="auth-header">
@@ -232,5 +235,6 @@ export default function Login() {
         </div>
       )}
     </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { DataContext } from '../context/DataContext';
 import { ShieldCheck, Search, AlertCircle, Calendar, User, Briefcase, Award, CheckCircle, FileText } from 'lucide-react';
 import { validateCertificateID } from '../utils/validation';
+import SEO from '../components/SEO';
 
 export default function Verify() {
   const [hash, setHash] = useState('');
@@ -48,6 +49,12 @@ export default function Verify() {
   };
 
   return (
+    <>
+    <SEO 
+      title="Certificate Verification | Skillzeno" 
+      description="Verify the authenticity of Skillzeno certificates online. Secure cryptographic verification for employers and students." 
+      canonical="/verify"
+    />
     <div className="container fade-in">
       <div className="section-title-wrapper">
 
@@ -147,5 +154,6 @@ export default function Verify() {
         </div>
       )}
     </div>
+    </>
   );
 }

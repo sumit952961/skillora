@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /my-internships/
+Disallow: /tasks/
+Disallow: /certificates/
+Disallow: /login/
+Disallow: /register/
 
 Sitemap: https://skillzeno.in/sitemap.xml

@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { ArrowLeft, Briefcase, Clock, MapPin, CheckCircle, ArrowRight, Layers, Award, Users, BookOpen } from 'lucide-react';
 import InternshipApplyFlow from '../components/InternshipApplyFlow';
+import SEO from '../components/SEO';
 
 export default function InternshipDetail() {
   const { id } = useParams();
@@ -61,6 +62,23 @@ export default function InternshipDetail() {
   }
   return (
     <>
+      <SEO 
+        title={`${internship.title} Internship | Skillzeno`}
+        description={`Apply for the ${internship.title} internship at Skillzeno. ${internship.description}`}
+        canonical={`/internships/${internship.id}`}
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "EducationalOccupationalProgram",
+          "name": `${internship.title} Virtual Internship`,
+          "description": internship.description,
+          "provider": {
+            "@type": "EducationalOrganization",
+            "name": "Skillzeno",
+            "sameAs": "https://skillzeno.in"
+          },
+          "timeToComplete": internship.duration
+        }}
+      />
       <div className="container fade-in" style={{ position: 'relative' }}>
         {/* Minimal Back Navigation */}
         <Link to="/internships" style={{ 

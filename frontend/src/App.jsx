@@ -29,6 +29,7 @@ import AdminCertificateVerification from './pages/AdminCertificateVerification'
 import PaymentSuccess from './pages/PaymentSuccess'
 import AdminPasswordReset from './pages/AdminPasswordReset'
 import { MapPin, Phone, Mail, BookOpen, ShieldCheck, Award } from 'lucide-react'
+import SEO from './components/SEO'
 import './App.css'
 
 function ProtectedRoute({ children }) {
@@ -36,14 +37,14 @@ function ProtectedRoute({ children }) {
   if (loading) return <div className="container"><h3>Verifying session...</h3></div>;
   if (!user) return <Navigate to="/login" replace />;
   if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
-  return children;
+  return <><SEO noindex={true} />{children}</>;
 }
 
 function AdminRoute({ children }) {
   const { user, loading } = useContext(AuthContext);
   if (loading) return <div className="container"><h3>Verifying session...</h3></div>;
   if (!user || user.role !== 'admin') return <Navigate to="/login" replace />;
-  return children;
+  return <><SEO noindex={true} />{children}</>;
 }
 
 // Scroll to top on every route change and handle browser reload

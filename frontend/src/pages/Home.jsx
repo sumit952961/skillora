@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { ArrowRight, Briefcase, MapPin, Clock, Award, Users, BookOpen, Shield, Zap, Code, Bookmark, Building2, ShieldCheck, Database, Atom, Box, Layers, Star, Target } from 'lucide-react';
+import SEO from '../components/SEO';
 
 function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
   const [count, setCount] = useState(0);
@@ -138,6 +139,24 @@ export default function Home() {
 
   return (
     <>
+    <SEO 
+      title="Skillzeno | Premium Internships and Learning Portal" 
+      description="Skillzeno is a premium project-based virtual internship and learning platform. Gain real-world experience, get verified certificates, and level up your career." 
+      canonical="/"
+      schema={{
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "Skillzeno",
+        "url": "https://skillzeno.in",
+        "logo": "https://skillzeno.in/favicon.png",
+        "description": "Skillzeno is a premium project-based virtual internship and learning platform in India.",
+        "sameAs": [
+          "https://www.facebook.com/profile.php?id=61593113833134",
+          "https://www.instagram.com/skillzeno26",
+          "https://www.linkedin.com/company/skillzeno"
+        ]
+      }}
+    />
     <div className="container fade-in">
       {/* Hero Section */}
       <section className="hero-section">

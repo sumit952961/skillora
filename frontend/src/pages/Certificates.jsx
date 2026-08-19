@@ -4,7 +4,7 @@ import { Award, ShieldCheck, Download, FileText, Lock, Clock } from 'lucide-reac
 import { Link } from 'react-router-dom';
 
 export default function Certificates() {
-  const { user, appliedInternships, quizApplications } = useContext(AuthContext);
+  const { appliedInternships, quizApplications } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

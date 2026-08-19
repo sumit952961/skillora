@@ -1,8 +1,15 @@
 import React from 'react';
 import { Award, ShieldCheck, Users } from 'lucide-react';
+import SEO from '../components/SEO';
 
 export default function About() {
   return (
+    <>
+    <SEO 
+      title="About Us | Skillzeno" 
+      description="Skillzeno is a state-of-the-art educational and professional portal offering project experience and verified credentials." 
+      canonical="/about"
+    />
     <div className="container fade-in" style={{ maxWidth: '800px' }}>
       <div className="section-title-wrapper" style={{ textAlign: 'left', marginBottom: '32px' }}>
 
@@ -50,5 +57,6 @@ export default function About() {
         </div>
       </div>
     </div>
+    </>
   );
 }
