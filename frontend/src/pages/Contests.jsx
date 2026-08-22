@@ -114,53 +114,78 @@ export default function Contests() {
             <p style={{ color: 'var(--text-light)' }}>Check back later for upcoming skill assessments.</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', maxWidth: '900px', margin: '0 auto' }}>
             {contests.map(contest => {
               const isRegistered = registeredContestIds.includes(contest._id);
               const isStarted = new Date(contest.startTime) <= new Date();
               
               return (
-                <div key={contest._id} className="internship-card" style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ padding: '24px', flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                      <h3 style={{ fontSize: '1.2rem', lineHeight: '1.4', margin: 0 }}>{contest.title}</h3>
+                <div key={contest._id} className="internship-card" style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-secondary)', overflow: 'hidden', border: '1px solid var(--primary-light)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+                  {/* Banner Area */}
+                  <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)', padding: '40px', color: 'white', position: 'relative' }}>
+                    <div style={{ position: 'relative', zIndex: 2 }}>
+                      <span style={{ display: 'inline-block', padding: '6px 12px', background: 'rgba(255,255,255,0.2)', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '16px', backdropFilter: 'blur(4px)' }}>
+                        Featured Assessment
+                      </span>
+                      <h2 style={{ fontSize: '2.5rem', marginBottom: '16px', color: 'white' }}>{contest.title}</h2>
+                      {contest.description && (
+                        <p style={{ fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: 0, lineHeight: 1.5 }}>{contest.description}</p>
+                      )}
                     </div>
-                    {contest.description && (
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '16px' }}>{contest.description}</p>
-                    )}
+                    {/* Decorative elements */}
+                    <Trophy size={160} style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)', opacity: 0.1 }} />
+                  </div>
+
+                  <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
                     
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                        <Calendar size={16} color="var(--primary)" /> 
-                        <span>Start: {new Date(contest.startTime).toLocaleString()}</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', background: 'var(--bg-primary)', padding: '16px', borderRadius: 'var(--radius-lg)' }}>
+                        <div style={{ background: 'var(--primary-light)', padding: '12px', borderRadius: '50%', color: 'var(--primary)' }}><Calendar size={24} /></div>
+                        <div>
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 4px 0' }}>Test Starts At</p>
+                          <p style={{ fontSize: '1.05rem', fontWeight: 'bold', color: 'var(--text-main)', margin: 0 }}>{new Date(contest.startTime).toLocaleString()}</p>
+                        </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                        <Clock size={16} color="var(--accent-warning)" /> 
-                        <span>Reg Ends: {new Date(contest.registrationEndTime).toLocaleString()}</span>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', background: 'var(--bg-primary)', padding: '16px', borderRadius: 'var(--radius-lg)' }}>
+                        <div style={{ background: 'var(--accent-warning-light)', padding: '12px', borderRadius: '50%', color: 'var(--accent-warning)' }}><Clock size={24} /></div>
+                        <div>
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 4px 0' }}>Registration Ends</p>
+                          <p style={{ fontSize: '1.05rem', fontWeight: 'bold', color: 'var(--text-main)', margin: 0 }}>{new Date(contest.registrationEndTime).toLocaleString()}</p>
+                        </div>
                       </div>
                     </div>
                     
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      {contest.domains.map(d => (
-                        <span key={d} style={{ fontSize: '0.75rem', background: 'var(--bg-primary)', color: 'var(--text-muted)', padding: '4px 10px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>{d}</span>
-                      ))}
+                    <div>
+                      <h4 style={{ fontSize: '1.1rem', marginBottom: '12px', color: 'var(--text-main)' }}>Available Domains</h4>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                        {contest.domains.map(d => (
+                          <span key={d} style={{ fontSize: '0.9rem', background: 'var(--primary-light)', color: 'var(--primary)', padding: '8px 16px', borderRadius: '20px', fontWeight: '500' }}>{d}</span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   
-                  <div style={{ padding: '16px 24px', background: 'var(--bg-primary)', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{contest.questionsPerStudent} Questions • {contest.timeLimitMinutes} Mins</span>
+                  <div style={{ padding: '24px 32px', background: 'var(--bg-primary)', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <span style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{contest.questionsPerStudent} Questions</span>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--text-muted)' }}></span>
+                      <span style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{contest.timeLimitMinutes} Mins Duration</span>
+                    </div>
                     
-                    {isRegistered ? (
-                       isStarted ? (
-                         <button className="btn btn-primary" onClick={() => navigate(`/contests/arena/${contest._id}`)}>Enter Arena</button>
-                       ) : (
-                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-success)', fontSize: '0.9rem', fontWeight: '600' }}>
-                           <CheckCircle2 size={16} /> Registered
-                         </span>
-                       )
-                    ) : (
-                      <button className="btn btn-primary" onClick={() => openRegisterModal(contest)}>Register Now</button>
-                    )}
+                    <div>
+                      {isRegistered ? (
+                         isStarted ? (
+                           <button className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '1.1rem', background: 'var(--accent-success)', borderColor: 'var(--accent-success)' }} onClick={() => navigate(`/contests/arena/${contest._id}`)}>Enter Arena 🚀</button>
+                         ) : (
+                           <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-success)', fontSize: '1.1rem', fontWeight: '600', padding: '12px 24px', background: 'var(--accent-success-light)', borderRadius: '8px' }}>
+                             <CheckCircle2 size={24} /> You are Registered
+                           </span>
+                         )
+                      ) : (
+                        <button className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '1.1rem' }} onClick={() => openRegisterModal(contest)}>Register Now</button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
