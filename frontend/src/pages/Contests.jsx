@@ -4,6 +4,36 @@ import { Trophy, Calendar, Clock, CheckCircle2 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useNavigate } from 'react-router-dom';
 
+const LiveCountdown = ({ targetDate }) => {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const updateTimer = () => {
+      const now = new Date();
+      const target = new Date(targetDate);
+      const diff = target - now;
+
+      if (diff <= 0) {
+        setTimeLeft('Started');
+        return;
+      }
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / 1000 / 60) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+
+      setTimeLeft(`${d > 0 ? d + 'd ' : ''}${h}h ${m}m ${s}s`);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  return <span style={{ fontFamily: 'monospace', fontSize: '1.1rem' }}>{timeLeft}</span>;
+};
+
 export default function Contests() {
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -122,7 +152,7 @@ export default function Contests() {
               return (
                 <div key={contest._id} className="internship-card" style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-secondary)', overflow: 'hidden', border: '1px solid var(--primary-light)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
                   {/* Banner Area */}
-                  <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)', padding: '40px', color: 'white', position: 'relative' }}>
+                  <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)', padding: '40px', color: 'white', position: 'relative' }}>
                     <div style={{ position: 'relative', zIndex: 2 }}>
                       <span style={{ display: 'inline-block', padding: '6px 12px', background: 'rgba(255,255,255,0.2)', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '16px', backdropFilter: 'blur(4px)' }}>
                         Featured Assessment
@@ -133,7 +163,7 @@ export default function Contests() {
                       )}
                     </div>
                     {/* Decorative elements */}
-                    <Trophy size={160} style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)', opacity: 0.1 }} />
+                    <Trophy size={160} style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)', opacity: 0.1, color: 'white' }} />
                   </div>
 
                   <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -142,8 +172,10 @@ export default function Contests() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', background: 'var(--bg-primary)', padding: '16px', borderRadius: 'var(--radius-lg)' }}>
                         <div style={{ background: 'var(--primary-light)', padding: '12px', borderRadius: '50%', color: 'var(--primary)' }}><Calendar size={24} /></div>
                         <div>
-                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 4px 0' }}>Test Starts At</p>
-                          <p style={{ fontSize: '1.05rem', fontWeight: 'bold', color: 'var(--text-main)', margin: 0 }}>{new Date(contest.startTime).toLocaleString()}</p>
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 4px 0' }}>Test Starts In</p>
+                          <p style={{ fontSize: '1.05rem', fontWeight: 'bold', color: 'var(--text-main)', margin: 0 }}>
+                            {isStarted ? <span style={{ color: 'var(--accent-success)' }}>Live Now!</span> : <LiveCountdown targetDate={contest.startTime} />}
+                          </p>
                         </div>
                       </div>
                       
