@@ -177,8 +177,17 @@ export default function Contests() {
       return;
     }
     setSelectedContest(contest);
+    setFormData({
+      studentName: user?.name || '',
+      studentEmail: user?.email || '',
+      mobileNumber: user?.mobileNumber || '',
+      course: user?.course || '',
+      branch: user?.branch || '',
+      semester: user?.semester || '',
+      college: user?.college || '',
+      domain: ''
+    });
     setShowRegisterModal(true);
-    setFormData(prev => ({ ...prev, domain: '' })); // reset domain selection
   };
 
   const handleInputChange = (e) => {
