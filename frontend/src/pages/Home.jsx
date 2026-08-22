@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { ArrowRight, Briefcase, MapPin, Clock, Award, Users, BookOpen, Shield, Zap, Code, Bookmark, Building2, ShieldCheck, Database, Atom, Box, Layers, Star, Target } from 'lucide-react';
 import SEO from '../components/SEO';
+import ContestTicker from '../components/ContestTicker';
 
 function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
   const [count, setCount] = useState(0);
@@ -157,7 +158,9 @@ export default function Home() {
         ]
       }}
     />
-    <div className="container fade-in">
+    <div style={{ position: 'relative' }}>
+      <ContestTicker />
+      <div className="container fade-in" style={{ paddingTop: '10px' }}>
       {/* Hero Section */}
       <section className="hero-section">
         {/* Left Column: Headings, Buttons, and integrated metrics row */}
@@ -496,6 +499,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </div>
     </div>
     </>
   );
