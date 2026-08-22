@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   // Student specific data
   const [appliedInternships, setAppliedInternships] = useState([]);
   const [quizApplications, setQuizApplications] = useState([]);
+  const [contestRegistrations, setContestRegistrations] = useState([]);
 
   const [passwordResetRequests, setPasswordResetRequests] = useState([]);
 
@@ -22,12 +23,14 @@ export const AuthProvider = ({ children }) => {
 
   const fetchStudentData = async (currentToken) => {
     try {
-      const [internshipRes, quizRes] = await Promise.all([
+      const [internshipRes, quizRes, contestRes] = await Promise.all([
         fetch(`${API_URL}/my-internships`, { headers: { Authorization: `Bearer ${currentToken}` } }),
-        fetch(`${API_URL}/my-quizzes`, { headers: { Authorization: `Bearer ${currentToken}` } })
+        fetch(`${API_URL}/my-quizzes`, { headers: { Authorization: `Bearer ${currentToken}` } }),
+        fetch(`${API_URL}/my-contest-registrations`, { headers: { Authorization: `Bearer ${currentToken}` } })
       ]);
       if (internshipRes.ok) setAppliedInternships(await internshipRes.json());
       if (quizRes.ok) setQuizApplications(await quizRes.json());
+      if (contestRes.ok) setContestRegistrations(await contestRes.json());
     } catch (err) {
       console.warn('Failed to fetch student data:', err);
     }
@@ -380,7 +383,7 @@ export const AuthProvider = ({ children }) => {
       user, token, login, register, logout, loading, updateProfile,
       appliedInternships, applyForInternship, submitTask, 
       processFinalSubmit, 
-      quizApplications, submitQuiz, processQuizPayment,
+      quizApplications, submitQuiz, processQuizPayment, contestRegistrations,
       passwordResetRequests, requestPasswordReset, resetUserPassword,
       sendOtp, verifyOtp, resetPasswordWithOtp, changePassword,
       API_URL

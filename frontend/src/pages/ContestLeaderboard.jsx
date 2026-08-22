@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Trophy, Medal, Clock, Star, Download } from 'lucide-react';
+import { Trophy, Medal, Clock, Download, AlertCircle } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import SEO from '../components/SEO';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 
 export default function ContestLeaderboard() {
   const { id: contestId } = useParams();
@@ -13,8 +11,6 @@ export default function ContestLeaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [generatingPdf, setGeneratingPdf] = useState(false);
-  const certificateRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
@@ -57,30 +53,6 @@ export default function ContestLeaderboard() {
     return `${m}m ${s}s`;
   };
 
-  const handleDownloadCertificate = async (studentData) => {
-    if (!certificateRef.current) return;
-    setGeneratingPdf(true);
-    try {
-      const element = certificateRef.current;
-      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL('image/png');
-      
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'px',
-        format: [canvas.width, canvas.height]
-      });
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-      pdf.save(`Skillzeno_Certificate_${studentData.name.replace(/\s+/g, '_')}.pdf`);
-    } catch (err) {
-      console.error(err);
-      alert("Error generating certificate PDF.");
-    } finally {
-      setGeneratingPdf(false);
-    }
-  };
-
   if (loading) return <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}><h3>Loading Leaderboard...</h3></div>;
   if (waitEndTime) {
     const timeString = new Date(waitEndTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -114,15 +86,26 @@ export default function ContestLeaderboard() {
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '24px' }}>Top performers from across the country</p>
           
           {currentUserData && (
-            <button 
-              className="btn btn-primary" 
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem', padding: '12px 24px', background: 'var(--accent-success)', borderColor: 'var(--accent-success)' }}
-              onClick={() => handleDownloadCertificate(currentUserData)}
-              disabled={generatingPdf}
-            >
-              <Download size={20} />
-              {generatingPdf ? 'Generating...' : 'Download My Certificate'}
-            </button>
+            <div style={{ display: 'inline-block', background: 'var(--bg-secondary)', padding: '20px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)', width: '100%', maxWidth: '400px' }}>
+              <h3 style={{ marginBottom: '16px', fontSize: '1.2rem' }}>Your Certificate</h3>
+              {currentUserData.certificateLink ? (
+                <a 
+                  href={currentUserData.certificateLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary" 
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem', padding: '12px 24px', background: 'var(--accent-success)', borderColor: 'var(--accent-success)', width: '100%', justifyContent: 'center' }}
+                >
+                  <Download size={20} />
+                  Download Certificate
+                </a>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--text-muted)' }}>
+                  <AlertCircle size={24} style={{ color: 'var(--accent-warning)' }} />
+                  <p style={{ margin: 0, fontSize: '0.95rem' }}>Certificate is being verified and will be available soon.</p>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -181,103 +164,6 @@ export default function ContestLeaderboard() {
           </button>
         </div>
       </div>
-
-      {/* Visible Certificate Preview */}
-      {currentUserData && (
-        <div className="container fade-in" style={{ padding: '0 20px 80px', maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '2rem', marginBottom: '32px' }}>Your Certificate of Participation</h2>
-          <div style={{ 
-            width: '100%', 
-            maxWidth: '1200px', 
-            margin: '0 auto',
-            position: 'relative',
-            overflow: 'hidden',
-            borderRadius: '12px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
-            aspectRatio: '1200/848',
-            background: 'var(--bg-secondary)'
-          }}>
-            <div style={{
-              width: '1200px',
-              height: '848px',
-              transformOrigin: 'top left',
-              transform: 'scale(var(--cert-scale, 1))',
-              position: 'absolute',
-              top: 0,
-              left: 0
-            }}>
-              <style>{`
-                @media (max-width: 1240px) {
-                  :root { --cert-scale: calc((100vw - 40px) / 1200); }
-                }
-                @media (min-width: 1241px) {
-                  :root { --cert-scale: calc(900px / 1200); }
-                }
-              `}</style>
-              <CertificateContent data={currentUserData} />
-            </div>
-          </div>
-          <p style={{ color: 'var(--text-muted)', marginTop: '20px' }}>Click the 'Download My Certificate' button at the top to save as PDF.</p>
-        </div>
-      )}
-
-      {/* Hidden Certificate Element for html2canvas to render */}
-      {currentUserData && (
-        <div style={{ overflow: 'hidden', height: 0, width: 0, position: 'absolute', top: -9999 }}>
-          <CertificateContent data={currentUserData} refObj={certificateRef} />
-        </div>
-      )}
     </>
   );
 }
-
-const CertificateContent = ({ data, refObj }) => (
-  <div 
-    ref={refObj} 
-    style={{ 
-      width: '1200px', 
-      height: '848px', 
-      position: 'relative', 
-      backgroundImage: 'url(/contest-certificate-template.jpg)', 
-      backgroundSize: 'cover', 
-      backgroundPosition: 'center',
-      fontFamily: "'Inter', sans-serif",
-      backgroundRepeat: 'no-repeat'
-    }}
-  >
-    {/* Name */}
-    <div style={{ position: 'absolute', top: '425px', left: '0', width: '100%', textAlign: 'center', fontSize: '42px', fontWeight: 'bold', color: '#0A192F', letterSpacing: '2px' }}>
-      {data.name}
-    </div>
-
-    {/* Domain (Mid) */}
-    <div style={{ position: 'absolute', top: '565px', left: '400px', width: '400px', textAlign: 'center', fontSize: '18px', fontWeight: '600', color: '#1B263B' }}>
-      {data.domain}
-    </div>
-
-    {/* Domain (Bottom Row 1) */}
-    <div style={{ position: 'absolute', bottom: '215px', left: '190px', width: '150px', textAlign: 'left', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-      {data.domain}
-    </div>
-
-    {/* Score (Bottom Row 2) */}
-    <div style={{ position: 'absolute', bottom: '215px', left: '445px', width: '80px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-      {data.score}
-    </div>
-
-    {/* Rank (Bottom Row 3) */}
-    <div style={{ position: 'absolute', bottom: '215px', left: '655px', width: '80px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-      {data.rank}
-    </div>
-
-    {/* Date (Bottom Row 4) */}
-    <div style={{ position: 'absolute', bottom: '215px', left: '855px', width: '120px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-      {data.date}
-    </div>
-
-    {/* Certificate ID */}
-    <div style={{ position: 'absolute', bottom: '150px', left: '145px', fontSize: '14px', fontWeight: 'bold', color: '#000' }}>
-      SKZ-QUZ-{data.registrationId}
-    </div>
-  </div>
-);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Upload, PlayCircle, Clock, Calendar, CheckCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, Upload, PlayCircle, Clock, Calendar, CheckCircle, Award, Save } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 export default function AdminContests() {
@@ -22,6 +22,12 @@ export default function AdminContests() {
   // Excel upload state
   const [uploadDomain, setUploadDomain] = useState('');
   const [uploading, setUploading] = useState(false);
+
+  // Certificate Management State
+  const [showCertModal, setShowCertModal] = useState(false);
+  const [selectedContestForCerts, setSelectedContestForCerts] = useState(null);
+  const [contestRegistrations, setContestRegistrations] = useState([]);
+  const [certLinks, setCertLinks] = useState({});
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
@@ -90,6 +96,53 @@ export default function AdminContests() {
       fetchContests();
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleManageCerts = async (contest) => {
+    setSelectedContestForCerts(contest);
+    setShowCertModal(true);
+    setContestRegistrations([]);
+    setCertLinks({});
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/contests/admin/registrations/${contest._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setContestRegistrations(data);
+        const links = {};
+        data.forEach(reg => {
+          links[reg._id] = reg.certificateLink || '';
+        });
+        setCertLinks(links);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load registrations");
+    }
+  };
+
+  const handleSaveCertLink = async (regId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/contests/admin/registrations/${regId}/certificate`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ certificateLink: certLinks[regId] })
+      });
+      if (res.ok) {
+        alert("Certificate link saved successfully!");
+      } else {
+        alert("Failed to save link");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save link");
     }
   };
 
@@ -302,6 +355,9 @@ export default function AdminContests() {
                   </span>
                 )}
                 <div style={{ display: 'flex', gap: '12px' }}>
+                  <button onClick={() => handleManageCerts(contest)} className="btn btn-outline" style={{ padding: '8px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--primary)', borderColor: 'var(--primary)' }} title="Manage Certificates">
+                    <Award size={16} /> Certificates
+                  </button>
                   <button onClick={() => handleEdit(contest)} className="btn btn-outline" style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit">
                     <Edit2 size={16} />
                   </button>
@@ -365,6 +421,51 @@ export default function AdminContests() {
                 <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>{isEditing ? 'Update Contest' : 'Create Contest'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showCertModal && (
+        <div className="modal-overlay" onClick={() => setShowCertModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px', maxHeight: '80vh', overflowY: 'auto' }}>
+            <h2 className="modal-title">Manage Certificates</h2>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>{selectedContestForCerts?.title}</p>
+            
+            {contestRegistrations.length === 0 ? (
+              <p>No students have completed this contest yet.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {contestRegistrations.map(reg => (
+                  <div key={reg._id} style={{ background: 'var(--bg-primary)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div>
+                        <strong>{reg.studentName}</strong> ({reg.domain})
+                      </div>
+                      <div>
+                        Score: {reg.score} | Time: {reg.timeTaken}s
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <input 
+                        type="url" 
+                        placeholder="Paste Google Drive Link here..." 
+                        className="form-input" 
+                        style={{ flex: 1 }}
+                        value={certLinks[reg._id] || ''}
+                        onChange={(e) => setCertLinks({...certLinks, [reg._id]: e.target.value})}
+                      />
+                      <button onClick={() => handleSaveCertLink(reg._id)} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Save size={16} /> Save Link
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+              <button type="button" className="btn btn-outline" onClick={() => setShowCertModal(false)}>Close</button>
+            </div>
           </div>
         </div>
       )}
