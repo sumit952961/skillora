@@ -30,8 +30,8 @@ export default function ContestTicker() {
       <style>
         {`
           @keyframes slideMarquee {
-            0% { transform: translateX(100vw); }
-            100% { transform: translateX(-100%); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
           }
           .contest-ticker-container {
             position: relative;
@@ -54,8 +54,8 @@ export default function ContestTicker() {
             white-space: nowrap;
             font-weight: 600;
             font-size: 0.95rem;
-            animation: slideMarquee 35s linear infinite;
-            padding-left: 100vw;
+            animation: slideMarquee 60s linear infinite;
+            will-change: transform;
           }
           .ticker-highlight {
             background: rgba(79, 70, 229, 0.15);
@@ -72,7 +72,7 @@ export default function ContestTicker() {
           @media (max-width: 768px) {
             .contest-ticker-text {
               font-size: 0.85rem;
-              animation-duration: 25s;
+              animation-duration: 45s;
             }
           }
         `}
