@@ -149,6 +149,11 @@ export default function Navbar() {
                 </NavLink>
               </li>
               <li>
+                <NavLink to="/contests" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
+                  <Trophy size={16} /> Contests
+                </NavLink>
+              </li>
+              <li>
                 <NavLink to="/my-internships" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
                   <Briefcase size={16} /> My Internships
                 </NavLink>

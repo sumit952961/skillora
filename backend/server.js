@@ -842,6 +842,42 @@ app.delete("/api/contests/:id", async (req, res) => {
   }
 });
 
+// Get active contests (Student)
+app.get("/api/contests/active", async (req, res) => {
+  try {
+    const contests = await Contest.find({ isActive: true }).sort({ startTime: 1 });
+    res.json(contests);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching contests", error: error.message });
+  }
+});
+
+// Register student for a contest
+app.post("/api/contests/register", async (req, res) => {
+  try {
+    const { userId, contestId, studentName, studentEmail, mobileNumber, course, branch, semester, college, domain } = req.body;
+    
+    // Check if already registered
+    const existingReg = await ContestRegistration.findOne({ userId, contestId });
+    if (existingReg) {
+      return res.status(400).json({ message: "You are already registered for this contest." });
+    }
+    
+    const newReg = new ContestRegistration({
+      userId, contestId, studentName, studentEmail, mobileNumber, course, branch, semester, college, domain
+    });
+    
+    await newReg.save();
+    
+    // Update user profile with college if missing
+    await User.findByIdAndUpdate(userId, { college });
+    
+    res.status(201).json({ message: "Successfully registered for the contest!", registration: newReg });
+  } catch (error) {
+    res.status(500).json({ message: "Error registering for contest", error: error.message });
+  }
+});
+
 // Bulk upload questions (JSON parsed from Excel on Frontend)
 app.post("/api/contests/upload-questions", async (req, res) => {
   try {
