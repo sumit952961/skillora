@@ -244,6 +244,8 @@ export default function Contests() {
               );
               const isRegistered = !!registration;
               const isStarted = isTestStartedMap[contest._id] || new Date(contest.startTime) <= new Date();
+              const contestEndTime = new Date(new Date(contest.startTime).getTime() + contest.timeLimitMinutes * 60000);
+              const isContestEnded = new Date() >= contestEndTime;
               
               if (isRegistered) {
                 // ---- REGISTERED DASHBOARD ----
@@ -262,30 +264,68 @@ export default function Contests() {
                         <span style={{ fontSize: '1.2rem', color: 'var(--primary-dark)', fontWeight: '900' }}>{registration.domain}</span>
                       </div>
 
-                      {/* Massive Countdown */}
-                      <div style={{ margin: '20px 0' }}>
-                        <MassiveLiveCountdown 
-                          targetDate={contest.startTime} 
-                          onComplete={() => setIsTestStartedMap(prev => ({ ...prev, [contest._id]: true }))} 
-                        />
-                      </div>
+                      {registration.hasTakenTest ? (
+                        <div style={{ width: '100%', maxWidth: '500px', textAlign: 'center', background: 'var(--bg-secondary)', padding: '40px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+                          <CheckCircle2 size={64} style={{ color: 'var(--accent-success)', margin: '0 auto 16px' }} />
+                          <h3 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Test Completed Successfully</h3>
+                          
+                          {isContestEnded ? (
+                            <>
+                              <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>The contest has officially ended. The final results are out!</p>
+                              <button 
+                                className="btn btn-primary" 
+                                style={{ width: '100%', padding: '16px', fontSize: '1.1rem' }}
+                                onClick={() => navigate(`/contests/leaderboard/${contest._id}`)}
+                              >
+                                View Leaderboard & Certificate
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <p style={{ color: 'var(--text-muted)', marginBottom: '12px' }}>
+                                Your answers have been recorded. You cannot take the test again.
+                              </p>
+                              <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginBottom: '24px' }}>
+                                The Leaderboard and Certificate will be available once the contest officially ends at <strong>{contestEndTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong>.
+                              </p>
+                              <button 
+                                className="btn btn-primary" 
+                                disabled
+                                style={{ width: '100%', padding: '16px', fontSize: '1.1rem', background: 'var(--text-light)', borderColor: 'var(--text-light)', cursor: 'not-allowed' }}
+                              >
+                                Test Submitted (Awaiting Results)
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <>
+                          {/* Massive Countdown */}
+                          <div style={{ margin: '20px 0' }}>
+                            <MassiveLiveCountdown 
+                              targetDate={contest.startTime} 
+                              onComplete={() => setIsTestStartedMap(prev => ({ ...prev, [contest._id]: true }))} 
+                            />
+                          </div>
 
-                      <div style={{ display: 'flex', gap: '30px', color: 'var(--text-muted)' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>✓ {contest.questionsPerStudent} Questions</span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>✓ {contest.timeLimitMinutes} Mins Duration</span>
-                      </div>
-                      
-                      <div style={{ marginTop: '20px', width: '100%', maxWidth: '400px' }}>
-                        <button 
-                          className="btn btn-primary" 
-                          disabled={!isStarted}
-                          style={{ width: '100%', padding: '20px', fontSize: '1.3rem', borderRadius: 'var(--radius-lg)', background: isStarted ? 'var(--primary)' : 'var(--text-light)', borderColor: isStarted ? 'var(--primary)' : 'var(--text-light)', cursor: isStarted ? 'pointer' : 'not-allowed', boxShadow: isStarted ? 'var(--shadow-premium)' : 'none' }} 
-                          onClick={() => isStarted && navigate(`/contests/arena/${contest._id}`)}
-                        >
-                          {isStarted ? 'Start Assessment' : 'Test Not Started Yet'}
-                        </button>
-                        {!isStarted && <p style={{ textAlign: 'center', marginTop: '12px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>The Start Assessment button will unlock automatically when the timer hits zero.</p>}
-                      </div>
+                          <div style={{ display: 'flex', gap: '30px', color: 'var(--text-muted)' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>✓ {contest.questionsPerStudent} Questions</span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>✓ {contest.timeLimitMinutes} Mins Duration</span>
+                          </div>
+                          
+                          <div style={{ marginTop: '20px', width: '100%', maxWidth: '400px' }}>
+                            <button 
+                              className="btn btn-primary" 
+                              disabled={!isStarted}
+                              style={{ width: '100%', padding: '20px', fontSize: '1.3rem', borderRadius: 'var(--radius-lg)', background: isStarted ? 'var(--primary)' : 'var(--text-light)', borderColor: isStarted ? 'var(--primary)' : 'var(--text-light)', cursor: isStarted ? 'pointer' : 'not-allowed', boxShadow: isStarted ? 'var(--shadow-premium)' : 'none' }} 
+                              onClick={() => isStarted && navigate(`/contests/arena/${contest._id}`)}
+                            >
+                              {isStarted ? 'Start Assessment' : 'Test Not Started Yet'}
+                            </button>
+                            {!isStarted && <p style={{ textAlign: 'center', marginTop: '12px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>The Start Assessment button will unlock automatically when the timer hits zero.</p>}
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 );

@@ -959,6 +959,14 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
     const contest = await Contest.findById(contestId);
     if (!contest) return res.status(404).json({ message: "Contest not found" });
 
+    const contestEndTime = new Date(new Date(contest.startTime).getTime() + contest.timeLimitMinutes * 60000);
+    if (new Date() < contestEndTime) {
+      return res.status(403).json({ 
+        message: "Leaderboard will be generated after the contest ends.", 
+        contestEndTime: contestEndTime.toISOString() 
+      });
+    }
+
     // Fetch all completed registrations, sorted by score (desc), then timeTaken (asc)
     const realStudents = await ContestRegistration.find({ contestId, hasTakenTest: true })
       .sort({ score: -1, timeTaken: 1 })

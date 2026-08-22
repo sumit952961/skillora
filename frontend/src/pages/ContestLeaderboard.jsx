@@ -18,6 +18,8 @@ export default function ContestLeaderboard() {
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
+  const [waitEndTime, setWaitEndTime] = useState(null);
+
   useEffect(() => {
     fetchLeaderboard();
   }, [contestId]);
@@ -25,8 +27,15 @@ export default function ContestLeaderboard() {
   const fetchLeaderboard = async () => {
     try {
       const res = await fetch(`${API_URL}/contests/leaderboard/${contestId}`);
-      if (!res.ok) throw new Error("Failed to fetch leaderboard");
       const data = await res.json();
+      
+      if (!res.ok) {
+        if (res.status === 403 && data.contestEndTime) {
+          setWaitEndTime(data.contestEndTime);
+        }
+        throw new Error(data.message || "Failed to fetch leaderboard");
+      }
+      
       setLeaderboard(data);
     } catch (err) {
       setError(err.message);
@@ -73,6 +82,21 @@ export default function ContestLeaderboard() {
   };
 
   if (loading) return <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}><h3>Loading Leaderboard...</h3></div>;
+  if (waitEndTime) {
+    const timeString = new Date(waitEndTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return (
+      <div className="container fade-in" style={{ padding: '80px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
+        <Clock size={64} style={{ color: 'var(--primary)', margin: '0 auto 24px' }} />
+        <h1 style={{ fontSize: '2.2rem', marginBottom: '16px' }}>Processing Results...</h1>
+        <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', marginBottom: '32px' }}>
+          The contest is currently ongoing. Final ranks and certificates will be generated once the contest officially ends at <strong style={{ color: 'var(--text-main)' }}>{timeString}</strong>.
+        </p>
+        <button className="btn btn-primary" onClick={() => navigate('/contests')}>
+          Return to Dashboard
+        </button>
+      </div>
+    );
+  }
   if (error) return <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}><h3 style={{ color: 'var(--accent-danger)' }}>{error}</h3></div>;
 
   const currentUserData = leaderboard.find(s => s.userId === user?._id);
