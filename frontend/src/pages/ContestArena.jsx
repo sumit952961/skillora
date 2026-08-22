@@ -30,7 +30,7 @@ export default function ContestArena() {
 
   const fetchArenaData = async () => {
     try {
-      const res = await fetch(`${API_URL}/contests/arena/${contestId}/${user._id}`);
+      const res = await fetch(`${API_URL}/contests/arena/${contestId}/${user?._id || user?.id}`);
       const data = await res.json();
       
       if (!res.ok) {
@@ -66,7 +66,7 @@ export default function ContestArena() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: user._id,
+          userId: user?._id || user?.id,
           contestId: contest._id,
           answers,
           timeTaken

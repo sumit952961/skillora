@@ -156,61 +156,104 @@ export default function ContestLeaderboard() {
             Back to Contests
           </button>
         </div>
-
       </div>
+
+      {/* Visible Certificate Preview */}
+      {currentUserData && (
+        <div className="container fade-in" style={{ padding: '0 20px 80px', maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '2rem', marginBottom: '32px' }}>Your Certificate of Participation</h2>
+          <div style={{ 
+            width: '100%', 
+            maxWidth: '1200px', 
+            margin: '0 auto',
+            position: 'relative',
+            overflow: 'hidden',
+            borderRadius: '12px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+            aspectRatio: '1200/848',
+            background: 'var(--bg-secondary)'
+          }}>
+            <div style={{
+              width: '1200px',
+              height: '848px',
+              transformOrigin: 'top left',
+              transform: 'scale(var(--cert-scale, 1))',
+              position: 'absolute',
+              top: 0,
+              left: 0
+            }}>
+              <style>{`
+                @media (max-width: 1240px) {
+                  :root { --cert-scale: calc((100vw - 40px) / 1200); }
+                }
+                @media (min-width: 1241px) {
+                  :root { --cert-scale: calc(900px / 1200); }
+                }
+              `}</style>
+              <CertificateContent data={currentUserData} />
+            </div>
+          </div>
+          <p style={{ color: 'var(--text-muted)', marginTop: '20px' }}>Click the 'Download My Certificate' button at the top to save as PDF.</p>
+        </div>
+      )}
 
       {/* Hidden Certificate Element for html2canvas to render */}
       {currentUserData && (
         <div style={{ overflow: 'hidden', height: 0, width: 0, position: 'absolute', top: -9999 }}>
-          <div 
-            ref={certificateRef} 
-            style={{ 
-              width: '1200px', 
-              height: '848px', 
-              position: 'relative', 
-              backgroundImage: 'url(/contest-certificate-template.jpg)', 
-              backgroundSize: 'cover', 
-              backgroundPosition: 'center',
-              fontFamily: "'Inter', sans-serif"
-            }}
-          >
-            {/* Name */}
-            <div style={{ position: 'absolute', top: '425px', left: '0', width: '100%', textAlign: 'center', fontSize: '42px', fontWeight: 'bold', color: '#0A192F', letterSpacing: '2px' }}>
-              {currentUserData.name}
-            </div>
-
-            {/* Domain (Mid) */}
-            <div style={{ position: 'absolute', top: '565px', left: '400px', width: '400px', textAlign: 'center', fontSize: '18px', fontWeight: '600', color: '#1B263B' }}>
-              {currentUserData.domain}
-            </div>
-
-            {/* Domain (Bottom Row 1) */}
-            <div style={{ position: 'absolute', bottom: '215px', left: '190px', width: '150px', textAlign: 'left', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-              {currentUserData.domain}
-            </div>
-
-            {/* Score (Bottom Row 2) */}
-            <div style={{ position: 'absolute', bottom: '215px', left: '445px', width: '80px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-              {currentUserData.score}
-            </div>
-
-            {/* Rank (Bottom Row 3) */}
-            <div style={{ position: 'absolute', bottom: '215px', left: '655px', width: '80px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-              {currentUserData.rank}
-            </div>
-
-            {/* Date (Bottom Row 4) */}
-            <div style={{ position: 'absolute', bottom: '215px', left: '855px', width: '120px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
-              {currentUserData.date}
-            </div>
-
-            {/* Certificate ID */}
-            <div style={{ position: 'absolute', bottom: '150px', left: '145px', fontSize: '14px', fontWeight: 'bold', color: '#000' }}>
-              SKZ-QUZ-{currentUserData.registrationId}
-            </div>
-          </div>
+          <CertificateContent data={currentUserData} refObj={certificateRef} />
         </div>
       )}
     </>
   );
 }
+
+const CertificateContent = ({ data, refObj }) => (
+  <div 
+    ref={refObj} 
+    style={{ 
+      width: '1200px', 
+      height: '848px', 
+      position: 'relative', 
+      backgroundImage: 'url(/contest-certificate-template.jpg)', 
+      backgroundSize: 'cover', 
+      backgroundPosition: 'center',
+      fontFamily: "'Inter', sans-serif",
+      backgroundRepeat: 'no-repeat'
+    }}
+  >
+    {/* Name */}
+    <div style={{ position: 'absolute', top: '425px', left: '0', width: '100%', textAlign: 'center', fontSize: '42px', fontWeight: 'bold', color: '#0A192F', letterSpacing: '2px' }}>
+      {data.name}
+    </div>
+
+    {/* Domain (Mid) */}
+    <div style={{ position: 'absolute', top: '565px', left: '400px', width: '400px', textAlign: 'center', fontSize: '18px', fontWeight: '600', color: '#1B263B' }}>
+      {data.domain}
+    </div>
+
+    {/* Domain (Bottom Row 1) */}
+    <div style={{ position: 'absolute', bottom: '215px', left: '190px', width: '150px', textAlign: 'left', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
+      {data.domain}
+    </div>
+
+    {/* Score (Bottom Row 2) */}
+    <div style={{ position: 'absolute', bottom: '215px', left: '445px', width: '80px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
+      {data.score}
+    </div>
+
+    {/* Rank (Bottom Row 3) */}
+    <div style={{ position: 'absolute', bottom: '215px', left: '655px', width: '80px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
+      {data.rank}
+    </div>
+
+    {/* Date (Bottom Row 4) */}
+    <div style={{ position: 'absolute', bottom: '215px', left: '855px', width: '120px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
+      {data.date}
+    </div>
+
+    {/* Certificate ID */}
+    <div style={{ position: 'absolute', bottom: '150px', left: '145px', fontSize: '14px', fontWeight: 'bold', color: '#000' }}>
+      SKZ-QUZ-{data.registrationId}
+    </div>
+  </div>
+);
