@@ -16,6 +16,7 @@ export default function InternshipDetail() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [applied, setApplied] = useState(false);
+  const [alreadyAppliedPopup, setAlreadyAppliedPopup] = useState(false);
 
   useEffect(() => {
     // Check if user has already applied
@@ -191,10 +192,9 @@ export default function InternshipDetail() {
               </p>
               <button
                 className="btn btn-primary sidebar-apply-btn"
-                onClick={() => setIsModalOpen(true)}
-                disabled={applied}
+                onClick={() => applied ? setAlreadyAppliedPopup(true) : setIsModalOpen(true)}
               >
-                {applied ? 'Applied ✓' : <>Apply Now <ArrowRight size={16} /></>}
+                {applied ? 'Applied ✓' : <><span>Apply Now</span> <ArrowRight size={16} /></>}
               </button>
 
               <div className="sidebar-quick-info">
@@ -234,6 +234,50 @@ export default function InternshipDetail() {
             setApplied(true);
           }}
         />
+      )}
+
+      {/* Already Applied Popup */}
+      {alreadyAppliedPopup && (
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setAlreadyAppliedPopup(false); }}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.45)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 1200, padding: '20px'
+          }}
+        >
+          <div style={{
+            background: 'var(--bg-secondary)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '36px 32px',
+            width: '100%', maxWidth: '420px',
+            boxShadow: 'var(--shadow-lg)',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>✅</div>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem', color: 'var(--text-main)' }}>Already Applied!</h3>
+            <p style={{ margin: '0 0 24px 0', fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+              You have already applied for <strong>{internship?.title}</strong>. Track your progress from <strong>My Internships</strong>.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button
+                onClick={() => setAlreadyAppliedPopup(false)}
+                className="btn btn-outline"
+                style={{ padding: '9px 20px', fontSize: '0.88rem' }}
+              >
+                Close
+              </button>
+              <a
+                href="/my-internships"
+                className="btn btn-primary"
+                style={{ padding: '9px 20px', fontSize: '0.88rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                My Internships <ArrowRight size={15} />
+              </a>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

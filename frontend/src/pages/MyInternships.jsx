@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { DataContext } from '../context/DataContext';
 import { Link } from 'react-router-dom';
-import { Calendar, Briefcase, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Calendar, Briefcase, ChevronRight, ShieldCheck, ArrowRight, Compass } from 'lucide-react';
 
 export default function MyInternships() {
   const { appliedInternships } = useContext(AuthContext);
+  const { internships: allInternships } = useContext(DataContext);
   const [myInternships, setMyInternships] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,6 +66,48 @@ export default function MyInternships() {
               </Link>
             </div>
           ))}
+      {myInternships.length > 0 && (
+        <div style={{ marginTop: '48px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+            <Compass size={20} style={{ color: 'var(--primary)' }} />
+            <h2 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>Explore More Internships</h2>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {allInternships
+              .filter(i => !myInternships.some(app => app.internshipId === i.id || app.details?.id === i.id))
+              .slice(0, 3)
+              .map(internship => (
+                <div key={internship.id} style={{
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '16px 20px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '16px'
+                }}>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', color: 'var(--text-main)', fontWeight: '600' }}>{internship.title}</h4>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>{internship.domain} · {internship.duration}</p>
+                  </div>
+                  <Link
+                    to={`/internships/${internship.id}`}
+                    className="btn btn-outline"
+                    style={{ padding: '6px 14px', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}
+                  >
+                    View <ArrowRight size={14} />
+                  </Link>
+                </div>
+              ))
+            }
+            {allInternships.filter(i => !myInternships.some(app => app.internshipId === i.id || app.details?.id === i.id)).length === 0 && (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '16px' }}>You have applied to all available internships! 🎉</p>
+            )}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <Link to="/internships" style={{ color: 'var(--primary)', fontSize: '0.88rem', textDecoration: 'none', fontWeight: '600' }}>View all internships →</Link>
+          </div>
         </div>
       )}
     </div>
