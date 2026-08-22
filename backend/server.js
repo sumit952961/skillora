@@ -30,7 +30,12 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["student", "admin"], default: "student" },
-  tokenVersion: { type: Number, default: 0 }
+  tokenVersion: { type: Number, default: 0 },
+  course: { type: String, default: "" },
+  branch: { type: String, default: "" },
+  semester: { type: String, default: "" },
+  mobileNumber: { type: String, default: "" },
+  skills: { type: String, default: "" }
 }, { timestamps: true });
 
 const applicationSchema = new mongoose.Schema({
@@ -191,7 +196,7 @@ app.post("/api/auth/register", async (req, res) => {
     
     sendWelcomeEmail(newUser.name, newUser.email);
 
-    res.status(201).json({ token, user: { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role } });
+    res.status(201).json({ token, user: { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role, course: newUser.course, branch: newUser.branch, semester: newUser.semester, mobileNumber: newUser.mobileNumber, skills: newUser.skills } });
   } catch (e) { res.status(500).json({ message: "Registration failed", error: e.message }); }
 });
 
@@ -205,7 +210,7 @@ app.post("/api/auth/login", async (req, res) => {
     
     sendLoginNotification(user.name, user.email);
 
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role, course: user.course, branch: user.branch, semester: user.semester, mobileNumber: user.mobileNumber, skills: user.skills } });
   } catch (e) { res.status(500).json({ message: "Login failed", error: e.message }); }
 });
 
@@ -213,8 +218,28 @@ app.get("/api/auth/profile", authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
-    res.json({ id: user._id, name: user.name, email: user.email, role: user.role });
+    res.json({ id: user._id, name: user.name, email: user.email, role: user.role, course: user.course, branch: user.branch, semester: user.semester, mobileNumber: user.mobileNumber, skills: user.skills });
   } catch (e) { res.status(500).json({ message: "Failed to fetch profile" }); }
+});
+
+app.put("/api/auth/profile", authenticateToken, async (req, res) => {
+  try {
+    const { name, course, branch, semester, mobileNumber, skills } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    
+    if (name) user.name = name;
+    user.course = course || "";
+    user.branch = branch || "";
+    user.semester = semester || "";
+    user.mobileNumber = mobileNumber || "";
+    user.skills = skills || "";
+    
+    await user.save();
+    res.json({ message: "Profile updated successfully", user: { id: user._id, name: user.name, email: user.email, role: user.role, course: user.course, branch: user.branch, semester: user.semester, mobileNumber: user.mobileNumber, skills: user.skills } });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to update profile", error: e.message });
+  }
 });
 
 app.post("/api/auth/change-password", authenticateToken, async (req, res) => {

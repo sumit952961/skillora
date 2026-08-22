@@ -19,6 +19,7 @@ import InternshipTaskOverview from './pages/InternshipTaskOverview'
 import Tasks from './pages/Tasks'
 import Certificates from './pages/Certificates'
 import Profile from './pages/Profile'
+import Contests from './pages/Contests'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminInternships from './pages/AdminInternships'
 import AdminApplications from './pages/AdminApplications'
@@ -92,6 +93,11 @@ function AppContent() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          } />
+          <Route path="/contests" element={
+            <ProtectedRoute>
+              <Contests />
             </ProtectedRoute>
           } />
 

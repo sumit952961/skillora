@@ -112,6 +112,22 @@ export const AuthProvider = ({ children }) => {
     setQuizApplications([]);
   };
 
+  const updateProfile = async (profileData) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(profileData)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to update profile');
+      setUser(data.user);
+      return { success: true };
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const applyForInternship = async (internshipData, generatedAppId) => {
     if (appliedInternships.some(app => app.internshipId === internshipData.id)) {
       alert("You have already applied for this internship.");
@@ -361,7 +377,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ 
-      user, token, login, register, logout, loading, 
+      user, token, login, register, logout, loading, updateProfile,
       appliedInternships, applyForInternship, submitTask, 
       processFinalSubmit, 
       quizApplications, submitQuiz, processQuizPayment,

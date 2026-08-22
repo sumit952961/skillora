@@ -1,7 +1,7 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Award, BookOpen, LogOut, CheckCircle, User, Briefcase, LayoutDashboard, Settings, Layers, MoreVertical, Key, Shield, Menu, X } from 'lucide-react';
+import { Award, BookOpen, LogOut, CheckCircle, User, Briefcase, LayoutDashboard, Settings, Layers, MoreVertical, Key, Shield, Menu, X, Trophy } from 'lucide-react';
 import '../navbar-fix.css';
 
 export default function Navbar() {
@@ -152,14 +152,32 @@ export default function Navbar() {
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/profile" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
-                  <User size={16} /> Profile
+                <NavLink to="/contests" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
+                  <Trophy size={16} /> Contests
                 </NavLink>
               </li>
+              {/* User profile icon — direct link to /profile, no dropdown */}
               <li style={{ marginLeft: '12px' }}>
-                <button onClick={handleLogout} className="btn btn-outline" style={{ padding: '8px 14px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <LogOut size={16} /> Logout
-                </button>
+                <Link
+                  to="/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  title="My Profile"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-main)',
+                    textDecoration: 'none',
+                    flexShrink: 0
+                  }}
+                >
+                  <User size={18} />
+                </Link>
               </li>
             </>
           )}
