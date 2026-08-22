@@ -235,12 +235,14 @@ export default function Contests() {
         title="Live Contests & Competitions | Skillzeno" 
         description="Participate in skill-based contests and national assessments. Win certificates and boost your portfolio."
       />
-      <div className="container fade-in" style={{ padding: '40px 20px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <div className="icon-wrapper" style={{ margin: '0 auto 16px', background: 'var(--primary-light)', color: 'var(--primary)', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Trophy size={32} />
-          </div>
-          <h1 className="section-title">Live Contests & Assessments</h1>
+      <div className="container fade-in" style={{ padding: '20px 20px 40px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <h1 className="section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+            <div className="icon-wrapper" style={{ background: 'var(--primary-light)', color: 'var(--primary)', width: '48px', height: '48px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Trophy size={24} />
+            </div>
+            Live Contests & Assessments
+          </h1>
           <p className="section-subtitle" style={{ maxWidth: '600px', margin: '0 auto' }}>
             Test your skills against peers nationally. Register for active contests, attempt domain-specific quizzes, and climb the leaderboard!
           </p>
