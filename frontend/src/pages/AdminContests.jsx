@@ -449,13 +449,19 @@ export default function AdminContests() {
                     <div style={{ display: 'flex', gap: '12px' }}>
                       <input 
                         type="url" 
-                        placeholder="Paste Google Drive Link here..." 
+                        placeholder={reg.hasTakenTest ? "Paste Google Drive Link here..." : "Waiting for test submission..."}
                         className="form-input" 
-                        style={{ flex: 1 }}
+                        style={{ flex: 1, cursor: reg.hasTakenTest ? 'text' : 'not-allowed', backgroundColor: reg.hasTakenTest ? 'var(--bg-primary)' : 'var(--bg-secondary)' }}
                         value={certLinks[reg._id] || ''}
                         onChange={(e) => setCertLinks({...certLinks, [reg._id]: e.target.value})}
+                        disabled={!reg.hasTakenTest}
                       />
-                      <button onClick={() => handleSaveCertLink(reg._id)} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <button 
+                        onClick={() => handleSaveCertLink(reg._id)} 
+                        className="btn btn-primary" 
+                        style={{ display: 'flex', alignItems: 'center', gap: '6px', opacity: reg.hasTakenTest ? 1 : 0.5, cursor: reg.hasTakenTest ? 'pointer' : 'not-allowed' }}
+                        disabled={!reg.hasTakenTest}
+                      >
                         <Save size={16} /> Save Link
                       </button>
                     </div>
