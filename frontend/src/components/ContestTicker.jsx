@@ -37,8 +37,8 @@ export default function ContestTicker() {
             position: relative;
             width: 100%;
             height: 36px;
-            background: linear-gradient(90deg, var(--primary-light), #f3e8ff);
-            color: var(--primary-dark);
+            background: var(--primary-light);
+            color: var(--primary);
             z-index: 50;
             display: flex;
             align-items: center;
@@ -54,7 +54,7 @@ export default function ContestTicker() {
             white-space: nowrap;
             font-weight: 600;
             font-size: 0.95rem;
-            animation: slideMarquee 60s linear infinite;
+            animation: slideMarquee 40s linear infinite;
             will-change: transform;
           }
           .ticker-highlight {
@@ -66,13 +66,13 @@ export default function ContestTicker() {
             text-transform: uppercase;
             font-size: 0.8rem;
             letter-spacing: 0.5px;
-            color: var(--primary);
+            color: var(--primary-hover);
             font-weight: 700;
           }
           @media (max-width: 768px) {
             .contest-ticker-text {
               font-size: 0.85rem;
-              animation-duration: 45s;
+              animation-duration: 30s;
             }
           }
         `}
