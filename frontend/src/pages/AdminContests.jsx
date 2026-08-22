@@ -57,6 +57,8 @@ export default function AdminContests() {
     const formattedData = {
       ...formData,
       domains: formData.domains.split(',').map(d => d.trim()),
+      startTime: new Date(formData.startTime).toISOString(),
+      registrationEndTime: new Date(formData.registrationEndTime).toISOString()
     };
 
     try {
@@ -92,13 +94,20 @@ export default function AdminContests() {
   };
 
   const handleEdit = (contest) => {
+    // Convert UTC to local datetime-local format
+    const toLocalDatetime = (isoStr) => {
+      if (!isoStr) return '';
+      const d = new Date(isoStr);
+      return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    };
+
     setSelectedContest(contest);
     setFormData({
       title: contest.title,
       description: contest.description,
       domains: contest.domains.join(', '),
-      startTime: new Date(contest.startTime).toISOString().slice(0, 16),
-      registrationEndTime: new Date(contest.registrationEndTime).toISOString().slice(0, 16),
+      startTime: toLocalDatetime(contest.startTime),
+      registrationEndTime: toLocalDatetime(contest.registrationEndTime),
       isActive: contest.isActive,
       timeLimitMinutes: contest.timeLimitMinutes,
       questionsPerStudent: contest.questionsPerStudent

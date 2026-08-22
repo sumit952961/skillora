@@ -183,7 +183,12 @@ export default function Contests() {
                         <div style={{ background: 'var(--accent-warning-light)', padding: '12px', borderRadius: '50%', color: 'var(--accent-warning)' }}><Clock size={24} /></div>
                         <div>
                           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 4px 0' }}>Registration Ends</p>
-                          <p style={{ fontSize: '1.05rem', fontWeight: 'bold', color: 'var(--text-main)', margin: 0 }}>{new Date(contest.registrationEndTime).toLocaleString()}</p>
+                          <p style={{ fontSize: '1.05rem', fontWeight: 'bold', color: 'var(--text-main)', margin: 0 }}>
+                            {new Date(contest.registrationEndTime).toLocaleString('en-US', {
+                              day: '2-digit', month: 'short', year: 'numeric',
+                              hour: 'numeric', minute: '2-digit', hour12: true
+                            })}
+                          </p>
                         </div>
                       </div>
                     </div>
