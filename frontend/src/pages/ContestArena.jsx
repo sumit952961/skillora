@@ -19,6 +19,7 @@ export default function ContestArena() {
   const [timeLeft, setTimeLeft] = useState(0); // in seconds
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [score, setScore] = useState(null);
+  const [warnings, setWarnings] = useState(0);
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
@@ -105,6 +106,67 @@ export default function ContestArena() {
     return () => clearInterval(timerId);
   }, [loading, score, handleSubmitTest]);
 
+  // Anti-Cheat Logic
+  useEffect(() => {
+    if (loading || score !== null) return;
+
+    const handleCheat = (reason) => {
+      setWarnings(prev => {
+        const newWarnings = prev + 1;
+        if (newWarnings >= 2) {
+          alert(`Violation: ${reason}.\nYou have exceeded the warning limit. Test is automatically submitting.`);
+          handleSubmitTest(true);
+        } else {
+          alert(`Warning (${newWarnings}/2): ${reason}.\nDo not do this again or your test will be submitted!`);
+        }
+        return newWarnings;
+      });
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        handleCheat("Tab switching or minimizing window is not allowed");
+      }
+    };
+
+    const preventCopyPaste = (e) => e.preventDefault();
+    const preventContextMenu = (e) => e.preventDefault();
+    const preventShortcuts = (e) => {
+      if (e.key === 'PrintScreen') {
+        if (navigator.clipboard) navigator.clipboard.writeText(''); 
+        handleCheat("Screenshots are not allowed");
+        e.preventDefault();
+      }
+      if (e.key === 'F12') e.preventDefault();
+      if (e.ctrlKey && ['c', 'v', 'x', 's', 'p'].includes(e.key.toLowerCase())) e.preventDefault();
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'i') e.preventDefault();
+    };
+    const handleKeyUp = (e) => {
+      if (e.key === 'PrintScreen') {
+        if (navigator.clipboard) navigator.clipboard.writeText('');
+        handleCheat("Screenshots are not allowed");
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("copy", preventCopyPaste);
+    document.addEventListener("paste", preventCopyPaste);
+    document.addEventListener("cut", preventCopyPaste);
+    document.addEventListener("contextmenu", preventContextMenu);
+    document.addEventListener("keydown", preventShortcuts);
+    document.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("copy", preventCopyPaste);
+      document.removeEventListener("paste", preventCopyPaste);
+      document.removeEventListener("cut", preventCopyPaste);
+      document.removeEventListener("contextmenu", preventContextMenu);
+      document.removeEventListener("keydown", preventShortcuts);
+      document.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [loading, score, handleSubmitTest]);
+
   const handleOptionSelect = (qId, optionIndex) => {
     setAnswers(prev => ({ ...prev, [qId]: optionIndex }));
   };
@@ -136,7 +198,7 @@ export default function ContestArena() {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <>
+    <div style={{ userSelect: 'none' }}>
       <SEO title={`${contest.title} - Live Arena | Skillzeno`} noindex={true} />
       
       {/* Sticky Header with Timer */}
@@ -221,6 +283,6 @@ export default function ContestArena() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
