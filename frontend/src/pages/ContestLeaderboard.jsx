@@ -77,22 +77,18 @@ export default function ContestLeaderboard() {
                   padding: '20px 24px', 
                   borderBottom: idx !== leaderboard.length - 1 ? '1px solid var(--border-color)' : 'none',
                   alignItems: 'center',
-                  background: student.isReal ? 'var(--primary-light)' : 'transparent',
+                  background: 'transparent',
                   transition: 'background 0.2s ease',
                   position: 'relative'
                 }}
               >
-                {student.isReal && (
-                  <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: 'var(--primary)' }} />
-                )}
                 
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   {getRankIcon(student.rank)}
                 </div>
                 
-                <div style={{ fontWeight: '600', fontSize: '1.05rem', color: student.isReal ? 'var(--primary-dark)' : 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ fontWeight: '600', fontSize: '1.05rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   {student.name}
-                  {student.isReal && <Star size={14} fill="var(--primary)" color="var(--primary)" title="Verified Participant" />}
                 </div>
                 
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
