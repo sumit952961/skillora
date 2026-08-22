@@ -439,7 +439,8 @@ export default function AdminContests() {
                   <div key={reg._id} style={{ background: 'var(--bg-primary)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <div>
-                        <strong>{reg.studentName}</strong> ({reg.domain})
+                        <div><strong>{reg.studentName}</strong> ({reg.domain})</div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '2px' }}>{reg.studentEmail}</div>
                       </div>
                       <div>
                         Score: {reg.score} | Time: {reg.timeTaken}s
