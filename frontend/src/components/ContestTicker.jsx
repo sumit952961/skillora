@@ -85,8 +85,7 @@ export default function ContestTicker() {
         <div className="contest-ticker-text">
           {Array(4).fill().map((_, i) => (
             <span key={i}>
-              <span style={{ marginRight: '6px' }}>🚀</span> 
-              FREE CERTIFICATION AVAILABLE! Participate in our Live Skill Assessments and boost your portfolio. 
+              🚀 FREE CERTIFICATION AVAILABLE! Participate in our Live Contests and Assessments and boost your portfolio. 
               <span className="ticker-highlight">Click Here to Register Now!</span>
             </span>
           ))}
