@@ -953,7 +953,7 @@ app.get("/api/contests/arena/:contestId/:userId", async (req, res) => {
 
     // Fetch random questions using $sample
     const questions = await QuestionBank.aggregate([
-      { $match: { domain: domain } },
+      { $match: { domain: { $regex: new RegExp(`^${domain}$`, 'i') } } },
       { $sample: { size: numQuestions } },
       { $project: { correctOptionIndex: 0 } } // Do not send correct answers to frontend
     ]);
