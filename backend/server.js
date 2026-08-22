@@ -1025,6 +1025,18 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
       "Rohan Verma", "Kavita Reddy", "Sanjay Das", "Vikram Singh", "Pooja Mehta"
     ];
 
+    const upRajkiyaColleges = [
+      "Rajkiya Engineering College, Azamgarh",
+      "Rajkiya Engineering College, Banda",
+      "Rajkiya Engineering College, Bijnor",
+      "Rajkiya Engineering College, Kannauj",
+      "Rajkiya Engineering College, Mainpuri",
+      "Rajkiya Engineering College, Sonbhadra",
+      "Rajkiya Engineering College, Ambedkar Nagar",
+      "Government Polytechnic, Lucknow",
+      "Government Polytechnic, Kanpur"
+    ];
+
     const finalLeaderboard = [];
     let dummyIndex = 0;
     let realIndex = 0;
@@ -1083,12 +1095,13 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
         }
 
         const dummyName = baseDummyNames[dummyIndex % baseDummyNames.length];
+        const dummyCollege = upRajkiyaColleges[dummyIndex % upRajkiyaColleges.length];
         
         finalLeaderboard.push({
           rank: i,
           userId: null,
           name: dummyName,
-          college: "Institute of Technology",
+          college: dummyCollege,
           score: dummyScore,
           timeTaken: dummyTime,
           domain: "General",
