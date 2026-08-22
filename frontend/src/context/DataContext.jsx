@@ -73,6 +73,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const deleteInternship = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this internship? This action cannot be undone.")) return;
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/admin/internships/${id}`, {
@@ -126,6 +127,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const deleteQuiz = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this quiz? This action cannot be undone.")) return;
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/admin/quizzes/${id}`, {
