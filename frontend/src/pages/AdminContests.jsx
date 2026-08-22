@@ -23,13 +23,18 @@ export default function AdminContests() {
   const [uploadDomain, setUploadDomain] = useState('');
   const [uploading, setUploading] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+
   useEffect(() => {
     fetchContests();
   }, []);
 
+  // Compute unique domains from all contests for the upload dropdown
+  const allDomains = Array.from(new Set(contests.flatMap(c => c.domains)));
+
   const fetchContests = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/contests');
+      const res = await fetch(`${API_URL}/contests`);
       const data = await res.json();
       setContests(data);
       setLoading(false);
@@ -56,8 +61,8 @@ export default function AdminContests() {
 
     try {
       const url = isEditing 
-        ? `http://localhost:5000/api/contests/${selectedContest._id}` 
-        : 'http://localhost:5000/api/contests';
+        ? `${API_URL}/contests/${selectedContest._id}` 
+        : `${API_URL}/contests`;
       const method = isEditing ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -79,7 +84,7 @@ export default function AdminContests() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this contest?")) return;
     try {
-      await fetch(`http://localhost:5000/api/contests/${id}`, { method: 'DELETE' });
+      await fetch(`${API_URL}/contests/${id}`, { method: 'DELETE' });
       fetchContests();
     } catch (err) {
       console.error(err);
@@ -134,7 +139,7 @@ export default function AdminContests() {
       }));
 
       try {
-        const res = await fetch('http://localhost:5000/api/contests/upload-questions', {
+        const res = await fetch(`${API_URL}/contests/upload-questions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ domain: uploadDomain, questions: formattedQuestions })
@@ -169,14 +174,17 @@ export default function AdminContests() {
           Excel format columns: <b>question, option1, option2, option3, option4, correctOptionIndex (0-3), difficulty</b>
         </p>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <input 
-            type="text" 
-            placeholder="Target Domain (e.g. MERN Stack)" 
-            className="form-input" 
+          <select
+            className="form-input"
             style={{ maxWidth: '300px' }}
             value={uploadDomain}
             onChange={(e) => setUploadDomain(e.target.value)}
-          />
+          >
+            <option value="">-- Select Target Domain --</option>
+            {allDomains.map((d, i) => (
+              <option key={i} value={d}>{d}</option>
+            ))}
+          </select>
           <input 
             type="file" 
             accept=".xlsx, .xls, .csv" 
