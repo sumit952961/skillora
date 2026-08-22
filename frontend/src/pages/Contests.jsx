@@ -399,7 +399,11 @@ export default function Contests() {
                     </div>
                     
                     <div>
-                      <button className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '1.1rem' }} onClick={() => openRegisterModal(contest)}>Register Now</button>
+                      {new Date() > new Date(contest.registrationEndTime) ? (
+                        <button className="btn btn-primary" disabled style={{ padding: '12px 32px', fontSize: '1.1rem', background: 'var(--text-light)', borderColor: 'var(--text-light)', cursor: 'not-allowed' }}>Registration Closed</button>
+                      ) : (
+                        <button className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '1.1rem' }} onClick={() => openRegisterModal(contest)}>Register Now</button>
+                      )}
                     </div>
                   </div>
                 </div>
