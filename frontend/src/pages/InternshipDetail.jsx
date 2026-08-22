@@ -194,7 +194,7 @@ export default function InternshipDetail() {
                 className="btn btn-primary sidebar-apply-btn"
                 onClick={() => applied ? setAlreadyAppliedPopup(true) : setIsModalOpen(true)}
               >
-                {applied ? 'Applied ✓' : <><span>Apply Now</span> <ArrowRight size={16} /></>}
+                {applied ? 'Applied ✓' : <>Apply Now <ArrowRight size={16} /></>}
               </button>
 
               <div className="sidebar-quick-info">
