@@ -875,7 +875,11 @@ app.post("/api/contests/register", async (req, res) => {
     
     res.status(201).json({ message: "Successfully registered for the contest!", registration: newReg });
   } catch (error) {
-    res.status(500).json({ message: "Error registering for contest", error: error.message });
+    console.error("Contest Registration Error:", error);
+    res.status(500).json({ 
+      message: "Error registering for contest", 
+      error: error.message 
+    });
   }
 });
 

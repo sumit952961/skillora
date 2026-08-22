@@ -97,7 +97,7 @@ export default function Contests() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: user._id,
+          userId: user?._id || user?.id,
           contestId: selectedContest._id,
           ...formData
         })
@@ -109,11 +109,11 @@ export default function Contests() {
         setRegisteredContestIds(prev => [...prev, selectedContest._id]);
         setShowRegisterModal(false);
       } else {
-        alert(data.message || "Registration failed");
+        alert(`Registration failed: ${data.error || data.message || 'Unknown error'}`);
       }
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
+      alert("Registration failed. Please check the console for details.");
     } finally {
       setRegistering(false);
     }
