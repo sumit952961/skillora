@@ -972,29 +972,24 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
       .sort({ score: -1, timeTaken: 1 })
       .limit(3);
 
-    // Dummy data base if admin hasn't provided yet
-    const baseDummies = contest.dummyLeaderboard && contest.dummyLeaderboard.length >= 7 
-      ? contest.dummyLeaderboard 
-      : [
-          { name: "Rahul Sharma", college: "JSS Academy of Technical Education, Noida", score: 24, timeTaken: 1200 },
-          { name: "Priya Singh", college: "Institute of Engineering and Technology (IET), Lucknow", score: 23, timeTaken: 1250 },
-          { name: "Amit Kumar", college: "Ajay Kumar Garg Engineering College (AKGEC)", score: 21, timeTaken: 1300 },
-          { name: "Neha Gupta", college: "KIET Group of Institutions, Ghaziabad", score: 19, timeTaken: 1400 },
-          { name: "Rohan Verma", college: "ABES Engineering College, Ghaziabad", score: 18, timeTaken: 1450 },
-          { name: "Kavita Reddy", college: "Galgotias College of Engineering and Technology", score: 17, timeTaken: 1500 },
-          { name: "Sanjay Das", college: "Kamla Nehru Institute of Technology (KNIT)", score: 15, timeTaken: 1600 },
-        ];
+    const maxQ = contest.questionsPerStudent || 25;
+    const maxT = (contest.timeLimitMinutes || 30) * 60;
+
+    const baseDummyNames = [
+      "Rahul Sharma", "Priya Singh", "Amit Kumar", "Neha Gupta", 
+      "Rohan Verma", "Kavita Reddy", "Sanjay Das", "Vikram Singh", "Pooja Mehta"
+    ];
 
     const finalLeaderboard = [];
     let dummyIndex = 0;
     let realIndex = 0;
-    const targetRanks = [3, 5, 8]; // Ranks where real students go (1-based, so indices 2, 4, 7)
+    const targetRanks = [3, 5, 8]; // Ranks where real students go (1-based)
 
-    // Calculate total size: 7 dummies + number of real students (max 3)
     const totalSize = 7 + realStudents.length;
 
     for (let i = 1; i <= totalSize; i++) {
       if (targetRanks.includes(i) && realIndex < realStudents.length) {
+        // --- REAL STUDENT SLOT ---
         const student = realStudents[realIndex];
         finalLeaderboard.push({
           rank: i,
@@ -1009,15 +1004,48 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
           isReal: true
         });
         realIndex++;
-      } else if (dummyIndex < baseDummies.length) {
-        const dummy = baseDummies[dummyIndex];
+      } else {
+        // --- DUMMY STUDENT SLOT ---
+        let dummyScore, dummyTime;
+        
+        if (realStudents.length === 0) {
+          // No real students at all, generate a believable descending list
+          dummyScore = Math.max(0, maxQ - Math.floor(i / 2));
+          dummyTime = 120 + (i * 25);
+        } else if (realIndex < realStudents.length) {
+          // Dummy is ABOVE the next real student
+          const nextReal = realStudents[realIndex];
+          const gap = targetRanks[realIndex] - i; // How many slots above the real student are we?
+          
+          dummyScore = nextReal.score;
+          dummyTime = nextReal.timeTaken - (gap * 25);
+          
+          if (dummyTime < 30) {
+            if (dummyScore < maxQ) {
+              dummyScore += 1;
+              dummyTime = nextReal.timeTaken + (gap * 15); // Higher score, so slower time is fine
+            } else {
+              dummyTime = Math.max(10, dummyTime); // Absolute minimum 10s if they both have max score
+            }
+          }
+        } else {
+          // Dummy is BELOW the last real student
+          const lastReal = realStudents[realStudents.length - 1];
+          const gap = i - targetRanks[realStudents.length - 1]; // How many slots below the real student?
+          
+          dummyScore = Math.max(0, lastReal.score - Math.floor((gap + 1) / 2));
+          dummyTime = lastReal.timeTaken + (gap * 35);
+        }
+
+        const dummyName = baseDummyNames[dummyIndex % baseDummyNames.length];
+        
         finalLeaderboard.push({
           rank: i,
           userId: null,
-          name: dummy.name || dummy.studentName,
-          college: dummy.college || "Institute of Technology",
-          score: dummy.score || 0,
-          timeTaken: dummy.timeTaken || 0,
+          name: dummyName,
+          college: "Institute of Technology",
+          score: dummyScore,
+          timeTaken: dummyTime,
           domain: "General",
           date: new Date().toLocaleDateString(),
           registrationId: "DUMMY" + Math.floor(Math.random() * 10000),
