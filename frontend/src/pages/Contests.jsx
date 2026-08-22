@@ -171,6 +171,12 @@ export default function Contests() {
   };
 
   const openRegisterModal = (contest) => {
+    if (new Date() > new Date(contest.registrationEndTime)) {
+      alert("Registration for this contest has already ended. Refreshing page...");
+      window.location.reload();
+      return;
+    }
+
     if (!user) {
       localStorage.setItem('pendingContestRedirect', 'true');
       navigate('/register');
