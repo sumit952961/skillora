@@ -212,6 +212,16 @@ export default function ContestArena() {
     );
   }
 
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}>
+        <h3 style={{ color: 'var(--accent-danger)', marginBottom: '16px' }}>No Questions Found</h3>
+        <p style={{ color: 'var(--text-muted)' }}>It seems no questions have been uploaded for your selected domain yet.</p>
+        <button className="btn btn-outline" onClick={() => navigate('/contests')} style={{ marginTop: '20px' }}>Go Back</button>
+      </div>
+    );
+  }
+
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
