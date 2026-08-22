@@ -883,6 +883,16 @@ app.post("/api/contests/register", async (req, res) => {
   }
 });
 
+// Get user's contest registrations
+app.get("/api/contests/user-registrations/:userId", async (req, res) => {
+  try {
+    const registrations = await ContestRegistration.find({ userId: req.params.userId }).populate('contestId');
+    res.json(registrations);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching registrations", error: error.message });
+  }
+});
+
 // Get contest questions (Arena)
 app.get("/api/contests/arena/:contestId/:userId", async (req, res) => {
   try {

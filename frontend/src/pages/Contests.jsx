@@ -34,6 +34,67 @@ const LiveCountdown = ({ targetDate }) => {
   return <span style={{ fontFamily: 'monospace', fontSize: '1.1rem' }}>{timeLeft}</span>;
 };
 
+// --- New Massive Countdown Component ---
+const MassiveLiveCountdown = ({ targetDate, onComplete }) => {
+  const [timeLeft, setTimeLeft] = useState({ d: '00', h: '00', m: '00', s: '00', isLive: false });
+
+  useEffect(() => {
+    const updateTimer = () => {
+      const now = new Date();
+      const target = new Date(targetDate);
+      const diff = target - now;
+
+      if (diff <= 0) {
+        setTimeLeft({ isLive: true });
+        if (onComplete) onComplete();
+        return;
+      }
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / 1000 / 60) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+
+      setTimeLeft({
+        d: String(d).padStart(2, '0'),
+        h: String(h).padStart(2, '0'),
+        m: String(m).padStart(2, '0'),
+        s: String(s).padStart(2, '0'),
+        isLive: false
+      });
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [targetDate, onComplete]);
+
+  if (timeLeft.isLive) {
+    return (
+      <div style={{ textAlign: 'center', padding: '40px', background: 'var(--accent-success-light)', borderRadius: 'var(--radius-lg)' }}>
+        <h2 style={{ color: 'var(--accent-success)', fontSize: '2.5rem', margin: 0 }}>🟢 TEST IS LIVE NOW</h2>
+      </div>
+    );
+  }
+
+  const TimeBlock = ({ value, label }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'white', padding: '20px', borderRadius: 'var(--radius-md)', minWidth: '100px', boxShadow: 'var(--shadow-md)' }}>
+      <span style={{ fontSize: '3.5rem', fontWeight: '900', color: 'var(--primary)', lineHeight: '1' }}>{value}</span>
+      <span style={{ fontSize: '1rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '8px', fontWeight: '600' }}>{label}</span>
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+      {timeLeft.d !== '00' && <TimeBlock value={timeLeft.d} label="Days" />}
+      <TimeBlock value={timeLeft.h} label="Hours" />
+      <TimeBlock value={timeLeft.m} label="Mins" />
+      <TimeBlock value={timeLeft.s} label="Secs" />
+    </div>
+  );
+};
+// ---------------------------------------
+
 export default function Contests() {
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,13 +115,29 @@ export default function Contests() {
   });
 
   const [registering, setRegistering] = useState(false);
-  const [registeredContestIds, setRegisteredContestIds] = useState([]);
+  const [userRegistrations, setUserRegistrations] = useState([]); // full registration docs
+  const [isTestStartedMap, setIsTestStartedMap] = useState({});
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
   useEffect(() => {
     fetchActiveContests();
-  }, []);
+    if (user?._id || user?.id) {
+      fetchUserRegistrations();
+    }
+  }, [user]);
+
+  const fetchUserRegistrations = async () => {
+    try {
+      const res = await fetch(`${API_URL}/contests/user-registrations/${user?._id || user?.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setUserRegistrations(data);
+      }
+    } catch (err) {
+      console.error("Error fetching registrations", err);
+    }
+  };
 
   const fetchActiveContests = async () => {
     try {
@@ -68,6 +145,13 @@ export default function Contests() {
       if (res.ok) {
         const data = await res.json();
         setContests(data);
+        
+        // Initialize the started map
+        const map = {};
+        data.forEach(c => {
+          map[c._id] = new Date(c.startTime) <= new Date();
+        });
+        setIsTestStartedMap(map);
       }
     } catch (error) {
       console.error("Error fetching contests:", error);
@@ -106,7 +190,7 @@ export default function Contests() {
       
       if (res.ok) {
         alert("Registration Successful!");
-        setRegisteredContestIds(prev => [...prev, selectedContest._id]);
+        fetchUserRegistrations(); // refresh registrations
         setShowRegisterModal(false);
       } else {
         alert(`Registration failed: ${data.error || data.message || 'Unknown error'}`);
@@ -146,9 +230,59 @@ export default function Contests() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', maxWidth: '900px', margin: '0 auto' }}>
             {contests.map(contest => {
-              const isRegistered = registeredContestIds.includes(contest._id);
-              const isStarted = new Date(contest.startTime) <= new Date();
+              const registration = userRegistrations.find(r => 
+                (r.contestId._id === contest._id) || (r.contestId === contest._id)
+              );
+              const isRegistered = !!registration;
+              const isStarted = isTestStartedMap[contest._id] || new Date(contest.startTime) <= new Date();
               
+              if (isRegistered) {
+                // ---- REGISTERED DASHBOARD ----
+                return (
+                  <div key={contest._id} className="internship-card" style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', borderRadius: 'var(--radius-lg)' }}>
+                    <div style={{ padding: '30px', textAlign: 'center', borderBottom: '1px solid var(--border-color)', background: 'white' }}>
+                      <h2 style={{ fontSize: '1.8rem', color: 'var(--text-main)', marginBottom: '8px' }}>Your Contest Dashboard</h2>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', margin: 0 }}>{contest.title}</p>
+                    </div>
+                    
+                    <div style={{ padding: '40px 20px', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px' }}>
+                      
+                      {/* Selected Domain Highlight */}
+                      <div style={{ padding: '16px 32px', background: 'var(--primary-light)', borderRadius: 'var(--radius-full)', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Selected Domain:</span>
+                        <span style={{ fontSize: '1.2rem', color: 'var(--primary-dark)', fontWeight: '900' }}>{registration.domain}</span>
+                      </div>
+
+                      {/* Massive Countdown */}
+                      <div style={{ margin: '20px 0' }}>
+                        <MassiveLiveCountdown 
+                          targetDate={contest.startTime} 
+                          onComplete={() => setIsTestStartedMap(prev => ({ ...prev, [contest._id]: true }))} 
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '30px', color: 'var(--text-muted)' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>✓ {contest.questionsPerStudent} Questions</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>✓ {contest.timeLimitMinutes} Mins Duration</span>
+                      </div>
+                      
+                      <div style={{ marginTop: '20px', width: '100%', maxWidth: '400px' }}>
+                        <button 
+                          className="btn btn-primary" 
+                          disabled={!isStarted}
+                          style={{ width: '100%', padding: '20px', fontSize: '1.3rem', borderRadius: 'var(--radius-lg)', background: isStarted ? 'var(--primary)' : 'var(--text-light)', borderColor: isStarted ? 'var(--primary)' : 'var(--text-light)', cursor: isStarted ? 'pointer' : 'not-allowed', boxShadow: isStarted ? 'var(--shadow-premium)' : 'none' }} 
+                          onClick={() => isStarted && navigate(`/contests/arena/${contest._id}`)}
+                        >
+                          {isStarted ? 'Start Assessment' : 'Test Not Started Yet'}
+                        </button>
+                        {!isStarted && <p style={{ textAlign: 'center', marginTop: '12px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>The Start Assessment button will unlock automatically when the timer hits zero.</p>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // ---- STANDARD REGISTRATION CARD ----
               return (
                 <div key={contest._id} className="internship-card" style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-secondary)', overflow: 'hidden', border: '1px solid var(--primary-light)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
                   {/* Banner Area */}
@@ -211,17 +345,7 @@ export default function Contests() {
                     </div>
                     
                     <div>
-                      {isRegistered ? (
-                         isStarted ? (
-                           <button className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '1.1rem', background: 'var(--accent-success)', borderColor: 'var(--accent-success)' }} onClick={() => navigate(`/contests/arena/${contest._id}`)}>Enter Arena 🚀</button>
-                         ) : (
-                           <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-success)', fontSize: '1.1rem', fontWeight: '600', padding: '12px 24px', background: 'var(--accent-success-light)', borderRadius: '8px' }}>
-                             <CheckCircle2 size={24} /> You are Registered
-                           </span>
-                         )
-                      ) : (
-                        <button className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '1.1rem' }} onClick={() => openRegisterModal(contest)}>Register Now</button>
-                      )}
+                      <button className="btn btn-primary" style={{ padding: '12px 32px', fontSize: '1.1rem' }} onClick={() => openRegisterModal(contest)}>Register Now</button>
                     </div>
                   </div>
                 </div>
