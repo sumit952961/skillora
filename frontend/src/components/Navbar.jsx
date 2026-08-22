@@ -31,7 +31,16 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="navbar-container">
+    <>
+      <style>{`
+        .profile-nav-item { margin-left: 12px; }
+        .profile-nav-text { display: none; font-weight: 600; font-size: 1rem; }
+        @media (max-width: 768px) {
+          .profile-nav-item { margin-left: 0; margin-top: 8px; }
+          .profile-nav-text { display: block; }
+        }
+      `}</style>
+      <nav className="navbar-container">
       <div className="navbar">
         <Link to="/" className="nav-logo" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           <img src="https://plain-apac-prod-public.komododecks.com/202608/15/dLTEVqKrqGQSZzgf3yI9/image.png" alt="Skillzeno Logo" style={{ height: '65px', objectFit: 'contain' }} />
@@ -157,7 +166,7 @@ export default function Navbar() {
                 </NavLink>
               </li>
               {/* User profile icon — direct link to /profile, no dropdown */}
-              <li style={{ marginLeft: '12px' }}>
+              <li className="profile-nav-item">
                 <Link
                   to="/profile"
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -165,25 +174,29 @@ export default function Navbar() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    textDecoration: 'none',
+                    color: 'var(--text-main)',
+                    gap: '12px'
+                  }}
+                >
+                  <div style={{
                     width: '38px',
                     height: '38px',
                     borderRadius: '50%',
                     background: 'var(--bg-secondary)',
                     border: '2px solid var(--primary)',
-                    color: 'var(--text-main)',
-                    textDecoration: 'none',
-                    flexShrink: 0,
                     overflow: 'hidden',
+                    flexShrink: 0,
                     padding: 0
-                  }}
-                >
-                  <img 
-                    src="https://plain-apac-prod-public.komododecks.com/202608/22/vBdIE9lQeDGLZWLwQroo/image.png" 
-                    alt="Profile" 
-                    referrerPolicy="no-referrer"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
-                  />
+                  }}>
+                    <img 
+                      src="https://plain-apac-prod-public.komododecks.com/202608/22/vBdIE9lQeDGLZWLwQroo/image.png" 
+                      alt="Profile" 
+                      referrerPolicy="no-referrer"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+                    />
+                  </div>
+                  <span className="profile-nav-text">Profile</span>
                 </Link>
               </li>
             </>
@@ -191,5 +204,6 @@ export default function Navbar() {
         </ul>
       </div>
     </nav>
+    </>
   );
 }
