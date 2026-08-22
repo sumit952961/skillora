@@ -335,7 +335,8 @@ export default function Contests() {
                                 <p style={{ margin: 0, color: 'var(--accent-danger)' }}><strong>2. Tab Switching:</strong> Do NOT switch tabs or minimize the window. Doing so will trigger an automatic submission.</p>
                                 <p style={{ margin: 0, color: 'var(--accent-danger)' }}><strong>3. Back Navigation:</strong> If you navigate back or refresh the page during the test, your test will be automatically submitted.</p>
                                 <p style={{ margin: 0 }}><strong>4. No Copy/Paste:</strong> Copying text, pasting, and using right-click (Context Menu) are strictly disabled.</p>
-                                <p style={{ margin: 0 }}><strong>5. No Screenshots:</strong> Attempting to take a screenshot or opening DevTools will result in a violation warning or auto-submission.</p>
+                                <p style={{ margin: 0, color: 'var(--accent-danger)' }}><strong>5. No Screenshots:</strong> Attempting to take a screenshot or opening DevTools will result in a violation warning and auto-submission.</p>
+                                <p style={{ margin: 0 }}><strong>6. General Rule:</strong> Please ensure you have a stable internet connection. Once submitted, answers cannot be modified.</p>
                               </div>
                             )}
                           </div>
