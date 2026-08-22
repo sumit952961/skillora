@@ -1108,7 +1108,7 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
         }
 
         const dummyName = baseDummyNames[dummyIndex % baseDummyNames.length];
-        const dummyCollege = upColleges[dummyIndex % upColleges.length];
+        const dummyCollege = upColleges[Math.floor(Math.random() * upColleges.length)];
         
         finalLeaderboard.push({
           rank: i,
