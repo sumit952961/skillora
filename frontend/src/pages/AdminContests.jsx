@@ -163,12 +163,13 @@ export default function AdminContests() {
               getVal(row, 'option2', 'optionb', 'b'), 
               getVal(row, 'option3', 'optionc', 'c'), 
               getVal(row, 'option4', 'optiond', 'd')
-            ].map(opt => String(opt || '')),
+            ].map(opt => String(opt || '').trim()),
             correctOptionIndex: correctIndex,
             difficulty: getVal(row, 'difficulty', 'level') || 'Medium'
           };
         })
-        .filter(q => q.question); // Filter out empty rows
+        // Only keep rows that have a question AND all 4 options filled
+        .filter(q => q.question && q.options.every(opt => opt !== ''));
 
       try {
         const res = await fetch(`${API_URL}/contests/upload-questions`, {
