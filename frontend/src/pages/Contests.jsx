@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Trophy, Calendar, Clock, CheckCircle2 } from 'lucide-react';
 import SEO from '../components/SEO';
@@ -38,15 +38,24 @@ const LiveCountdown = ({ targetDate }) => {
 const MassiveLiveCountdown = ({ targetDate, onComplete }) => {
   const [timeLeft, setTimeLeft] = useState({ d: '00', h: '00', m: '00', s: '00', isLive: false });
 
+  const onCompleteRef = useRef(onComplete);
   useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  useEffect(() => {
+    let triggered = false;
     const updateTimer = () => {
       const now = new Date();
       const target = new Date(targetDate);
       const diff = target - now;
 
       if (diff <= 0) {
-        setTimeLeft({ isLive: true });
-        if (onComplete) onComplete();
+        if (!triggered) {
+          triggered = true;
+          setTimeLeft({ isLive: true });
+          if (onCompleteRef.current) onCompleteRef.current();
+        }
         return;
       }
 
@@ -67,7 +76,7 @@ const MassiveLiveCountdown = ({ targetDate, onComplete }) => {
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [targetDate, onComplete]);
+  }, [targetDate]);
 
   if (timeLeft.isLive) {
     return (
