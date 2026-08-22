@@ -179,7 +179,7 @@ export default function Navbar() {
                   }}
                 >
                   <img 
-                    src="https://kommodo.ai/i/vBdIE9lQeDGLZWLwQroo" 
+                    src="https://plain-apac-prod-public.komododecks.com/202608/22/vBdIE9lQeDGLZWLwQroo/image.png" 
                     alt="Profile" 
                     referrerPolicy="no-referrer"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
