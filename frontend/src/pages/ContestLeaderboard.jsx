@@ -168,7 +168,7 @@ export default function ContestLeaderboard() {
               width: '1200px', 
               height: '848px', 
               position: 'relative', 
-              backgroundImage: 'url(/contest-certificate-template.png)', 
+              backgroundImage: 'url(/contest-certificate-template.jpg)', 
               backgroundSize: 'cover', 
               backgroundPosition: 'center',
               fontFamily: "'Inter', sans-serif"
