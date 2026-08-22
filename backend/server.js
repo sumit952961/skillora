@@ -937,6 +937,17 @@ app.post("/api/contests/submit", async (req, res) => {
   }
 });
 
+// Delete all questions for a specific domain
+app.delete("/api/contests/questions/:domain", async (req, res) => {
+  try {
+    const { domain } = req.params;
+    const result = await QuestionBank.deleteMany({ domain });
+    res.json({ message: `Successfully deleted ${result.deletedCount} questions for domain: ${domain}` });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting questions", error: error.message });
+  }
+});
+
 // Bulk upload questions (JSON parsed from Excel on Frontend)
 app.post("/api/contests/upload-questions", async (req, res) => {
   try {

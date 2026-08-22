@@ -157,6 +157,20 @@ export default function AdminContests() {
     reader.readAsBinaryString(file);
   };
 
+  const handleDeleteQuestions = async () => {
+    if (!uploadDomain) return alert("Please select a domain first.");
+    if (!window.confirm(`Are you sure you want to delete ALL questions for the domain: ${uploadDomain}?`)) return;
+    
+    try {
+      const res = await fetch(`${API_URL}/contests/questions/${uploadDomain}`, { method: 'DELETE' });
+      const result = await res.json();
+      alert(result.message);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete questions.");
+    }
+  };
+
   if (loading) return <div className="container"><h3>Loading Contests...</h3></div>;
 
   return (
@@ -192,9 +206,17 @@ export default function AdminContests() {
             style={{ display: 'none' }}
             onChange={handleFileUpload}
           />
-          <label htmlFor="excel-upload" className="btn btn-primary" style={{ cursor: 'pointer', opacity: uploading || !uploadDomain ? 0.5 : 1 }}>
-            {uploading ? 'Uploading...' : 'Select Excel File'}
+          <label htmlFor="excel-upload" className="btn btn-primary" style={{ cursor: 'pointer', opacity: uploading || !uploadDomain ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Upload size={16} /> {uploading ? 'Uploading...' : 'Upload Excel'}
           </label>
+          <button 
+            className="btn btn-outline" 
+            style={{ color: 'var(--accent-danger)', borderColor: 'var(--accent-danger)', opacity: !uploadDomain ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: '6px' }}
+            onClick={handleDeleteQuestions}
+            disabled={!uploadDomain}
+          >
+            <Trash2 size={16} /> Delete Domain Questions
+          </button>
         </div>
       </div>
 
