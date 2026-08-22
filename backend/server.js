@@ -907,7 +907,13 @@ app.post("/api/contests/register", async (req, res) => {
       return res.status(400).json({ message: "You are already registered for this contest." });
     }
     const contest = await Contest.findById(contestId);
-    const contestTitle = contest ? contest.title : "Contest";
+    if (!contest) return res.status(404).json({ message: "Contest not found." });
+    
+    if (new Date() > new Date(contest.registrationEndTime)) {
+      return res.status(400).json({ message: "Registration for this contest has already ended." });
+    }
+
+    const contestTitle = contest.title;
 
     const newReg = new ContestRegistration({
       userId, contestId, contestTitle, studentName, studentEmail, mobileNumber, course, branch, semester, college, domain

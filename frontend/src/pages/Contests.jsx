@@ -198,6 +198,13 @@ export default function Contests() {
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!formData.domain) return alert("Please select a domain");
+    
+    if (new Date() > new Date(selectedContest.registrationEndTime)) {
+      alert("Registration for this contest has already ended. Refreshing page...");
+      window.location.reload();
+      return;
+    }
+    
     setRegistering(true);
 
     try {
