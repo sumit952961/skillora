@@ -86,6 +86,7 @@ function AppContent() {
           <Route path="/internships/:id" element={<InternshipDetail />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/verify" element={<Verify />} />
+          <Route path="/contests" element={<Contests />} />
 
           {/* Protected Dashboard Routes */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -96,11 +97,6 @@ function AppContent() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <Profile />
-            </ProtectedRoute>
-          } />
-          <Route path="/contests" element={
-            <ProtectedRoute>
-              <Contests />
             </ProtectedRoute>
           } />
           <Route path="/contests/arena/:id" element={

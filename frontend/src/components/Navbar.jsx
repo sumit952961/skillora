@@ -57,7 +57,7 @@ export default function Navbar() {
               <li><NavLink to="/internships" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Internships</NavLink></li>
               <li><NavLink to="/quiz" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Quiz Test</NavLink></li>
               <li><NavLink to="/verify" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Verify Certificate</NavLink></li>
-              <li><NavLink to="/about" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>About</NavLink></li>
+              <li><NavLink to="/contests" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Contests</NavLink></li>
               <li><NavLink to="/contact" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Contact</NavLink></li>
               <li style={{ marginLeft: '12px', display: 'flex', gap: '8px' }}>
                 <Link to="/login" className="btn btn-outline" style={{ padding: '8px 18px', fontSize: '0.9rem' }} onClick={() => setIsMobileMenuOpen(false)}>

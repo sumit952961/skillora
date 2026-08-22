@@ -170,6 +170,11 @@ export default function Contests() {
   };
 
   const openRegisterModal = (contest) => {
+    if (!user) {
+      localStorage.setItem('pendingContestRedirect', 'true');
+      navigate('/register');
+      return;
+    }
     setSelectedContest(contest);
     setShowRegisterModal(true);
     setFormData(prev => ({ ...prev, domain: '' })); // reset domain selection

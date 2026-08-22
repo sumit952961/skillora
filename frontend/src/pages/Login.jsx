@@ -32,9 +32,14 @@ export default function Login() {
     try {
       const res = await login(email, password);
       if (res.success) {
+        const pendingContest = localStorage.getItem('pendingContestRedirect');
         const pendingId = localStorage.getItem('pendingApplicationId');
         const pendingQuizId = localStorage.getItem('pendingQuizId');
-        if (pendingId) {
+        
+        if (pendingContest) {
+          localStorage.removeItem('pendingContestRedirect');
+          navigate('/contests');
+        } else if (pendingId) {
           localStorage.removeItem('pendingApplicationId');
           navigate(`/internships/${pendingId}?autoOpenApply=true`);
         } else if (pendingQuizId) {
