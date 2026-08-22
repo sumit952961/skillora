@@ -13,9 +13,9 @@ export default function InternshipApplyFlow({ internship, isOpen, onClose, onApp
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: '',
+    phone: user?.mobileNumber || '',
     college: '',
-    yearOfStudy: '',
+    yearOfStudy: user?.semester || '',
     linkedIn: '',
     resumeLink: '',
     coverLetter: ''
@@ -25,7 +25,13 @@ export default function InternshipApplyFlow({ internship, isOpen, onClose, onApp
 
   useEffect(() => {
     if (isOpen && user && window.location.search.includes('autoOpenApply=true')) {
-      setFormData((prev) => ({ ...prev, name: user.name || '', email: user.email || '' }));
+      setFormData((prev) => ({ 
+        ...prev, 
+        name: user.name || '', 
+        email: user.email || '',
+        phone: user.mobileNumber || prev.phone,
+        yearOfStudy: user.semester || prev.yearOfStudy
+      }));
       setStep('form');
     } else if (isOpen) {
       setStep('detail'); // Reset to detail when normally opened
@@ -102,7 +108,13 @@ export default function InternshipApplyFlow({ internship, isOpen, onClose, onApp
                 navigate('/login');
                 return;
               }
-              setFormData((prev) => ({ ...prev, name: user?.name || '', email: user?.email || '' }));
+              setFormData((prev) => ({ 
+                ...prev, 
+                name: user?.name || '', 
+                email: user?.email || '',
+                phone: user?.mobileNumber || prev.phone,
+                yearOfStudy: user?.semester || prev.yearOfStudy
+              }));
               setStep('form');
             }}>
               Apply for this Internship
@@ -119,18 +131,14 @@ export default function InternshipApplyFlow({ internship, isOpen, onClose, onApp
                 submitApplication();
               }}
             >
-              {/* Auto‑filled fields (read‑only) */}
-              <div className="form-group auto-filled">
+              <div className="form-group">
                 <label>Full Name</label>
-                <input type="text" name="name" value={formData.name} readOnly />
-                <span className="auto-badge">🔒 Auto‑filled</span>
+                <input type="text" name="name" required value={formData.name} onChange={handleChange} />
               </div>
-              <div className="form-group auto-filled">
+              <div className="form-group">
                 <label>Email</label>
-                <input type="email" name="email" value={formData.email} readOnly />
-                <span className="auto-badge">🔒 Auto‑filled</span>
+                <input type="email" name="email" required value={formData.email} onChange={handleChange} />
               </div>
-              {/* Manual fields */}
               <div className="form-group">
                 <label>Phone Number</label>
                 <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} />
