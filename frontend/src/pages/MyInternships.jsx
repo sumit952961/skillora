@@ -10,7 +10,6 @@ export default function MyInternships() {
   const [myInternships, setMyInternships] = useState([]);
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
     const fetchMyInternships = async () => {
       // In this version, we are using the global appliedInternships state directly
@@ -24,6 +23,11 @@ export default function MyInternships() {
   if (loading) {
     return <div className="container"><h3>Fetching active courses...</h3></div>;
   }
+
+  // Internships the user has NOT applied to yet
+  const unappliedInternships = allInternships.filter(
+    i => !myInternships.some(app => app.internshipId === i.id || app.details?.id === i.id)
+  );
 
   return (
     <div className="container fade-in">
@@ -66,17 +70,24 @@ export default function MyInternships() {
               </Link>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Explore More Internships — shown when user has applied to at least one */}
       {myInternships.length > 0 && (
         <div style={{ marginTop: '48px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
             <Compass size={20} style={{ color: 'var(--primary)' }} />
             <h2 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>Explore More Internships</h2>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {allInternships
-              .filter(i => !myInternships.some(app => app.internshipId === i.id || app.details?.id === i.id))
-              .slice(0, 3)
-              .map(internship => (
+
+          {unappliedInternships.length === 0 ? (
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '16px' }}>
+              You have applied to all available internships! 🎉
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {unappliedInternships.slice(0, 3).map(internship => (
                 <div key={internship.id} style={{
                   background: 'var(--bg-secondary)',
                   border: '1px solid var(--border-color)',
@@ -99,14 +110,14 @@ export default function MyInternships() {
                     View <ArrowRight size={14} />
                   </Link>
                 </div>
-              ))
-            }
-            {allInternships.filter(i => !myInternships.some(app => app.internshipId === i.id || app.details?.id === i.id)).length === 0 && (
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '16px' }}>You have applied to all available internships! 🎉</p>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
+
           <div style={{ textAlign: 'center', marginTop: '16px' }}>
-            <Link to="/internships" style={{ color: 'var(--primary)', fontSize: '0.88rem', textDecoration: 'none', fontWeight: '600' }}>View all internships →</Link>
+            <Link to="/internships" style={{ color: 'var(--primary)', fontSize: '0.88rem', textDecoration: 'none', fontWeight: '600' }}>
+              View all internships →
+            </Link>
           </div>
         </div>
       )}
