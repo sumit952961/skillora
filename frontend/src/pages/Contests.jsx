@@ -395,9 +395,16 @@ export default function Contests() {
                         <div style={{ background: 'var(--primary-light)', padding: '12px', borderRadius: '50%', color: 'var(--primary)' }}><Calendar size={24} /></div>
                         <div>
                           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 4px 0' }}>Test Starts In</p>
-                          <p style={{ fontSize: '1.05rem', fontWeight: 'bold', color: 'var(--text-main)', margin: 0 }}>
-                            {isStarted ? <span style={{ color: 'var(--accent-success)' }}>Live Now!</span> : <LiveCountdown targetDate={contest.startTime} />}
-                          </p>
+                          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                            <p style={{ fontSize: '1.05rem', fontWeight: 'bold', color: 'var(--text-main)', margin: 0 }}>
+                              {isStarted ? <span style={{ color: 'var(--accent-success)' }}>Live Now!</span> : <LiveCountdown targetDate={contest.startTime} />}
+                            </p>
+                            {!isStarted && contest.startTime && (
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'var(--border-color)', padding: '2px 8px', borderRadius: '12px', fontWeight: '500' }}>
+                                {new Date(contest.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {new Date(contest.startTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       
