@@ -114,6 +114,9 @@ export default function Navbar() {
                     <NavLink to="/admin/quizzes" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)' }}>
                       <BookOpen size={16} /> Manage Quizzes
                     </NavLink>
+                    <NavLink to="/admin/contests" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)' }}>
+                      <Trophy size={16} /> Manage Contests
+                    </NavLink>
                     <NavLink to="/admin/quiz-certificates" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)' }}>
                       <Award size={16} /> Quiz Certificates
                     </NavLink>

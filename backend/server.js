@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema({
   course: { type: String, default: "" },
   branch: { type: String, default: "" },
   semester: { type: String, default: "" },
+  college: { type: String, default: "" },
   mobileNumber: { type: String, default: "" },
   skills: { type: String, default: "" }
 }, { timestamps: true });
@@ -135,6 +136,53 @@ const Quiz = mongoose.model("Quiz", quizSchema);
 const Setting = mongoose.model("Setting", settingSchema);
 const PasswordResetRequest = mongoose.model("PasswordResetRequest", passwordResetRequestSchema);
 const OTP = mongoose.model("OTP", otpSchema);
+
+const contestSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String },
+  domains: [{ type: String, required: true }],
+  startTime: { type: Date, required: true },
+  registrationEndTime: { type: Date, required: true },
+  isActive: { type: Boolean, default: false },
+  timeLimitMinutes: { type: Number, default: 30 },
+  questionsPerStudent: { type: Number, default: 25 },
+  dummyLeaderboard: [{
+    rank: Number,
+    name: String,
+    score: Number,
+    timeTaken: String
+  }]
+}, { timestamps: true });
+
+const questionBankSchema = new mongoose.Schema({
+  domain: { type: String, required: true, index: true },
+  question: { type: String, required: true },
+  options: [{ type: String, required: true }],
+  correctOptionIndex: { type: Number, required: true },
+  difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' }
+}, { timestamps: true });
+
+const contestRegistrationSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  contestId: { type: mongoose.Schema.Types.ObjectId, ref: "Contest", required: true },
+  studentName: { type: String, required: true },
+  studentEmail: { type: String, required: true },
+  mobileNumber: { type: String },
+  course: { type: String },
+  branch: { type: String },
+  semester: { type: String },
+  college: { type: String, required: true },
+  domain: { type: String, required: true },
+  hasTakenTest: { type: Boolean, default: false },
+  score: { type: Number, default: 0 },
+  timeTaken: { type: Number, default: 0 }, // in seconds
+  registrationDate: { type: Date, default: Date.now },
+  certificateUrl: { type: String, default: "" }
+}, { timestamps: true });
+
+const Contest = mongoose.model("Contest", contestSchema);
+const QuestionBank = mongoose.model("QuestionBank", questionBankSchema);
+const ContestRegistration = mongoose.model("ContestRegistration", contestRegistrationSchema);
 
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
@@ -749,6 +797,73 @@ app.post("/api/send-email", async (req, res) => {
     await transporter.sendMail({ from: `"Skillzeno" <${gmailUser}>`, to: gmailUser, subject, html });
     res.json({ success: true });
   } catch (err) { res.status(500).json({ message: "Email failed", error: err.message }); }
+});
+
+// --- Contest API Endpoints ---
+
+// Get all contests (Admin)
+app.get("/api/contests", async (req, res) => {
+  try {
+    const contests = await Contest.find().sort({ createdAt: -1 });
+    res.json(contests);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching contests", error: error.message });
+  }
+});
+
+// Create new contest
+app.post("/api/contests", async (req, res) => {
+  try {
+    const newContest = new Contest(req.body);
+    await newContest.save();
+    res.status(201).json({ message: "Contest created successfully!", contest: newContest });
+  } catch (error) {
+    res.status(500).json({ message: "Error creating contest", error: error.message });
+  }
+});
+
+// Update contest
+app.put("/api/contests/:id", async (req, res) => {
+  try {
+    const updatedContest = await Contest.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ message: "Contest updated successfully!", contest: updatedContest });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating contest", error: error.message });
+  }
+});
+
+// Delete contest
+app.delete("/api/contests/:id", async (req, res) => {
+  try {
+    await Contest.findByIdAndDelete(req.params.id);
+    res.json({ message: "Contest deleted successfully!" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting contest", error: error.message });
+  }
+});
+
+// Bulk upload questions (JSON parsed from Excel on Frontend)
+app.post("/api/contests/upload-questions", async (req, res) => {
+  try {
+    const { questions, domain } = req.body;
+    if (!questions || !Array.isArray(questions)) {
+      return res.status(400).json({ message: "Invalid questions format" });
+    }
+    
+    // Validate format before inserting
+    const formattedQuestions = questions.map(q => ({
+      domain: domain || q.domain,
+      question: q.question,
+      options: q.options || [q.option1, q.option2, q.option3, q.option4].filter(Boolean),
+      correctOptionIndex: parseInt(q.correctOptionIndex) || 0,
+      difficulty: q.difficulty || 'Medium'
+    }));
+    
+    await QuestionBank.insertMany(formattedQuestions);
+    res.json({ message: `${formattedQuestions.length} questions uploaded successfully for ${domain || 'mixed domains'}` });
+  } catch (error) {
+    res.status(500).json({ message: "Error uploading questions", error: error.message });
+  }
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

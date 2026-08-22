@@ -26,6 +26,7 @@ import AdminApplications from './pages/AdminApplications'
 import AdminQuizzes from './pages/AdminQuizzes'
 import AdminQuizCertificates from './pages/AdminQuizCertificates'
 import AdminSettings from './pages/AdminSettings'
+import AdminContests from './pages/AdminContests'
 import AdminCertificateVerification from './pages/AdminCertificateVerification'
 import PaymentSuccess from './pages/PaymentSuccess'
 import AdminPasswordReset from './pages/AdminPasswordReset'
@@ -140,6 +141,11 @@ function AppContent() {
           <Route path="/admin/settings" element={
             <AdminRoute>
               <AdminSettings />
+            </AdminRoute>
+          } />
+          <Route path="/admin/contests" element={
+            <AdminRoute>
+              <AdminContests />
             </AdminRoute>
           } />
 
