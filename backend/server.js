@@ -1126,6 +1126,17 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
       }
     }
 
+    // Guarantee strictly correct ordering based on actual score and time
+    finalLeaderboard.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.timeTaken - b.timeTaken;
+    });
+
+    // Re-assign ranks
+    finalLeaderboard.forEach((entry, idx) => {
+      entry.rank = idx + 1;
+    });
+
     res.json(finalLeaderboard);
   } catch (error) {
     console.error("Leaderboard Error:", error);
