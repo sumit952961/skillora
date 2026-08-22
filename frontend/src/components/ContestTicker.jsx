@@ -36,15 +36,20 @@ export default function ContestTicker() {
           .contest-ticker-container {
             position: relative;
             width: 100%;
-            height: 28px;
-            background: var(--primary-light);
-            color: var(--primary);
+            height: 32px;
+            background: linear-gradient(90deg, #ec4899, #8b5cf6, #ec4899);
+            background-size: 200% auto;
+            animation: shineBanner 4s linear infinite;
+            color: #ffffff;
             z-index: 50;
             display: flex;
             align-items: center;
             overflow: hidden;
             cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          }
+          @keyframes shineBanner {
+            to { background-position: 200% center; }
           }
           .contest-ticker-container:hover .contest-ticker-text {
             animation-play-state: paused;
@@ -56,18 +61,21 @@ export default function ContestTicker() {
             font-size: 0.85rem;
             animation: slideMarquee 40s linear infinite;
             will-change: transform;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
           }
           .ticker-highlight {
-            background: rgba(79, 70, 229, 0.15);
-            padding: 1px 8px;
-            border-radius: 12px;
+            background: #fde047;
+            padding: 2px 10px;
+            border-radius: 20px;
             margin-left: 6px;
             margin-right: 30px;
             text-transform: uppercase;
             font-size: 0.75rem;
             letter-spacing: 0.5px;
-            color: var(--primary-hover);
-            font-weight: 700;
+            color: #1e3a8a;
+            font-weight: 800;
+            box-shadow: 0 0 10px rgba(253, 224, 71, 0.5);
+            text-shadow: none;
           }
           @media (max-width: 768px) {
             .contest-ticker-text {
