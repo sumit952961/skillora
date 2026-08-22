@@ -34,12 +34,10 @@ export default function ContestTicker() {
             100% { transform: translateX(-100%); }
           }
           .contest-ticker-container {
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100%;
-            height: 40px;
-            background: linear-gradient(90deg, #4f46e5, #ec4899);
+            height: 36px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-hover));
             color: white;
             z-index: 50;
             display: flex;
