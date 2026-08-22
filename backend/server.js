@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import Razorpay from "razorpay";
 import crypto from "crypto";
-import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation } from "./emailService.js";
+import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification } from "./emailService.js";
 
 dotenv.config();
 
@@ -990,6 +990,15 @@ app.post("/api/contests/submit", async (req, res) => {
     registration.timeTaken = timeTaken; // in seconds
     registration.hasTakenTest = true;
     await registration.save();
+    
+    // Send email to admin
+    await sendAdminContestNotification(
+      registration.studentName, 
+      registration.studentEmail, 
+      registration.contestTitle || "Contest", 
+      registration.domain, 
+      score
+    );
 
     res.json({ message: "Test submitted successfully!", score });
   } catch (error) {

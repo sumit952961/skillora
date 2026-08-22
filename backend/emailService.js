@@ -140,3 +140,22 @@ export const sendPasswordChangeConfirmation = async (name, email) => {
     html: baseTemplate(content),
   }).catch(console.error);
 };
+
+export const sendAdminContestNotification = async (studentName, studentEmail, contestTitle, domain, score) => {
+  const content = `
+    <h2 style="color:#1f2937;margin-top:0;">New Contest Submission</h2>
+    <p>A student has just submitted a contest assessment.</p>
+    <div style="background:#f9fafb;padding:16px;border-radius:6px;margin:24px 0;">
+      <p style="margin:0 0 8px 0;"><strong>Name:</strong> ${studentName}</p>
+      <p style="margin:0 0 8px 0;"><strong>Email:</strong> ${studentEmail}</p>
+      <p style="margin:0 0 8px 0;"><strong>Contest:</strong> ${contestTitle}</p>
+      <p style="margin:0 0 8px 0;"><strong>Domain:</strong> ${domain}</p>
+      <p style="margin:0;"><strong>Score:</strong> ${score}</p>
+    </div>
+  `;
+  await sendEmail({
+    to: "skillzeno26@gmail.com",
+    subject: `New Contest Submission: ${studentName}`,
+    html: baseTemplate(content),
+  }).catch(console.error);
+};
