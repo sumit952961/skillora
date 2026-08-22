@@ -99,7 +99,7 @@ export default function ContestLeaderboard() {
   }
   if (error) return <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}><h3 style={{ color: 'var(--accent-danger)' }}>{error}</h3></div>;
 
-  const currentUserData = leaderboard.find(s => s.userId === user?._id);
+  const currentUserData = leaderboard.find(s => s.userId === (user?._id || user?.id));
 
   return (
     <>
