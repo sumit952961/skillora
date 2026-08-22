@@ -177,10 +177,14 @@ export default function AdminContests() {
           body: JSON.stringify({ domain: uploadDomain, questions: formattedQuestions })
         });
         const result = await res.json();
-        alert(result.message);
+        if (!res.ok) {
+          alert("Error: " + result.message);
+        } else {
+          alert(result.message);
+        }
       } catch (err) {
         console.error(err);
-        alert("Upload failed.");
+        alert("Upload failed. Please check the console for more details.");
       } finally {
         setUploading(false);
         e.target.value = null; // reset input

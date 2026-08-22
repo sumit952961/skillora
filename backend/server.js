@@ -1007,6 +1007,7 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
 
     res.json(finalLeaderboard);
   } catch (error) {
+    console.error("Leaderboard Error:", error);
     res.status(500).json({ message: "Error fetching leaderboard", error: error.message });
   }
 });
@@ -1018,6 +1019,7 @@ app.delete("/api/contests/questions/:domain", async (req, res) => {
     const result = await QuestionBank.deleteMany({ domain });
     res.json({ message: `Successfully deleted ${result.deletedCount} questions for domain: ${domain}` });
   } catch (error) {
+    console.error("Delete Questions Error:", error);
     res.status(500).json({ message: "Error deleting questions", error: error.message });
   }
 });
@@ -1042,7 +1044,11 @@ app.post("/api/contests/upload-questions", async (req, res) => {
     await QuestionBank.insertMany(formattedQuestions);
     res.json({ message: `${formattedQuestions.length} questions uploaded successfully for ${domain || 'mixed domains'}` });
   } catch (error) {
-    res.status(500).json({ message: "Error uploading questions", error: error.message });
+    console.error("Upload Error:", error);
+    res.status(500).json({ 
+      message: `Error uploading questions: ${error.message}`, 
+      error: error.message 
+    });
   }
 });
 
