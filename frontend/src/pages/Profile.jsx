@@ -86,13 +86,13 @@ export default function Profile() {
 
       <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)' }}>
         {error && (
-          <div style={{ background: 'var(--accent-danger-light)', color: 'var(--accent-danger)', padding: '12px 16px', borderRadius: 'var(--radius-md)', marginBottom: '20px', fontWeight: '600' }}>
+          <div style={{ position: 'fixed', top: '80px', right: '20px', zIndex: 1000, background: 'var(--accent-danger-light)', color: 'var(--accent-danger)', padding: '16px 24px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-md)', fontWeight: '600', border: '1px solid var(--accent-danger)' }}>
             {error}
           </div>
         )}
         {saved && (
-          <div style={{ background: 'var(--accent-success-light)', color: 'var(--accent-success)', padding: '12px 16px', borderRadius: 'var(--radius-md)', marginBottom: '20px', fontWeight: '600' }}>
-            Profile details updated successfully!
+          <div style={{ position: 'fixed', top: '80px', right: '20px', zIndex: 1000, background: 'var(--accent-success-light)', color: 'var(--accent-success)', padding: '16px 24px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-md)', fontWeight: '600', border: '1px solid var(--accent-success)' }}>
+            ✅ Profile details updated successfully!
           </div>
         )}
 
@@ -152,12 +152,12 @@ export default function Profile() {
         <h2 style={{ fontSize: '1.2rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}><Lock size={20} /> Change Password</h2>
         
         {passwordError && (
-          <div style={{ background: 'var(--accent-danger-light)', color: 'var(--accent-danger)', padding: '12px 16px', borderRadius: 'var(--radius-md)', marginBottom: '20px', fontWeight: '600' }}>
+          <div style={{ position: 'fixed', top: '150px', right: '20px', zIndex: 1000, background: 'var(--accent-danger-light)', color: 'var(--accent-danger)', padding: '16px 24px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-md)', fontWeight: '600', border: '1px solid var(--accent-danger)' }}>
             {passwordError}
           </div>
         )}
         {passwordSuccess && (
-          <div style={{ background: 'var(--accent-success-light)', color: 'var(--accent-success)', padding: '12px 16px', borderRadius: 'var(--radius-md)', marginBottom: '20px', fontWeight: '600' }}>
+          <div style={{ position: 'fixed', top: '150px', right: '20px', zIndex: 1000, background: 'var(--accent-success-light)', color: 'var(--accent-success)', padding: '16px 24px', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-md)', fontWeight: '600', border: '1px solid var(--accent-success)' }}>
             ✅ Password changed successfully!
           </div>
         )}
