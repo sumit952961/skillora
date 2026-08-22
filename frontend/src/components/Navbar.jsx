@@ -166,20 +166,22 @@ export default function Navbar() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: '36px',
-                    height: '36px',
+                    width: '38px',
+                    height: '38px',
                     borderRadius: '50%',
                     background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
+                    border: '2px solid var(--primary)',
                     color: 'var(--text-main)',
                     textDecoration: 'none',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    overflow: 'hidden',
+                    padding: 0
                   }}
                 >
                   <img 
                     src="https://kommodo.ai/i/vBdIE9lQeDGLZWLwQroo" 
                     alt="Profile" 
-                    style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
                   />
                 </Link>
               </li>
