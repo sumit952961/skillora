@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { Trophy, Calendar, Clock, CheckCircle2 } from 'lucide-react';
+import { Trophy, Calendar, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useNavigate } from 'react-router-dom';
 
@@ -126,6 +126,7 @@ export default function Contests() {
   const [registering, setRegistering] = useState(false);
   const [userRegistrations, setUserRegistrations] = useState([]); // full registration docs
   const [isTestStartedMap, setIsTestStartedMap] = useState({});
+  const [showInstructionsMap, setShowInstructionsMap] = useState({});
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
@@ -316,6 +317,27 @@ export default function Contests() {
                           <div style={{ display: 'flex', gap: '30px', color: 'var(--text-muted)' }}>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>✓ {contest.questionsPerStudent} Questions</span>
                             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>✓ {contest.timeLimitMinutes} Mins Duration</span>
+                          </div>
+
+                          {/* Instructions Toggle */}
+                          <div style={{ marginTop: '20px', background: 'rgba(0,0,0,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', width: '100%', maxWidth: '600px' }}>
+                            <div 
+                              onClick={() => setShowInstructionsMap(prev => ({ ...prev, [contest._id]: !prev[contest._id] }))}
+                              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', fontWeight: 'bold', color: 'var(--text-main)' }}
+                            >
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><AlertCircle size={18} color="var(--primary)" /> Test Instructions & Rules</span>
+                              <span style={{ fontSize: '0.9rem', color: 'var(--primary)' }}>{showInstructionsMap[contest._id] ? 'Hide' : 'See More'}</span>
+                            </div>
+                            
+                            {showInstructionsMap[contest._id] && (
+                              <div style={{ marginTop: '16px', fontSize: '0.95rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <p style={{ margin: 0 }}><strong>1. Time Limit:</strong> Once the timer hits 0, the test will automatically submit.</p>
+                                <p style={{ margin: 0, color: 'var(--accent-danger)' }}><strong>2. Tab Switching:</strong> Do NOT switch tabs or minimize the window. Doing so will trigger an automatic submission.</p>
+                                <p style={{ margin: 0, color: 'var(--accent-danger)' }}><strong>3. Back Navigation:</strong> If you navigate back or refresh the page during the test, your test will be automatically submitted.</p>
+                                <p style={{ margin: 0 }}><strong>4. No Copy/Paste:</strong> Copying text, pasting, and using right-click (Context Menu) are strictly disabled.</p>
+                                <p style={{ margin: 0 }}><strong>5. No Screenshots:</strong> Attempting to take a screenshot or opening DevTools will result in a violation warning or auto-submission.</p>
+                              </div>
+                            )}
                           </div>
                           
                           <div style={{ marginTop: '20px', width: '100%', maxWidth: '400px' }}>

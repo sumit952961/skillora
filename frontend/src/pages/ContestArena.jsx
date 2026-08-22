@@ -148,6 +148,21 @@ export default function ContestArena() {
       }
     };
 
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+
+    const handlePopState = () => {
+      alert("Violation: Back navigation is not allowed. Test is automatically submitting.");
+      handleSubmitTest(true);
+    };
+
+    // Push a dummy state to trap the back button
+    window.history.pushState(null, null, window.location.pathname);
+
+    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     document.addEventListener("copy", preventCopyPaste);
     document.addEventListener("paste", preventCopyPaste);
@@ -157,6 +172,8 @@ export default function ContestArena() {
     document.addEventListener("keyup", handleKeyUp);
 
     return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       document.removeEventListener("copy", preventCopyPaste);
       document.removeEventListener("paste", preventCopyPaste);
