@@ -198,44 +198,53 @@ export default function AdminContests() {
         </div>
       </div>
 
-      <div className="table-responsive">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Contest Title</th>
-              <th>Domains</th>
-              <th>Status</th>
-              <th>Start Time</th>
-              <th>Registration End</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {contests.length === 0 ? (
-              <tr><td colSpan="6" style={{ textAlign: 'center' }}>No contests found.</td></tr>
-            ) : (
-              contests.map(contest => (
-                <tr key={contest._id}>
-                  <td style={{ fontWeight: '600' }}>{contest.title}</td>
-                  <td>{contest.domains.join(', ')}</td>
-                  <td>
-                    {contest.isActive ? (
-                      <span className="status-badge status-completed"><CheckCircle size={14}/> Active</span>
-                    ) : (
-                      <span className="status-badge status-pending">Inactive</span>
-                    )}
-                  </td>
-                  <td>{new Date(contest.startTime).toLocaleString()}</td>
-                  <td>{new Date(contest.registrationEndTime).toLocaleString()}</td>
-                  <td className="action-cells">
-                    <button className="btn-icon" onClick={() => handleEdit(contest)} title="Edit"><Edit2 size={16} /></button>
-                    <button className="btn-icon delete" onClick={() => handleDelete(contest._id)} title="Delete"><Trash2 size={16} /></button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {contests.length === 0 ? (
+          <div style={{ background: 'var(--bg-secondary)', padding: '40px', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px solid var(--border-color)' }}>
+            <h3 style={{ color: 'var(--text-muted)' }}>No contests found.</h3>
+          </div>
+        ) : (
+          contests.map(contest => (
+            <div key={contest._id} style={{ background: 'var(--bg-secondary)', padding: '24px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                <h3 style={{ marginBottom: '6px' }}>{contest.title}</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>Domains:</span> {contest.domains.join(', ')}
+                </p>
+                <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+                    <Calendar size={14} style={{ display: 'inline', marginRight: '4px' }}/> 
+                    Starts: {new Date(contest.startTime).toLocaleDateString()}
+                  </p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+                    <Clock size={14} style={{ display: 'inline', marginRight: '4px' }}/> 
+                    Reg End: {new Date(contest.registrationEndTime).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                {contest.isActive ? (
+                  <span style={{ fontSize: '0.85rem', background: 'var(--accent-success-light)', color: 'var(--accent-success)', padding: '6px 12px', borderRadius: '20px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <CheckCircle size={14}/> Active
+                  </span>
+                ) : (
+                  <span style={{ fontSize: '0.85rem', background: 'var(--bg-primary)', color: 'var(--text-muted)', padding: '6px 12px', borderRadius: '20px', fontWeight: 'bold', border: '1px solid var(--border-color)' }}>
+                    Inactive
+                  </span>
+                )}
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button onClick={() => handleEdit(contest)} className="btn btn-outline" style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit">
+                    <Edit2 size={16} />
+                  </button>
+                  <button onClick={() => handleDelete(contest._id)} className="btn btn-outline" style={{ padding: '8px', color: 'var(--accent-danger)', borderColor: 'var(--accent-danger)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {showModal && (
