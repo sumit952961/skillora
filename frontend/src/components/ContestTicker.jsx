@@ -36,7 +36,7 @@ export default function ContestTicker() {
           .contest-ticker-container {
             position: relative;
             width: 100%;
-            height: 36px;
+            height: 28px;
             background: var(--primary-light);
             color: var(--primary);
             z-index: 50;
@@ -44,7 +44,7 @@ export default function ContestTicker() {
             align-items: center;
             overflow: hidden;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
           }
           .contest-ticker-container:hover .contest-ticker-text {
             animation-play-state: paused;
@@ -53,25 +53,25 @@ export default function ContestTicker() {
             display: inline-block;
             white-space: nowrap;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             animation: slideMarquee 40s linear infinite;
             will-change: transform;
           }
           .ticker-highlight {
             background: rgba(79, 70, 229, 0.15);
-            padding: 2px 10px;
-            border-radius: 20px;
-            margin-left: 8px;
-            margin-right: 40px;
+            padding: 1px 8px;
+            border-radius: 12px;
+            margin-left: 6px;
+            margin-right: 30px;
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             letter-spacing: 0.5px;
             color: var(--primary-hover);
             font-weight: 700;
           }
           @media (max-width: 768px) {
             .contest-ticker-text {
-              font-size: 0.85rem;
+              font-size: 0.75rem;
               animation-duration: 30s;
             }
           }
@@ -85,7 +85,8 @@ export default function ContestTicker() {
         <div className="contest-ticker-text">
           {Array(4).fill().map((_, i) => (
             <span key={i}>
-              🚀 FREE CERTIFICATION AVAILABLE! Participate in our Live Skill Assessments and boost your portfolio. 
+              <span style={{ marginRight: '6px' }}>🚀</span> 
+              FREE CERTIFICATION AVAILABLE! Participate in our Live Skill Assessments and boost your portfolio. 
               <span className="ticker-highlight">Click Here to Register Now!</span>
             </span>
           ))}
