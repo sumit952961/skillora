@@ -431,14 +431,14 @@ export default function AdminContests() {
             <h2 className="modal-title">Manage Certificates</h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>{selectedContestForCerts?.title}</p>
             
-            {contestRegistrations.filter(reg => reg.hasTakenTest).length === 0 ? (
-              <p>No students have completed this contest yet.</p>
+            {contestRegistrations.length === 0 ? (
+              <p>No students have registered for this contest yet.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <p style={{ fontWeight: 'bold', color: 'var(--primary)' }}>
-                  Total Completed: {contestRegistrations.filter(reg => reg.hasTakenTest).length}
+                  Total Registrations: {contestRegistrations.length} | Completed: {contestRegistrations.filter(reg => reg.hasTakenTest).length}
                 </p>
-                {contestRegistrations.filter(reg => reg.hasTakenTest).map(reg => (
+                {contestRegistrations.map(reg => (
                   <div key={reg._id} style={{ background: 'var(--bg-primary)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <div>
