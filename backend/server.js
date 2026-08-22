@@ -953,13 +953,13 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
     const baseDummies = contest.dummyLeaderboard && contest.dummyLeaderboard.length >= 7 
       ? contest.dummyLeaderboard 
       : [
-          { name: "Rahul Sharma", college: "IIT Bombay", score: 24, timeTaken: 1200 },
-          { name: "Priya Singh", college: "NIT Trichy", score: 23, timeTaken: 1250 },
-          { name: "Amit Kumar", college: "BITS Pilani", score: 21, timeTaken: 1300 },
-          { name: "Neha Gupta", college: "VIT Vellore", score: 19, timeTaken: 1400 },
-          { name: "Rohan Verma", college: "SRM University", score: 18, timeTaken: 1450 },
-          { name: "Kavita Reddy", college: "Manipal Institute", score: 17, timeTaken: 1500 },
-          { name: "Sanjay Das", college: "Delhi University", score: 15, timeTaken: 1600 },
+          { name: "Rahul Sharma", college: "JSS Academy of Technical Education, Noida", score: 24, timeTaken: 1200 },
+          { name: "Priya Singh", college: "Institute of Engineering and Technology (IET), Lucknow", score: 23, timeTaken: 1250 },
+          { name: "Amit Kumar", college: "Ajay Kumar Garg Engineering College (AKGEC)", score: 21, timeTaken: 1300 },
+          { name: "Neha Gupta", college: "KIET Group of Institutions, Ghaziabad", score: 19, timeTaken: 1400 },
+          { name: "Rohan Verma", college: "ABES Engineering College, Ghaziabad", score: 18, timeTaken: 1450 },
+          { name: "Kavita Reddy", college: "Galgotias College of Engineering and Technology", score: 17, timeTaken: 1500 },
+          { name: "Sanjay Das", college: "Kamla Nehru Institute of Technology (KNIT)", score: 15, timeTaken: 1600 },
         ];
 
     const finalLeaderboard = [];
@@ -975,10 +975,14 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
         const student = realStudents[realIndex];
         finalLeaderboard.push({
           rank: i,
+          userId: student.userId.toString(),
           name: student.studentName,
           college: student.college,
           score: student.score,
           timeTaken: student.timeTaken,
+          domain: student.domain,
+          date: new Date(student.createdAt).toLocaleDateString(),
+          registrationId: student._id.toString().substring(0, 8).toUpperCase(),
           isReal: true
         });
         realIndex++;
@@ -986,10 +990,14 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
         const dummy = baseDummies[dummyIndex];
         finalLeaderboard.push({
           rank: i,
+          userId: null,
           name: dummy.name || dummy.studentName,
           college: dummy.college || "Institute of Technology",
           score: dummy.score || 0,
           timeTaken: dummy.timeTaken || 0,
+          domain: "General",
+          date: new Date().toLocaleDateString(),
+          registrationId: "DUMMY" + Math.floor(Math.random() * 10000),
           isReal: false
         });
         dummyIndex++;
