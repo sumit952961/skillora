@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Trophy, Medal, Clock, Award, Star } from 'lucide-react';
+import { Trophy, Medal, Clock, Star, Download } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
 import SEO from '../components/SEO';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 export default function ContestLeaderboard() {
   const { id: contestId } = useParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+  const certificateRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
@@ -42,8 +48,34 @@ export default function ContestLeaderboard() {
     return `${m}m ${s}s`;
   };
 
+  const handleDownloadCertificate = async (studentData) => {
+    if (!certificateRef.current) return;
+    setGeneratingPdf(true);
+    try {
+      const element = certificateRef.current;
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save(`Skillzeno_Certificate_${studentData.name.replace(/\s+/g, '_')}.pdf`);
+    } catch (err) {
+      console.error(err);
+      alert("Error generating certificate PDF.");
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+
   if (loading) return <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}><h3>Loading Leaderboard...</h3></div>;
   if (error) return <div className="container" style={{ padding: '60px 20px', textAlign: 'center' }}><h3 style={{ color: 'var(--accent-danger)' }}>{error}</h3></div>;
+
+  const currentUserData = leaderboard.find(s => s.userId === user?._id);
 
   return (
     <>
@@ -55,7 +87,19 @@ export default function ContestLeaderboard() {
             <Trophy size={40} color="var(--primary)" />
           </div>
           <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>National Leaderboard</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Top performers from across the country</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '24px' }}>Top performers from across the country</p>
+          
+          {currentUserData && (
+            <button 
+              className="btn btn-primary" 
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem', padding: '12px 24px', background: 'var(--accent-success)', borderColor: 'var(--accent-success)' }}
+              onClick={() => handleDownloadCertificate(currentUserData)}
+              disabled={generatingPdf}
+            >
+              <Download size={20} />
+              {generatingPdf ? 'Generating...' : 'Download My Certificate'}
+            </button>
+          )}
         </div>
 
         <div style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)', overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
@@ -114,6 +158,59 @@ export default function ContestLeaderboard() {
         </div>
 
       </div>
+
+      {/* Hidden Certificate Element for html2canvas to render */}
+      {currentUserData && (
+        <div style={{ overflow: 'hidden', height: 0, width: 0, position: 'absolute', top: -9999 }}>
+          <div 
+            ref={certificateRef} 
+            style={{ 
+              width: '1200px', 
+              height: '848px', 
+              position: 'relative', 
+              backgroundImage: 'url(/contest-certificate-template.png)', 
+              backgroundSize: 'cover', 
+              backgroundPosition: 'center',
+              fontFamily: "'Inter', sans-serif"
+            }}
+          >
+            {/* Name */}
+            <div style={{ position: 'absolute', top: '425px', left: '0', width: '100%', textAlign: 'center', fontSize: '42px', fontWeight: 'bold', color: '#0A192F', letterSpacing: '2px' }}>
+              {currentUserData.name}
+            </div>
+
+            {/* Domain (Mid) */}
+            <div style={{ position: 'absolute', top: '565px', left: '400px', width: '400px', textAlign: 'center', fontSize: '18px', fontWeight: '600', color: '#1B263B' }}>
+              {currentUserData.domain}
+            </div>
+
+            {/* Domain (Bottom Row 1) */}
+            <div style={{ position: 'absolute', bottom: '215px', left: '190px', width: '150px', textAlign: 'left', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
+              {currentUserData.domain}
+            </div>
+
+            {/* Score (Bottom Row 2) */}
+            <div style={{ position: 'absolute', bottom: '215px', left: '445px', width: '80px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
+              {currentUserData.score}
+            </div>
+
+            {/* Rank (Bottom Row 3) */}
+            <div style={{ position: 'absolute', bottom: '215px', left: '655px', width: '80px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
+              {currentUserData.rank}
+            </div>
+
+            {/* Date (Bottom Row 4) */}
+            <div style={{ position: 'absolute', bottom: '215px', left: '855px', width: '120px', textAlign: 'center', fontSize: '16px', fontWeight: 'bold', color: '#333' }}>
+              {currentUserData.date}
+            </div>
+
+            {/* Certificate ID */}
+            <div style={{ position: 'absolute', bottom: '150px', left: '145px', fontSize: '14px', fontWeight: 'bold', color: '#000' }}>
+              SKZ-QUZ-{currentUserData.registrationId}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
