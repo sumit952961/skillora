@@ -166,6 +166,7 @@ const questionBankSchema = new mongoose.Schema({
 const contestRegistrationSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   contestId: { type: mongoose.Schema.Types.ObjectId, ref: "Contest", required: true },
+  contestTitle: { type: String },
   studentName: { type: String, required: true },
   studentEmail: { type: String, required: true },
   mobileNumber: { type: String },
@@ -905,9 +906,11 @@ app.post("/api/contests/register", async (req, res) => {
     if (existingReg) {
       return res.status(400).json({ message: "You are already registered for this contest." });
     }
-    
+    const contest = await Contest.findById(contestId);
+    const contestTitle = contest ? contest.title : "Contest";
+
     const newReg = new ContestRegistration({
-      userId, contestId, studentName, studentEmail, mobileNumber, course, branch, semester, college, domain
+      userId, contestId, contestTitle, studentName, studentEmail, mobileNumber, course, branch, semester, college, domain
     });
     
     await newReg.save();

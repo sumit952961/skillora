@@ -331,7 +331,7 @@ export default function Certificates() {
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
                     <div>
-                      <h3 style={{ fontSize: '1.25rem', marginBottom: '4px', color: 'var(--text-main)' }}>{reg.contestId?.title || "Contest"}</h3>
+                      <h3 style={{ fontSize: '1.25rem', marginBottom: '4px', color: 'var(--text-main)' }}>{reg.contestTitle || reg.contestId?.title || "Contest"}</h3>
                       <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '4px' }}>Score: {reg.score} | Domain: {reg.domain}</p>
                       <p style={{ color: 'var(--text-light)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={14} /> Reg No: {reg._id}</p>
                     </div>
