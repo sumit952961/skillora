@@ -37,14 +37,14 @@ export default function ContestTicker() {
             position: relative;
             width: 100%;
             height: 36px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-hover));
-            color: white;
+            background: linear-gradient(90deg, var(--primary-light), #f3e8ff);
+            color: var(--primary-dark);
             z-index: 50;
             display: flex;
             align-items: center;
             overflow: hidden;
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
           }
           .contest-ticker-container:hover .contest-ticker-text {
             animation-play-state: paused;
@@ -53,17 +53,27 @@ export default function ContestTicker() {
             display: inline-block;
             white-space: nowrap;
             font-weight: 600;
-            font-size: 1rem;
-            animation: slideMarquee 20s linear infinite;
+            font-size: 0.95rem;
+            animation: slideMarquee 35s linear infinite;
+            padding-left: 100vw;
           }
           .ticker-highlight {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(79, 70, 229, 0.15);
             padding: 2px 10px;
             border-radius: 20px;
-            margin-left: 10px;
+            margin-left: 8px;
+            margin-right: 40px;
             text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+            font-weight: 700;
+          }
+          @media (max-width: 768px) {
+            .contest-ticker-text {
+              font-size: 0.85rem;
+              animation-duration: 25s;
+            }
           }
         `}
       </style>
@@ -73,8 +83,12 @@ export default function ContestTicker() {
         title="Click to view live contests"
       >
         <div className="contest-ticker-text">
-          🚀 FREE CERTIFICATION AVAILABLE! Participate in our Live Skill Assessments and boost your portfolio. 
-          <span className="ticker-highlight">Click Here to Register Now!</span>
+          {Array(4).fill().map((_, i) => (
+            <span key={i}>
+              🚀 FREE CERTIFICATION AVAILABLE! Participate in our Live Skill Assessments and boost your portfolio. 
+              <span className="ticker-highlight">Click Here to Register Now!</span>
+            </span>
+          ))}
         </div>
       </div>
     </>
