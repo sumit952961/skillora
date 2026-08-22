@@ -54,6 +54,16 @@ export default function Home() {
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
   useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') {
+        navigate('/admin-dashboard', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setActiveTestimonial(prev => (prev + 1) % 3);
     }, 4500);
