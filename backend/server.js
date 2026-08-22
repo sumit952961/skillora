@@ -166,174 +166,6 @@ const questionBankSchema = new mongoose.Schema({
 const contestRegistrationSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   contestId: { type: mongoose.Schema.Types.ObjectId, ref: "Contest", required: true },
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import nodemailer from "nodemailer";
-import Razorpay from "razorpay";
-import crypto from "crypto";
-import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation } from "./emailService.js";
-
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET || "secretkey";
-
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_dummykey',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'dummysecret'
-});
-
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
-app.get("/", (req, res) => res.json({ message: "Skillzeno API is running successfully!" }));
-
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true, lowercase: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ["student", "admin"], default: "student" },
-  tokenVersion: { type: Number, default: 0 },
-  course: { type: String, default: "" },
-  branch: { type: String, default: "" },
-  semester: { type: String, default: "" },
-  college: { type: String, default: "" },
-  mobileNumber: { type: String, default: "" },
-  skills: { type: String, default: "" }
-}, { timestamps: true });
-
-const applicationSchema = new mongoose.Schema({
-  appNumber: { type: String, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  studentName: { type: String, required: true },
-  studentEmail: { type: String, required: true },
-  internshipId: { type: String, required: true },
-  status: { type: String, default: "In Progress" },
-  appliedDate: { type: String, default: () => new Date().toISOString().split("T")[0] },
-  finalSubmitted: { type: Boolean, default: false },
-  paymentDetails: { type: Object, default: null },
-  tasks: [{ id: String, title: String, status: { type: String, default: "Pending" }, submissionLink: { type: String, default: "" }, linkedinLink: { type: String, default: "" }, feedback: { type: String, default: "" } }],
-  offerLetterUrl: { type: String, default: "" },
-  certificateUrl: { type: String, default: "" }
-}, { timestamps: true });
-
-const quizApplicationSchema = new mongoose.Schema({
-  appNumber: { type: String, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  studentName: { type: String, required: true },
-  studentEmail: { type: String, required: true },
-  quizId: { type: String, required: true },
-  quizTitle: { type: String, required: true },
-  score: { type: Number, required: true },
-  totalQuestions: { type: Number, required: true },
-  takenDate: { type: String, default: () => new Date().toISOString().split("T")[0] },
-  paymentSubmitted: { type: Boolean, default: false },
-  paymentDetails: { type: Object, default: null },
-  certificateUrl: { type: String, default: "" }
-}, { timestamps: true });
-
-const certificateSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  userName: String, internshipTitle: String, domain: String, title: String,
-  issueDate: String, certificateNumber: { type: String, unique: true },
-  verificationHash: String, performanceRemarks: String, applicationId: String
-}, { timestamps: true });
-
-const internshipSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  company: { type: String, default: "Skillzeno" },
-  department: { type: String, required: true },
-  domain: { type: String, required: true },
-  duration: { type: String, required: true },
-  stipend: { type: String, default: "Unpaid (Certificate + LOR)" },
-  type: { type: String, required: true },
-  mode: { type: String, default: "Full-Time" },
-  description: { type: String, required: true },
-  overview: { type: String },
-  responsibilities: [String],
-  requirements: [String],
-  skillsLearned: [String],
-  perks: [String],
-  tasks: [{ id: String, title: String, description: String }]
-}, { timestamps: true });
-
-const quizSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  timeLimit: { type: Number, required: true },
-  questions: [{
-    question: String,
-    options: [String],
-    answer: Number
-  }]
-}, { timestamps: true });
-
-const settingSchema = new mongoose.Schema({
-  internshipPaymentLink: { type: String, default: "https://razorpay.me/@skillzeno" },
-  quizPaymentLink: { type: String, default: "https://razorpay.me/@skillzeno" },
-  processingFee: { type: String, default: "99" },
-  quizProcessingFee: { type: String, default: "19" }
-}, { timestamps: true });
-
-const passwordResetRequestSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  email: { type: String, required: true },
-  name: { type: String, required: true },
-  requestedDate: { type: String, default: () => new Date().toISOString() },
-  status: { type: String, enum: ["pending", "resolved"], default: "pending" }
-}, { timestamps: true });
-
-const otpSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  otp: { type: String, required: true },
-  expiresAt: { type: Date, required: true },
-  attempts: { type: Number, default: 0 }
-}, { timestamps: true });
-
-const User = mongoose.model("User", userSchema);
-const Application = mongoose.model("Application", applicationSchema);
-const QuizApplication = mongoose.model("QuizApplication", quizApplicationSchema);
-const Certificate = mongoose.model("Certificate", certificateSchema);
-const Internship = mongoose.model("Internship", internshipSchema);
-const Quiz = mongoose.model("Quiz", quizSchema);
-const Setting = mongoose.model("Setting", settingSchema);
-const PasswordResetRequest = mongoose.model("PasswordResetRequest", passwordResetRequestSchema);
-const OTP = mongoose.model("OTP", otpSchema);
-
-const contestSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String },
-  domains: [{ type: String, required: true }],
-  startTime: { type: Date, required: true },
-  registrationEndTime: { type: Date, required: true },
-  isActive: { type: Boolean, default: false },
-  timeLimitMinutes: { type: Number, default: 30 },
-  questionsPerStudent: { type: Number, default: 25 },
-  dummyLeaderboard: [{
-    rank: Number,
-    name: String,
-    score: Number,
-    timeTaken: String
-  }]
-}, { timestamps: true });
-
-const questionBankSchema = new mongoose.Schema({
-  domain: { type: String, required: true, index: true },
-  question: { type: String, required: true },
-  options: [{ type: String, required: true }],
-  correctOptionIndex: { type: Number, required: true },
-  difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' }
-}, { timestamps: true });
-
-const contestRegistrationSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  contestId: { type: mongoose.Schema.Types.ObjectId, ref: "Contest", required: true },
   studentName: { type: String, required: true },
   studentEmail: { type: String, required: true },
   mobileNumber: { type: String },
@@ -344,9 +176,9 @@ const contestRegistrationSchema = new mongoose.Schema({
   domain: { type: String, required: true },
   hasTakenTest: { type: Boolean, default: false },
   score: { type: Number, default: 0 },
-  timeTaken: { type: Number, default: 0 },
-  certificateLink: { type: String, default: "" },
-  createdAt: { type: Date, default: Date.now }
+  timeTaken: { type: Number, default: 0 }, // in seconds
+  registrationDate: { type: Date, default: Date.now },
+  certificateLink: { type: String, default: "" }
 }, { timestamps: true });
 
 const Contest = mongoose.model("Contest", contestSchema);
@@ -707,6 +539,48 @@ app.get("/api/my-quizzes", authenticateToken, async (req, res) => {
     const apps = await QuizApplication.find({ userId: req.user.id }).sort({ _id: -1 });
     res.json(apps.map(app => ({ ...app.toObject(), id: app._id.toString() })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch quizzes" }); }
+});
+
+app.get("/api/my-contest-registrations", authenticateToken, async (req, res) => {
+  try {
+    const regs = await ContestRegistration.find({ userId: req.user.id })
+      .populate("contestId", "title startTime endTime")
+      .sort({ _id: -1 });
+    res.json(regs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch contest registrations" });
+  }
+});
+
+app.get("/api/contests/admin/registrations/:contestId", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") return res.status(403).json({ message: "Admin access required" });
+    const regs = await ContestRegistration.find({ contestId: req.params.contestId })
+      .populate("userId", "name email")
+      .sort({ score: -1, timeTaken: 1 });
+    res.json(regs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch registrations" });
+  }
+});
+
+app.put("/api/contests/admin/registrations/:registrationId/certificate", authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== "admin") return res.status(403).json({ message: "Admin access required" });
+    const { certificateLink } = req.body;
+    const reg = await ContestRegistration.findByIdAndUpdate(
+      req.params.registrationId,
+      { certificateLink },
+      { new: true }
+    );
+    if (!reg) return res.status(404).json({ message: "Registration not found" });
+    res.json(reg);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to update certificate link" });
+  }
 });
 
 app.post("/api/quizzes/submit", authenticateToken, async (req, res) => {
@@ -1169,7 +1043,6 @@ app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
           domain: student.domain,
           date: new Date(student.createdAt).toLocaleDateString(),
           registrationId: student._id.toString().substring(0, 8).toUpperCase(),
-          certificateLink: student.certificateLink || "",
           isReal: true
         });
         realIndex++;
@@ -1268,47 +1141,6 @@ app.post("/api/contests/upload-questions", async (req, res) => {
       message: `Error uploading questions: ${error.message}`, 
       error: error.message 
     });
-  }
-});
-
-// Admin Route: Get all registrations for a contest that have taken the test
-app.get("/api/contests/admin/registrations/:contestId", authenticateToken, authorizeAdmin, async (req, res) => {
-  try {
-    const registrations = await ContestRegistration.find({ contestId: req.params.contestId, hasTakenTest: true })
-      .sort({ score: -1, timeTaken: 1 });
-    res.json(registrations);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Admin Route: Update Certificate Link
-app.put("/api/contests/admin/registrations/:id/certificate", authenticateToken, authorizeAdmin, async (req, res) => {
-  try {
-    const { certificateLink } = req.body;
-    const registration = await ContestRegistration.findByIdAndUpdate(
-      req.params.id,
-      { certificateLink },
-      { new: true }
-    );
-    if (!registration) return res.status(404).json({ message: "Registration not found" });
-    res.json({ message: "Certificate updated successfully", registration });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// Student Route: Get all my contest registrations
-app.get("/api/my-contest-registrations", authenticateToken, async (req, res) => {
-  try {
-    const registrations = await ContestRegistration.find({ userId: req.user.id })
-      .populate('contestId', 'title startTime endTime');
-    res.json(registrations);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
   }
 });
 
