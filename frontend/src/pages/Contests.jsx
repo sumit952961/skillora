@@ -246,7 +246,7 @@ export default function Contests() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', maxWidth: '900px', margin: '0 auto' }}>
             {contests.map(contest => {
               const registration = userRegistrations.find(r => 
-                (r.contestId._id === contest._id) || (r.contestId === contest._id)
+                (r.contestId?._id === contest._id) || (r.contestId === contest._id)
               );
               const isRegistered = !!registration;
               const isStarted = isTestStartedMap[contest._id] || new Date(contest.startTime) <= new Date();
