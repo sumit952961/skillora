@@ -148,12 +148,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const submitTask = async (internshipId, taskId, link) => {
+  const submitTask = async (internshipId, taskId, link, linkedinLink = '') => {
     try {
       const res = await fetch(`${API_URL}/tasks/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ internshipId, taskId, submissionLink: link })
+        body: JSON.stringify({ internshipId, taskId, submissionLink: link, linkedinLink })
       });
       if (res.ok) {
         const { updatedTasks } = await res.json();

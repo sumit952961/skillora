@@ -43,7 +43,7 @@ const applicationSchema = new mongoose.Schema({
   appliedDate: { type: String, default: () => new Date().toISOString().split("T")[0] },
   finalSubmitted: { type: Boolean, default: false },
   paymentDetails: { type: Object, default: null },
-  tasks: [{ id: String, title: String, status: { type: String, default: "Pending" }, submissionLink: { type: String, default: "" }, feedback: { type: String, default: "" } }],
+  tasks: [{ id: String, title: String, status: { type: String, default: "Pending" }, submissionLink: { type: String, default: "" }, linkedinLink: { type: String, default: "" }, feedback: { type: String, default: "" } }],
   offerLetterUrl: { type: String, default: "" },
   certificateUrl: { type: String, default: "" }
 }, { timestamps: true });
@@ -446,7 +446,7 @@ app.post("/api/tasks/submit", authenticateToken, async (req, res) => {
     if (!app) return res.status(404).json({ message: "Application not found" });
     const task = app.tasks.find(t => t.id === req.body.taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
-    task.status = "Submitted"; task.submissionLink = req.body.submissionLink; task.feedback = "Under Review";
+    task.status = "Submitted"; task.submissionLink = req.body.submissionLink; task.linkedinLink = req.body.linkedinLink || ""; task.feedback = "Under Review";
     await app.save();
     res.json({ message: "Task submitted!", updatedTasks: app.tasks });
   } catch (e) { res.status(500).json({ message: "Failed to submit task" }); }
