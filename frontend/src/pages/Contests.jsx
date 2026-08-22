@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { Trophy, Calendar, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Trophy, Calendar, Clock, CheckCircle2 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useNavigate } from 'react-router-dom';
 
@@ -325,7 +325,7 @@ export default function Contests() {
                               onClick={() => setShowInstructionsMap(prev => ({ ...prev, [contest._id]: !prev[contest._id] }))}
                               style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', fontWeight: 'bold', color: 'var(--text-main)' }}
                             >
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><AlertCircle size={18} color="var(--primary)" /> Test Instructions & Rules</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Test Instructions & Rules</span>
                               <span style={{ fontSize: '0.9rem', color: 'var(--primary)' }}>{showInstructionsMap[contest._id] ? 'Hide' : 'See More'}</span>
                             </div>
                             
