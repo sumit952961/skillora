@@ -20,6 +20,7 @@ import Tasks from './pages/Tasks'
 import Certificates from './pages/Certificates'
 import Profile from './pages/Profile'
 import Contests from './pages/Contests'
+import ContestArena from './pages/ContestArena'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminInternships from './pages/AdminInternships'
 import AdminApplications from './pages/AdminApplications'
@@ -99,6 +100,11 @@ function AppContent() {
           <Route path="/contests" element={
             <ProtectedRoute>
               <Contests />
+            </ProtectedRoute>
+          } />
+          <Route path="/contests/arena/:id" element={
+            <ProtectedRoute>
+              <ContestArena />
             </ProtectedRoute>
           } />
 

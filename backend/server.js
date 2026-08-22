@@ -878,6 +878,65 @@ app.post("/api/contests/register", async (req, res) => {
   }
 });
 
+// Get contest questions (Arena)
+app.get("/api/contests/arena/:contestId/:userId", async (req, res) => {
+  try {
+    const { contestId, userId } = req.params;
+    
+    const registration = await ContestRegistration.findOne({ contestId, userId }).populate('contestId');
+    if (!registration) return res.status(403).json({ message: "Not registered for this contest." });
+    if (registration.hasTakenTest) return res.status(403).json({ message: "You have already completed this test." });
+    if (!registration.contestId.isActive) return res.status(403).json({ message: "Contest is not active." });
+
+    const numQuestions = registration.contestId.questionsPerStudent || 25;
+    const domain = registration.domain;
+
+    // Fetch random questions using $sample
+    const questions = await QuestionBank.aggregate([
+      { $match: { domain: domain } },
+      { $sample: { size: numQuestions } },
+      { $project: { correctOptionIndex: 0 } } // Do not send correct answers to frontend
+    ]);
+
+    res.json({
+      contest: registration.contestId,
+      registration: registration,
+      questions: questions
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching arena data", error: error.message });
+  }
+});
+
+// Submit contest test
+app.post("/api/contests/submit", async (req, res) => {
+  try {
+    const { userId, contestId, answers, timeTaken } = req.body;
+    
+    const registration = await ContestRegistration.findOne({ contestId, userId });
+    if (!registration) return res.status(400).json({ message: "Registration not found." });
+    if (registration.hasTakenTest) return res.status(400).json({ message: "Test already submitted." });
+
+    let score = 0;
+    // Calculate score server-side
+    for (const [qId, selectedIndex] of Object.entries(answers)) {
+      const q = await QuestionBank.findById(qId);
+      if (q && q.correctOptionIndex === selectedIndex) {
+        score += 1;
+      }
+    }
+
+    registration.score = score;
+    registration.timeTaken = timeTaken; // in seconds
+    registration.hasTakenTest = true;
+    await registration.save();
+
+    res.json({ message: "Test submitted successfully!", score });
+  } catch (error) {
+    res.status(500).json({ message: "Error submitting test", error: error.message });
+  }
+});
+
 // Bulk upload questions (JSON parsed from Excel on Frontend)
 app.post("/api/contests/upload-questions", async (req, res) => {
   try {
