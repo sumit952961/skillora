@@ -130,13 +130,20 @@ export default function AdminContests() {
       const ws = wb.Sheets[wsname];
       const data = XLSX.utils.sheet_to_json(ws);
       
-      // Expected columns: question, option1, option2, option3, option4, correctOptionIndex (0-3), difficulty
-      const formattedQuestions = data.map(row => ({
-        question: row.question,
-        options: [row.option1, row.option2, row.option3, row.option4],
-        correctOptionIndex: parseInt(row.correctOptionIndex) || 0,
-        difficulty: row.difficulty || 'Medium'
-      }));
+      // Case-insensitive key lookup
+      const getVal = (row, targetKey) => {
+        const foundKey = Object.keys(row).find(k => k.toLowerCase().replace(/\s+/g, '') === targetKey.toLowerCase());
+        return row[foundKey];
+      };
+
+      const formattedQuestions = data
+        .map(row => ({
+          question: getVal(row, 'question'),
+          options: [getVal(row, 'option1'), getVal(row, 'option2'), getVal(row, 'option3'), getVal(row, 'option4')],
+          correctOptionIndex: parseInt(getVal(row, 'correctoptionindex') || getVal(row, 'answer') || 0),
+          difficulty: getVal(row, 'difficulty') || 'Medium'
+        }))
+        .filter(q => q.question); // Filter out empty rows
 
       try {
         const res = await fetch(`${API_URL}/contests/upload-questions`, {
