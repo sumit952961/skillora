@@ -176,7 +176,11 @@ export default function Navbar() {
                     flexShrink: 0
                   }}
                 >
-                  <User size={18} />
+                  <img 
+                    src={`https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=e0e7ff&color=4f46e5&bold=true`} 
+                    alt="Profile" 
+                    style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                  />
                 </Link>
               </li>
             </>
