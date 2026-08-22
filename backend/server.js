@@ -937,6 +937,71 @@ app.post("/api/contests/submit", async (req, res) => {
   }
 });
 
+// Get contest leaderboard
+app.get("/api/contests/leaderboard/:contestId", async (req, res) => {
+  try {
+    const { contestId } = req.params;
+    const contest = await Contest.findById(contestId);
+    if (!contest) return res.status(404).json({ message: "Contest not found" });
+
+    // Fetch all completed registrations, sorted by score (desc), then timeTaken (asc)
+    const realStudents = await ContestRegistration.find({ contestId, hasTakenTest: true })
+      .sort({ score: -1, timeTaken: 1 })
+      .limit(3);
+
+    // Dummy data base if admin hasn't provided yet
+    const baseDummies = contest.dummyLeaderboard && contest.dummyLeaderboard.length >= 7 
+      ? contest.dummyLeaderboard 
+      : [
+          { name: "Rahul Sharma", college: "IIT Bombay", score: 24, timeTaken: 1200 },
+          { name: "Priya Singh", college: "NIT Trichy", score: 23, timeTaken: 1250 },
+          { name: "Amit Kumar", college: "BITS Pilani", score: 21, timeTaken: 1300 },
+          { name: "Neha Gupta", college: "VIT Vellore", score: 19, timeTaken: 1400 },
+          { name: "Rohan Verma", college: "SRM University", score: 18, timeTaken: 1450 },
+          { name: "Kavita Reddy", college: "Manipal Institute", score: 17, timeTaken: 1500 },
+          { name: "Sanjay Das", college: "Delhi University", score: 15, timeTaken: 1600 },
+        ];
+
+    const finalLeaderboard = [];
+    let dummyIndex = 0;
+    let realIndex = 0;
+    const targetRanks = [3, 5, 8]; // Ranks where real students go (1-based, so indices 2, 4, 7)
+
+    // Calculate total size: 7 dummies + number of real students (max 3)
+    const totalSize = 7 + realStudents.length;
+
+    for (let i = 1; i <= totalSize; i++) {
+      if (targetRanks.includes(i) && realIndex < realStudents.length) {
+        const student = realStudents[realIndex];
+        finalLeaderboard.push({
+          rank: i,
+          name: student.studentName,
+          college: student.college,
+          score: student.score,
+          timeTaken: student.timeTaken,
+          isReal: true
+        });
+        realIndex++;
+      } else if (dummyIndex < baseDummies.length) {
+        const dummy = baseDummies[dummyIndex];
+        finalLeaderboard.push({
+          rank: i,
+          name: dummy.name || dummy.studentName,
+          college: dummy.college || "Institute of Technology",
+          score: dummy.score || 0,
+          timeTaken: dummy.timeTaken || 0,
+          isReal: false
+        });
+        dummyIndex++;
+      }
+    }
+
+    res.json(finalLeaderboard);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching leaderboard", error: error.message });
+  }
+});
+
 // Delete all questions for a specific domain
 app.delete("/api/contests/questions/:domain", async (req, res) => {
   try {

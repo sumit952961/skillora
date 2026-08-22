@@ -21,6 +21,7 @@ import Certificates from './pages/Certificates'
 import Profile from './pages/Profile'
 import Contests from './pages/Contests'
 import ContestArena from './pages/ContestArena'
+import ContestLeaderboard from './pages/ContestLeaderboard'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminInternships from './pages/AdminInternships'
 import AdminApplications from './pages/AdminApplications'
@@ -105,6 +106,11 @@ function AppContent() {
           <Route path="/contests/arena/:id" element={
             <ProtectedRoute>
               <ContestArena />
+            </ProtectedRoute>
+          } />
+          <Route path="/contests/leaderboard/:id" element={
+            <ProtectedRoute>
+              <ContestLeaderboard />
             </ProtectedRoute>
           } />
 
