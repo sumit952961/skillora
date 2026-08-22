@@ -131,18 +131,43 @@ export default function AdminContests() {
       const data = XLSX.utils.sheet_to_json(ws);
       
       // Case-insensitive key lookup
-      const getVal = (row, targetKey) => {
-        const foundKey = Object.keys(row).find(k => k.toLowerCase().replace(/\s+/g, '') === targetKey.toLowerCase());
+      const getVal = (row, ...targetKeys) => {
+        const foundKey = Object.keys(row).find(k => {
+          const normalizedK = k.toLowerCase().replace(/[\s_]+/g, '');
+          return targetKeys.some(tk => normalizedK === tk.toLowerCase().replace(/[\s_]+/g, ''));
+        });
         return row[foundKey];
       };
 
       const formattedQuestions = data
-        .map(row => ({
-          question: getVal(row, 'question'),
-          options: [getVal(row, 'option1'), getVal(row, 'option2'), getVal(row, 'option3'), getVal(row, 'option4')],
-          correctOptionIndex: parseInt(getVal(row, 'correctoptionindex') || getVal(row, 'answer') || 0),
-          difficulty: getVal(row, 'difficulty') || 'Medium'
-        }))
+        .map(row => {
+          // If 'Correct Option' has 'A', 'B', 'C', 'D', parse it to 0, 1, 2, 3
+          let correctStr = getVal(row, 'correctoptionindex', 'correctoption', 'answer', 'correct');
+          let correctIndex = parseInt(correctStr);
+          
+          if (isNaN(correctIndex) && typeof correctStr === 'string') {
+            const letter = correctStr.trim().toUpperCase();
+            if (letter === 'A') correctIndex = 0;
+            else if (letter === 'B') correctIndex = 1;
+            else if (letter === 'C') correctIndex = 2;
+            else if (letter === 'D') correctIndex = 3;
+            else correctIndex = 0;
+          } else if (isNaN(correctIndex)) {
+            correctIndex = 0;
+          }
+
+          return {
+            question: getVal(row, 'question', 'q'),
+            options: [
+              getVal(row, 'option1', 'optiona', 'a'), 
+              getVal(row, 'option2', 'optionb', 'b'), 
+              getVal(row, 'option3', 'optionc', 'c'), 
+              getVal(row, 'option4', 'optiond', 'd')
+            ].map(opt => String(opt || '')),
+            correctOptionIndex: correctIndex,
+            difficulty: getVal(row, 'difficulty', 'level') || 'Medium'
+          };
+        })
         .filter(q => q.question); // Filter out empty rows
 
       try {
