@@ -56,7 +56,7 @@ export default function Home() {
   useEffect(() => {
     if (user) {
       if (user.role === 'admin') {
-        navigate('/admin-dashboard', { replace: true });
+        navigate('/admin/dashboard', { replace: true });
       } else {
         navigate('/dashboard', { replace: true });
       }
