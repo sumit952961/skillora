@@ -212,7 +212,6 @@ function AppContent() {
             <h4 className="footer-title">Career Sectors</h4>
             <ul className="footer-links">
               <li><Link to="/internships">Frontend React Development</Link></li>
-              <li><Link to="/internships">Backend API Engineering</Link></li>
               <li><Link to="/internships">Full Stack MERN Systems</Link></li>
               <li><Link to="/internships">UI/UX & Web Design</Link></li>
               <li><Link to="/internships">Data Science & AI</Link></li>
@@ -227,7 +226,6 @@ function AppContent() {
               <li><Link to="/verify">Verification Portal</Link></li>
               <li><Link to="/arena">SkillZeno Arena</Link></li>
               <li><Link to="/quiz">Interactive Quiz Test</Link></li>
-              <li><Link to="/about">About Programs</Link></li>
             </ul>
           </div>
 
