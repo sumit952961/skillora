@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, Link } from 'react
 import { AuthProvider, AuthContext } from './context/AuthContext'
 import { DataProvider } from './context/DataContext'
 import Navbar from './components/Navbar'
+import AIAssistant from './components/AIAssistant'
 import Home from './pages/Home'
 import About from './pages/About'
 import Contact from './pages/Contact'
@@ -74,6 +75,7 @@ function AppContent() {
     <>
       <ScrollToTop />
       <Navbar />
+      <AIAssistant />
       <main style={{ minHeight: 'calc(100vh - 220px)' }}>
         <Routes>
           {/* Public Routes */}

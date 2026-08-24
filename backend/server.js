@@ -1560,5 +1560,55 @@ app.get("/api/arena/progress", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch progress", error: error.message });
   }
 });
+// AI Assistant Chat Route
+app.post("/api/chat", async (req, res) => {
+  try {
+    const { message, history } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ message: "Message is required" });
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ message: "AI is currently unavailable (API key missing)." });
+    }
+
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    
+    // Construct conversation history for context
+    let formattedHistory = "";
+    if (history && Array.isArray(history)) {
+      history.slice(-5).forEach(msg => {
+        formattedHistory += `${msg.role === 'user' ? 'Student' : 'Assistant'}: ${msg.content}\n`;
+      });
+    }
+
+    const systemPrompt = `You are the official AI Assistant and Career/Coding Mentor for 'SkillZeno'.
+SkillZeno is a premium online platform offering high-quality internships, an adaptive AI coding/quiz battleground called 'Arena', and verifiable certificates.
+Your role:
+1. Help users navigate the platform, apply for internships, and understand features.
+2. Act as a coding and career mentor. Answer coding questions, explain concepts, and give interview advice.
+3. Be friendly, encouraging, and concise. Format responses with markdown for readability (bullet points, bold text, code blocks if necessary).
+4. Do not mention that you are an AI trained by Google. You are 'SkillZeno AI Mentor'.
+
+Conversation History:
+${formattedHistory}
+
+Student's new message:
+${message}
+
+Respond appropriately based on your role.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash-lite',
+      contents: systemPrompt,
+    });
+
+    res.json({ reply: response.text });
+  } catch (error) {
+    console.error("AI Chat Error:", error);
+    res.status(500).json({ message: "Sorry, I am having trouble connecting to my brain right now. Please try again later.", error: error.message });
+  }
+});
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
