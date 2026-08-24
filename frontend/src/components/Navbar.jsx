@@ -1,7 +1,7 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Award, BookOpen, LogOut, CheckCircle, User, Briefcase, LayoutDashboard, Settings, Layers, MoreVertical, Key, Shield, Menu, X, Trophy } from 'lucide-react';
+import { Award, BookOpen, LogOut, CheckCircle, User, Briefcase, LayoutDashboard, Settings, Layers, MoreVertical, Key, Shield, Menu, X, Trophy, Zap } from 'lucide-react';
 import '../navbar-fix.css';
 
 export default function Navbar() {
@@ -171,7 +171,7 @@ export default function Navbar() {
               </li>
               <li>
                 <NavLink to="/arena" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
-                  <span style={{ fontSize: '16px', lineHeight: 1 }}>⚡</span> Arena
+                  <Zap size={16} /> Arena
                 </NavLink>
               </li>
               {/* User profile icon — direct link to /profile, no dropdown */}
