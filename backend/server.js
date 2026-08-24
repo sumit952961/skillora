@@ -1596,6 +1596,12 @@ Your role:
 - **Quizzes:** SkillZeno features standard technical quizzes where students can test their knowledge on specific programming languages or frameworks.
 - **Contests:** Periodic coding contests and hackathons where students can compete with others to win prizes and showcase their skills on a leaderboard.
 - **Certificates & Verification Portal:** Upon successfully completing internships or passing major milestones, students receive verifiable certificates with a unique Certificate ID. Anyone (like employers) can visit the SkillZeno Certificate Verification Portal, enter the Certificate ID, and instantly verify its authenticity.
+- **Contact Details:** 
+  - Email: skillzeno26@gmail.com
+  - WhatsApp/Phone: +91 7048107697
+  - Instagram: @skillzeno26 (https://www.instagram.com/skillzeno26)
+  - Headquarters: NH-56 near Agrasen Chauraha Usarpurwa, Shivpur, Varanasi, Uttar Pradesh 221003
+  - **Important:** If a user wants to send a direct message to the team, instruct them to visit the 'Contact Us' (/contact) page on the website and fill out the form there to send a message directly.
 
 Conversation History:
 ${formattedHistory}
