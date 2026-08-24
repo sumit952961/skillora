@@ -2102,3 +2102,58 @@
   .arena-stats { justify-content: center; } 
   .arena-text-content .arena-title { justify-content: center; } 
 }
+
+@media (max-width: 768px) {
+  .hero-metrics-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  .hero-metric-item {
+    align-items: center;
+    text-align: center;
+    min-width: 140px;
+  }
+  .metric-divider {
+    display: none;
+  }
+  
+  .home-arena-banner-wrapper {
+    padding: 24px;
+    border-radius: 16px;
+  }
+  .arena-bg-glow {
+    width: 300px;
+    height: 300px;
+  }
+  .arena-icon-container {
+    width: 60px;
+    height: 60px;
+  }
+  .arena-text-content .arena-title {
+    font-size: 1.8rem;
+  }
+  .arena-desc {
+    font-size: 0.95rem;
+  }
+  .arena-play-btn {
+    padding: 14px 28px;
+    font-size: 1.1rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-metric-item {
+    min-width: 120px;
+  }
+  .metric-value {
+    font-size: 1.4rem;
+  }
+  .home-arena-banner-wrapper {
+    padding: 20px;
+  }
+  .arena-text-content .arena-title {
+    font-size: 1.5rem;
+  }
+}
