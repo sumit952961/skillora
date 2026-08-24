@@ -21,6 +21,7 @@ export default function ArenaGame() {
   const [difficulty, setDifficulty] = useState('easy');
   const [showConfirmEnd, setShowConfirmEnd] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [language, setLanguage] = useState('English');
 
   useEffect(() => {
     if (!sessionId) {
@@ -41,7 +42,7 @@ export default function ArenaGame() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ sessionId })
+        body: JSON.stringify({ sessionId, language })
       });
       const data = await res.json();
       if (res.ok) {
@@ -137,6 +138,27 @@ export default function ArenaGame() {
                 <span>VS AI</span>
               </div>
               <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                {category?.name?.toLowerCase() !== 'english' && (
+                  <button 
+                    onClick={() => setLanguage(lang => lang === 'English' ? 'Hindi' : 'English')}
+                    style={{
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '20px',
+                      padding: '4px 12px',
+                      fontSize: '0.85rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      color: 'var(--text-main)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                    title="Switch Language"
+                  >
+                    {language === 'English' ? 'अ Hindi' : 'A English'}
+                  </button>
+                )}
                 {renderDifficulty()}
                 <div className="arena-streak">
                   <Flame size={20} /> {streak} Streak

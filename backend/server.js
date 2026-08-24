@@ -1259,7 +1259,7 @@ app.post("/api/arena/start", authenticateToken, async (req, res) => {
 
 app.post("/api/arena/question", authenticateToken, async (req, res) => {
   try {
-    const { sessionId } = req.body;
+    const { sessionId, language = 'English' } = req.body;
     if (!sessionId) return res.status(400).json({ message: "Session ID required" });
 
     const session = await ArenaSession.findOne({ _id: sessionId, userId: req.user.id });
@@ -1276,15 +1276,22 @@ app.post("/api/arena/question", authenticateToken, async (req, res) => {
     }
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    
+    // Ensure English category is always in English
+    const targetLanguage = session.category.toLowerCase().includes('english') ? 'English' : language;
+    
     const prompt = `Generate a single multiple-choice question for a student.
 Category: ${session.category}
 Difficulty: ${session.highestDifficulty}
+Language: ${targetLanguage}
+Please write the question text, options, and explanation strictly in the ${targetLanguage} language.
+
 Respond ONLY with a valid JSON object matching this exact schema, without markdown formatting or code blocks:
 {
-  "question": "The question text",
+  "question": "The question text (in ${targetLanguage})",
   "options": ["Option A", "Option B", "Option C", "Option D"],
   "correctAnswer": "The exact string from options that is correct",
-  "explanation": "Short explanation of why it is correct",
+  "explanation": "Short explanation of why it is correct (in ${targetLanguage})",
   "category": "${session.category}",
   "difficulty": "${session.highestDifficulty}"
 }`;
