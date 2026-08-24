@@ -94,23 +94,23 @@ export default function ArenaHome() {
             </>
           ) : (
             <div style={{ textAlign: 'center' }}>
-              <Bot size={60} color="#FF6B6B" style={{ margin: '0 auto 1rem' }} />
-              <h2 style={{ marginBottom: '1.5rem' }}>Ready to Face the AI?</h2>
+              <Bot size={40} color="#FF6B6B" style={{ margin: '0 auto 0.5rem' }} />
+              <h2 style={{ marginBottom: '1rem' }}>Ready to Face the AI?</h2>
               
-              <div style={{ background: 'var(--bg-main)', padding: '1.5rem', borderRadius: '12px', margin: '0 auto 2rem', maxWidth: '400px', textAlign: 'left' }}>
-                <p style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+              <div style={{ background: 'var(--bg-main)', padding: '1rem', borderRadius: '12px', margin: '0 auto 1rem', maxWidth: '400px', textAlign: 'left' }}>
+                <p style={{ marginBottom: '0.75rem', fontSize: '1rem' }}>
                   <strong>Selected Category:</strong> <br/>
-                  <span style={{ color: 'var(--primary)', display: 'inline-block', marginTop: '4px' }}>
+                  <span style={{ color: 'var(--primary)', display: 'inline-block', marginTop: '2px' }}>
                     {selectedCategory?.icon} {selectedCategory?.name}
                   </span>
                 </p>
-                <p style={{ fontSize: '1.1rem' }}>
+                <p style={{ fontSize: '1rem', marginBottom: 0 }}>
                   <strong>Starting Difficulty:</strong> <br/>
-                  <span className="arena-difficulty easy" style={{ display: 'inline-flex', marginTop: '4px' }}>🟢 Easy</span>
+                  <span className="arena-difficulty easy" style={{ display: 'inline-flex', marginTop: '2px' }}>🟢 Easy</span>
                 </p>
               </div>
 
-              <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
+              <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
                 Questions will become harder as your performance improves.<br/>
                 This is an endless mode. Go as far as you can!
               </p>
