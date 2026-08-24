@@ -61,32 +61,6 @@ export default function AIAssistant() {
   };
 
   useEffect(() => {
-    // Attempt to load chat history if logged in
-    const loadHistory = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-      
-      try {
-        const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
-        const res = await fetch(`${API_URL}/chat/history`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        
-        if (data.messages && data.messages.length > 0) {
-          setMessages(data.messages);
-          setChatState('CHATTING');
-          setLanguage('english'); // Defaulting context
-        }
-      } catch (error) {
-        console.error("Failed to load chat history");
-      }
-    };
-    
-    loadHistory();
-  }, []);
-
-  useEffect(() => {
     if (isOpen) {
       scrollToBottom();
       // Speak welcome message on first open
@@ -98,6 +72,16 @@ export default function AIAssistant() {
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
+      
+      // If user closes chat, reset to welcome state so it greets again when re-opened
+      setChatState('LANGUAGE_SELECTION');
+      setLanguage(null);
+      setMessages([
+        {
+          role: 'ai',
+          content: "Welcome to SkillZeno! 👋 I am your AI Mentor.\n\nPlease select your preferred language / कृपया अपनी भाषा चुनें:"
+        }
+      ]);
     }
   }, [isOpen]);
 

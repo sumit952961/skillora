@@ -1637,7 +1637,21 @@ app.post("/api/chat", async (req, res) => {
       liveContext += "- **Active Contests**: None right now.\n";
     }
 
-    // Construct conversation history for context
+    // Fetch past history from DB for persistent memory context
+    let dbHistoryContext = "";
+    if (userId) {
+      const pastChat = await AIChatHistory.findOne({ userId });
+      if (pastChat && pastChat.messages && pastChat.messages.length > 0) {
+        dbHistoryContext = "### PAST CONVERSATION MEMORY (Use this context if the user refers to past chats):\n";
+        // Get last 6 messages from DB
+        pastChat.messages.slice(-6).forEach(msg => {
+          dbHistoryContext += `${msg.role === 'user' ? 'Student' : 'Assistant'}: ${msg.content}\n`;
+        });
+        dbHistoryContext += "\n";
+      }
+    }
+
+    // Construct immediate conversation history for context
     let formattedHistory = "";
     if (history && Array.isArray(history)) {
       history.slice(-5).forEach(msg => {
@@ -1651,7 +1665,8 @@ Your role:
 2. Act as a coding and career mentor. Answer coding questions, explain concepts, and give interview advice.
 3. Be friendly, encouraging, and concise. Format responses with markdown for readability (bullet points, bold text).
 4. Do not mention that you are an AI trained by Google. You are 'SkillZeno AI Mentor'.
-5. **IMPORTANT RULE**: DO NOT say "Namaste", "Welcome", or repeat greetings in every single message. Only answer the user's current question directly and naturally.
+5. **CRITICAL RULE**: DO NOT say "Namaste", "Welcome", or repeat greetings in every single message. Only answer the user's current question directly.
+6. **CRITICAL RULE**: BE EXTREMELY CONCISE. Answer ONLY what the user explicitly asks about. If they ask about internships, talk ONLY about internships. Do NOT volunteer information about quizzes, contests, or other features unless specifically asked.
 
 ### SKILLZENO KNOWLEDGE BASE (Use this to answer user queries accurately):
 - **Internships:** SkillZeno offers high-quality, hands-on internship programs across various domains (like Web Development, AI, etc.). Students can enroll, complete tasks via their dashboard, and build real-world portfolios. All internship task submissions are done via the student dashboard under the 'My Internships' or 'Tasks' section.
@@ -1668,7 +1683,9 @@ Your role:
 
 ${liveContext}
 
-Conversation History:
+${dbHistoryContext}
+
+Immediate Conversation History:
 ${formattedHistory}
 
 Student's new message:
