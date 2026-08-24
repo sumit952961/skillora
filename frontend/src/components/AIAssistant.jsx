@@ -56,6 +56,8 @@ export default function AIAssistant() {
     window.speechSynthesis.speak(utterance);
   };
 
+  const [isReceivingSpeech, setIsReceivingSpeech] = useState(false);
+
   const startListening = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -72,6 +74,14 @@ export default function AIAssistant() {
       setIsListening(true);
     };
 
+    recognition.onsoundstart = () => {
+      setIsReceivingSpeech(true);
+    };
+
+    recognition.onsoundend = () => {
+      setIsReceivingSpeech(false);
+    };
+
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInputMessage(prev => prev ? `${prev} ${transcript}` : transcript);
@@ -80,10 +90,12 @@ export default function AIAssistant() {
     recognition.onerror = (event) => {
       console.error("Speech recognition error", event.error);
       setIsListening(false);
+      setIsReceivingSpeech(false);
     };
 
     recognition.onend = () => {
       setIsListening(false);
+      setIsReceivingSpeech(false);
     };
 
     recognition.start();
@@ -287,19 +299,58 @@ export default function AIAssistant() {
           </div>
 
           <div className="ai-chat-input-area">
-            <button 
-              className="ai-mic-btn"
-              onClick={startListening}
-              disabled={chatState === 'LANGUAGE_SELECTION' || isListening}
-              title="Speak"
-              style={{
-                background: 'none', border: 'none', color: isListening ? 'var(--accent-danger)' : 'var(--text-muted)',
-                cursor: chatState === 'LANGUAGE_SELECTION' ? 'not-allowed' : 'pointer',
-                animation: isListening ? 'pulse 1.5s infinite' : 'none'
-              }}
-            >
-              <Mic size={20} />
-            </button>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button 
+                className={`ai-mic-btn ${isListening ? 'listening' : ''} ${isReceivingSpeech ? 'receiving-speech' : ''}`}
+                onClick={startListening}
+                disabled={chatState === 'LANGUAGE_SELECTION' || isListening}
+                title="Speak"
+                style={{
+                  background: 'none', border: 'none', 
+                  color: isListening ? 'var(--accent-danger)' : 'var(--text-muted)',
+                  cursor: chatState === 'LANGUAGE_SELECTION' ? 'not-allowed' : 'pointer',
+                  position: 'relative',
+                  zIndex: 2,
+                  padding: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%'
+                }}
+              >
+                <Mic size={20} />
+              </button>
+              
+              {/* Siri-like spinning rings */}
+              {isListening && (
+                <div style={{
+                  position: 'absolute',
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  borderRadius: '50%',
+                  border: isReceivingSpeech ? '2px solid var(--accent-danger)' : '1px dashed var(--accent-danger)',
+                  animation: isReceivingSpeech ? 'spin 1s linear infinite' : 'pulse 1.5s infinite',
+                  opacity: 0.6,
+                  zIndex: 1,
+                  pointerEvents: 'none'
+                }}></div>
+              )}
+              {isReceivingSpeech && (
+                <div style={{
+                  position: 'absolute',
+                  top: '-4px', left: '-4px', right: '-4px', bottom: '-4px',
+                  borderRadius: '50%',
+                  borderTop: '2px solid #ff3366',
+                  borderRight: '2px solid transparent',
+                  borderBottom: '2px solid #00c3ff',
+                  borderLeft: '2px solid transparent',
+                  animation: 'spin 0.8s linear infinite',
+                  opacity: 0.8,
+                  zIndex: 1,
+                  pointerEvents: 'none'
+                }}></div>
+              )}
+            </div>
+            
             <input
               type="text"
               className="ai-chat-input"
