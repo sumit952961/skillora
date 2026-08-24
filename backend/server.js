@@ -1621,8 +1621,8 @@ app.post("/api/chat", async (req, res) => {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     
     // Fetch live data from Database
-    const activeInternships = await Internship.find({ status: 'active' }).select('title duration skillsRequired').lean();
-    const activeContests = await Contest.find({ status: 'active' }).select('title description startDate').lean();
+    const activeInternships = await Internship.find({}).select('title duration skillsRequired').lean();
+    const activeContests = await Contest.find({ isActive: true }).select('title description startDate').lean();
     
     let liveContext = "### LIVE DATABASE DATA (Use this to provide up-to-date answers):\n";
     if (activeInternships.length > 0) {
