@@ -169,6 +169,11 @@ export default function Navbar() {
                   <Trophy size={16} /> Contests
                 </NavLink>
               </li>
+              <li>
+                <NavLink to="/arena" className={({ isActive }) => isActive ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => setIsMobileMenuOpen(false)}>
+                  <span style={{ fontSize: '16px', lineHeight: 1 }}>⚡</span> Arena
+                </NavLink>
+              </li>
               {/* User profile icon — direct link to /profile, no dropdown */}
               <li className="profile-nav-item">
                 <Link

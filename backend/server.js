@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import { GoogleGenAI } from "@google/genai";
 import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification } from "./emailService.js";
 
 dotenv.config();
@@ -182,9 +183,45 @@ const contestRegistrationSchema = new mongoose.Schema({
   certificateLink: { type: String, default: "" }
 }, { timestamps: true });
 
+const arenaProgressSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, unique: true },
+  xp: { type: Number, default: 0 },
+  level: { type: Number, default: 1 },
+  currentStreak: { type: Number, default: 0 },
+  longestStreak: { type: Number, default: 0 },
+  questionsAttempted: { type: Number, default: 0 },
+  correctAnswers: { type: Number, default: 0 },
+  aiWins: { type: Number, default: 0 },
+  aiLosses: { type: Number, default: 0 },
+  badges: { type: Number, default: 0 },
+  lastArenaActivityDate: { type: Date }
+}, { timestamps: true });
+
+const arenaSessionSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  category: { type: String, required: true },
+  startingDifficulty: { type: String, default: 'easy' },
+  questionsAttempted: { type: Number, default: 0 },
+  correctAnswers: { type: Number, default: 0 },
+  accuracy: { type: Number, default: 0 },
+  bestQuestionStreak: { type: Number, default: 0 },
+  highestDifficulty: { type: String, default: 'easy' },
+  baseXp: { type: Number, default: 0 },
+  streakBonusXp: { type: Number, default: 0 },
+  aiBeatBonusXp: { type: Number, default: 0 },
+  totalXp: { type: Number, default: 0 },
+  aiBenchmark: { type: Number, default: 0 },
+  result: { type: String, enum: ['win', 'loss', 'draw'], default: 'loss' },
+  currentQuestionData: { type: Object },
+  startedAt: { type: Date, default: Date.now },
+  endedAt: { type: Date }
+}, { timestamps: true });
+
 const Contest = mongoose.model("Contest", contestSchema);
 const QuestionBank = mongoose.model("QuestionBank", questionBankSchema);
 const ContestRegistration = mongoose.model("ContestRegistration", contestRegistrationSchema);
+const ArenaProgress = mongoose.model("ArenaProgress", arenaProgressSchema);
+const ArenaSession = mongoose.model("ArenaSession", arenaSessionSchema);
 
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
@@ -1187,6 +1224,262 @@ app.post("/api/contests/upload-questions", async (req, res) => {
       message: `Error uploading questions: ${error.message}`, 
       error: error.message 
     });
+  }
+});
+
+// ==========================================
+// ARENA (PHASE 2) ENDPOINTS
+// ==========================================
+
+app.post("/api/arena/start", authenticateToken, async (req, res) => {
+  try {
+    const { category } = req.body;
+    if (!category) return res.status(400).json({ message: "Category is required" });
+
+    const session = await ArenaSession.create({
+      userId: req.user.id,
+      category: category,
+      startingDifficulty: 'easy',
+      highestDifficulty: 'easy',
+      questionsAttempted: 0,
+      correctAnswers: 0,
+      bestQuestionStreak: 0,
+      baseXp: 0,
+      streakBonusXp: 0,
+      totalXp: 0,
+      startedAt: new Date(),
+    });
+
+    res.json({ sessionId: session._id, message: "Arena session started successfully." });
+  } catch (error) {
+    console.error("Arena Start Error:", error);
+    res.status(500).json({ message: "Failed to start Arena session", error: error.message });
+  }
+});
+
+app.post("/api/arena/question", authenticateToken, async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+    if (!sessionId) return res.status(400).json({ message: "Session ID required" });
+
+    const session = await ArenaSession.findOne({ _id: sessionId, userId: req.user.id });
+    if (!session) return res.status(404).json({ message: "Session not found" });
+    if (session.endedAt) return res.status(400).json({ message: "Session already ended" });
+
+    if (session.currentQuestionData) {
+      const q = session.currentQuestionData;
+      return res.json({ question: q.question, options: q.options, category: q.category, difficulty: q.difficulty });
+    }
+
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ message: "GEMINI_API_KEY is missing in backend environment" });
+    }
+
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const prompt = `Generate a single multiple-choice question for a student.
+Category: ${session.category}
+Difficulty: ${session.highestDifficulty}
+Respond ONLY with a valid JSON object matching this exact schema, without markdown formatting or code blocks:
+{
+  "question": "The question text",
+  "options": ["Option A", "Option B", "Option C", "Option D"],
+  "correctAnswer": "The exact string from options that is correct",
+  "explanation": "Short explanation of why it is correct",
+  "category": "${session.category}",
+  "difficulty": "${session.highestDifficulty}"
+}`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: { responseMimeType: "application/json" }
+    });
+
+    const aiData = JSON.parse(response.text);
+
+    if (!aiData.question || !aiData.options || !aiData.correctAnswer) {
+      throw new Error("AI returned invalid question format");
+    }
+
+    // Shuffle options to prevent bias
+    const shuffledOptions = aiData.options.sort(() => Math.random() - 0.5);
+
+    session.currentQuestionData = {
+      ...aiData,
+      options: shuffledOptions,
+      isAnswered: false
+    };
+    await session.save();
+
+    res.json({
+      question: session.currentQuestionData.question,
+      options: session.currentQuestionData.options,
+      category: session.currentQuestionData.category,
+      difficulty: session.currentQuestionData.difficulty
+    });
+
+  } catch (error) {
+    console.error("Arena Question Error:", error);
+    res.status(500).json({ message: "Failed to generate question. Please try again.", error: error.message });
+  }
+});
+
+app.post("/api/arena/answer", authenticateToken, async (req, res) => {
+  try {
+    const { sessionId, answer } = req.body;
+    if (!sessionId || !answer) return res.status(400).json({ message: "Session ID and answer required" });
+
+    const session = await ArenaSession.findOne({ _id: sessionId, userId: req.user.id });
+    if (!session || !session.currentQuestionData) return res.status(400).json({ message: "Invalid session or no active question" });
+    if (session.endedAt) return res.status(400).json({ message: "Session already ended" });
+
+    let progress = await ArenaProgress.findOne({ userId: req.user.id });
+    if (!progress) {
+      progress = new ArenaProgress({ userId: req.user.id });
+    }
+
+    const qData = session.currentQuestionData;
+    const isCorrect = (answer === qData.correctAnswer);
+    session.questionsAttempted += 1;
+    progress.questionsAttempted += 1;
+
+    let xpGained = 0;
+    let base = 0;
+    let streakMult = 1;
+
+    if (isCorrect) {
+      session.correctAnswers += 1;
+      progress.correctAnswers += 1;
+      progress.currentStreak += 1;
+      if (progress.currentStreak > progress.longestStreak) progress.longestStreak = progress.currentStreak;
+      
+      const currentQStreak = progress.currentStreak;
+      if (currentQStreak > session.bestQuestionStreak) session.bestQuestionStreak = currentQStreak;
+
+      // Base XP
+      if (qData.difficulty === 'easy') base = 5;
+      else if (qData.difficulty === 'medium') base = 15;
+      else if (qData.difficulty === 'hard') base = 30;
+      else if (qData.difficulty === 'expert') base = 50;
+
+      // Streak Multiplier
+      if (currentQStreak >= 10) streakMult = 2;
+      else if (currentQStreak >= 8) streakMult = 1.75;
+      else if (currentQStreak >= 5) streakMult = 1.5;
+      else if (currentQStreak >= 3) streakMult = 1.25;
+
+      xpGained = Math.round(base * streakMult);
+      session.baseXp += base;
+      session.streakBonusXp += (xpGained - base);
+      session.totalXp += xpGained;
+      progress.xp += xpGained;
+
+      // Adjust difficulty up
+      if (currentQStreak >= 5) session.highestDifficulty = 'expert';
+      else if (currentQStreak >= 3) session.highestDifficulty = 'hard';
+      else if (currentQStreak >= 1) session.highestDifficulty = 'medium';
+    } else {
+      progress.currentStreak = 0; // Reset streak
+      // Adjust difficulty down slightly
+      if (session.highestDifficulty === 'expert') session.highestDifficulty = 'hard';
+      else if (session.highestDifficulty === 'hard') session.highestDifficulty = 'medium';
+      else if (session.highestDifficulty === 'medium') session.highestDifficulty = 'easy';
+    }
+
+    // Update level
+    const newLevel = Math.floor(progress.xp / 500) + 1;
+    if (newLevel > progress.level) progress.level = newLevel;
+
+    // Badges evaluation (simplified Phase 2)
+    let badgesEarned = 0;
+    if (progress.questionsAttempted === 1) badgesEarned++; // First Battle
+    if (progress.currentStreak === 5) badgesEarned++; // Hot Streak
+    if (progress.currentStreak === 10) badgesEarned++; // Unstoppable
+    if (session.highestDifficulty === 'expert' && isCorrect) badgesEarned++; // AI Master (one-time logic mock)
+    progress.badges += badgesEarned;
+    progress.lastArenaActivityDate = new Date();
+
+    session.currentQuestionData = null; // clear question
+    await session.save();
+    await progress.save();
+
+    res.json({
+      isCorrect,
+      correctAnswer: qData.correctAnswer,
+      explanation: qData.explanation,
+      xpGained,
+      streak: progress.currentStreak,
+      newDifficulty: session.highestDifficulty
+    });
+
+  } catch (error) {
+    console.error("Arena Answer Error:", error);
+    res.status(500).json({ message: "Failed to submit answer", error: error.message });
+  }
+});
+
+app.post("/api/arena/end", authenticateToken, async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+    if (!sessionId) return res.status(400).json({ message: "Session ID required" });
+
+    const session = await ArenaSession.findOne({ _id: sessionId, userId: req.user.id });
+    if (!session) return res.status(404).json({ message: "Session not found" });
+    if (session.endedAt) return res.json({ session }); // Already ended
+
+    session.endedAt = new Date();
+    session.accuracy = session.questionsAttempted > 0 ? (session.correctAnswers / session.questionsAttempted) * 100 : 0;
+
+    // Deterministic AI Benchmark based on difficulty reached
+    let benchmarkProb = 0.8; // Default 80% if no questions
+    if (session.highestDifficulty === 'easy') benchmarkProb = 0.95;
+    else if (session.highestDifficulty === 'medium') benchmarkProb = 0.75;
+    else if (session.highestDifficulty === 'hard') benchmarkProb = 0.55;
+    else if (session.highestDifficulty === 'expert') benchmarkProb = 0.35;
+    
+    session.aiBenchmark = benchmarkProb * 100;
+    const aiBeat = session.accuracy > session.aiBenchmark && session.questionsAttempted > 0;
+
+    let progress = await ArenaProgress.findOne({ userId: req.user.id });
+    if (aiBeat) {
+      session.result = 'win';
+      session.aiBeatBonusXp = 100;
+      progress.aiWins += 1;
+    } else {
+      session.result = 'loss';
+      session.aiBeatBonusXp = 50; // completion bonus
+      progress.aiLosses += 1;
+    }
+
+    session.totalXp += session.aiBeatBonusXp;
+    progress.xp += session.aiBeatBonusXp;
+    
+    // Level up check again
+    progress.level = Math.floor(progress.xp / 500) + 1;
+
+    await session.save();
+    await progress.save();
+
+    res.json({ session });
+  } catch (error) {
+    console.error("Arena End Error:", error);
+    res.status(500).json({ message: "Failed to end session", error: error.message });
+  }
+});
+
+app.get("/api/arena/progress", authenticateToken, async (req, res) => {
+  try {
+    let progress = await ArenaProgress.findOne({ userId: req.user.id });
+    if (!progress) {
+      progress = {
+        xp: 0, level: 1, currentStreak: 0, longestStreak: 0, 
+        questionsAttempted: 0, correctAnswers: 0, badges: 0, aiWins: 0
+      };
+    }
+    res.json(progress);
+  } catch (error) {
+    console.error("Arena Progress Error:", error);
+    res.status(500).json({ message: "Failed to fetch progress", error: error.message });
   }
 });
 

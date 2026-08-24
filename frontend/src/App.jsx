@@ -32,6 +32,9 @@ import AdminContests from './pages/AdminContests'
 import AdminCertificateVerification from './pages/AdminCertificateVerification'
 import PaymentSuccess from './pages/PaymentSuccess'
 import AdminPasswordReset from './pages/AdminPasswordReset'
+import ArenaHome from './pages/Arena/ArenaHome'
+import ArenaGame from './pages/Arena/ArenaGame'
+import ArenaResult from './pages/Arena/ArenaResult'
 import { MapPin, Phone, Mail, BookOpen, ShieldCheck, Award } from 'lucide-react'
 import SEO from './components/SEO'
 import './App.css'
@@ -107,6 +110,23 @@ function AppContent() {
           <Route path="/contests/leaderboard/:id" element={
             <ProtectedRoute>
               <ContestLeaderboard />
+            </ProtectedRoute>
+          } />
+          
+          {/* Arena Routes */}
+          <Route path="/arena" element={
+            <ProtectedRoute>
+              <ArenaHome />
+            </ProtectedRoute>
+          } />
+          <Route path="/arena/play" element={
+            <ProtectedRoute>
+              <ArenaGame />
+            </ProtectedRoute>
+          } />
+          <Route path="/arena/result" element={
+            <ProtectedRoute>
+              <ArenaResult />
             </ProtectedRoute>
           } />
 

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { User, Mail, Shield, Save, Lock, LogOut, BookOpen, Layers, Calendar, Phone, Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +25,25 @@ export default function Profile() {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+  const [arenaProgress, setArenaProgress] = useState(null);
+
+  useEffect(() => {
+    const fetchArenaProgress = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/arena/progress`, {
+          headers: { 'Authorization': `Bearer ${user?.token || localStorage.getItem('token')}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setArenaProgress(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch arena progress", err);
+      }
+    };
+    fetchArenaProgress();
+  }, [user]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -146,6 +165,34 @@ export default function Profile() {
             <Save size={18} /> Save & Change
           </button>
         </form>
+      </div>
+
+      <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)', marginTop: '32px' }}>
+        <h2 style={{ fontSize: '1.2rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>⚡</span> Arena Progress
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '16px' }}>
+          <div style={{ background: 'var(--bg-main)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>💎</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{arenaProgress?.xp || 0} XP</div>
+          </div>
+          <div style={{ background: 'var(--bg-main)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>⭐</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Level {arenaProgress?.level || 1}</div>
+          </div>
+          <div style={{ background: 'var(--bg-main)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>🔥</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{arenaProgress?.currentStreak || 0} Streak</div>
+          </div>
+          <div style={{ background: 'var(--bg-main)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>🏆</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>Best: {arenaProgress?.longestStreak || 0}</div>
+          </div>
+          <div style={{ background: 'var(--bg-main)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border-color)', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>🎖️</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{arenaProgress?.badges || 0} Badges</div>
+          </div>
+        </div>
       </div>
 
       <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '32px', boxShadow: 'var(--shadow-sm)', marginTop: '32px' }}>
