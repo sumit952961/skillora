@@ -122,46 +122,74 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Arena Banner */}
+      {/* Premium Arena Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1))',
-        border: '1px solid rgba(99, 102, 241, 0.2)',
+        background: 'var(--bg-secondary)',
+        border: '1px solid rgba(99, 102, 241, 0.3)',
         borderRadius: '16px',
-        padding: '24px 32px',
+        padding: '28px 36px',
         marginBottom: '60px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: '24px',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        boxShadow: '0 10px 30px -10px rgba(99, 102, 241, 0.2)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        {/* Subtle background glow */}
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          right: '-10%',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(255,255,255,0) 70%)',
+          borderRadius: '50%',
+          zIndex: 0
+        }} />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', zIndex: 1 }}>
           <div style={{
             background: 'linear-gradient(135deg, #FF6B6B, #6B66FF)',
             color: 'white',
             padding: '16px',
-            borderRadius: '12px',
+            borderRadius: '14px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            boxShadow: '0 4px 15px rgba(107, 102, 255, 0.4)'
           }}>
             <Bot size={32} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '8px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              SkillZeno Arena <Zap size={20} color="#F59E0B" />
+            <h3 style={{ fontSize: '1.6rem', marginBottom: '6px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '800' }}>
+              Enter the Arena: You vs AI <Zap size={22} color="#F59E0B" fill="#F59E0B" />
             </h3>
-            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1.05rem', maxWidth: '600px' }}>
-              Test your skills against our Adaptive AI. Build your streak, earn XP, and prove your expertise in endless mode!
+            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1.05rem', maxWidth: '650px', lineHeight: '1.5' }}>
+              Challenge our adaptive AI in an endless battle of wits. Prove your mastery, build an unstoppable streak, and see how far you can go!
             </p>
           </div>
         </div>
         <button 
           className="btn btn-primary" 
           onClick={() => navigate('/arena')}
-          style={{ padding: '12px 28px', fontSize: '1.1rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '8px' }}
+          style={{ 
+            padding: '14px 32px', 
+            fontSize: '1.15rem', 
+            fontWeight: '700',
+            whiteSpace: 'nowrap', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px',
+            background: 'linear-gradient(135deg, var(--primary), #8B5CF6)',
+            boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)',
+            border: 'none',
+            zIndex: 1
+          }}
         >
-          Play Arena <ArrowRight size={18} />
+          Enter Now <ArrowRight size={20} />
         </button>
       </div>
 
