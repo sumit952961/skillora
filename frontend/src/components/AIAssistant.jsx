@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Sparkles, Volume2, VolumeX } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Sparkles, Volume2, VolumeX, Mic } from 'lucide-react';
 
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [chatState, setChatState] = useState('LANGUAGE_SELECTION');
   const [language, setLanguage] = useState(null);
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
+  const [isListening, setIsListening] = useState(false);
   const [messages, setMessages] = useState([
     {
       role: 'ai',
@@ -38,42 +39,66 @@ export default function AIAssistant() {
 
   const speakText = (text, langCode) => {
     if (!isVoiceEnabled || !window.speechSynthesis) return;
-    
-    // Cancel any ongoing speech
     window.speechSynthesis.cancel();
     
-    // Strip emojis and markdown formatting for cleaner speech
     const cleanText = text.replace(/[\u{1F600}-\u{1F6FF}]/gu, '')
                           .replace(/\*\*/g, '')
                           .replace(/\*/g, '')
                           .replace(/#/g, '');
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    
     if (langCode === 'hindi') {
       utterance.lang = 'hi-IN';
     } else {
-      utterance.lang = 'en-IN'; // Indian English often sounds better for local contexts
+      utterance.lang = 'en-IN';
+    }
+    utterance.rate = 1.05;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const startListening = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support voice input.");
+      return;
     }
     
-    utterance.rate = 1.05; // Slightly faster so it doesn't drag
-    window.speechSynthesis.speak(utterance);
+    const recognition = new SpeechRecognition();
+    recognition.lang = language === 'hindi' ? 'hi-IN' : 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInputMessage(prev => prev ? `${prev} ${transcript}` : transcript);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error", event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
   };
 
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
-      // Speak welcome message on first open
       if (messages.length === 1 && chatState === 'LANGUAGE_SELECTION') {
         speakText("Welcome to SkillZeno! I am your A I Mentor. Please select your preferred language.", 'english');
       }
     } else {
-      // Stop speaking when closed
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
-      
-      // If user closes chat, reset to welcome state so it greets again when re-opened
       setChatState('LANGUAGE_SELECTION');
       setLanguage(null);
       setMessages([
@@ -82,10 +107,10 @@ export default function AIAssistant() {
           content: "Welcome to SkillZeno! 👋 I am your AI Mentor.\n\nPlease select your preferred language / कृपया अपनी भाषा चुनें:"
         }
       ]);
+      setInputMessage("");
     }
   }, [isOpen]);
 
-  // Handle scroll on new messages
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
@@ -163,7 +188,6 @@ export default function AIAssistant() {
 
   return (
     <div className="ai-assistant-wrapper">
-      {/* Floating Action Button */}
       <button 
         className={`ai-fab ${isOpen ? 'open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
@@ -173,10 +197,8 @@ export default function AIAssistant() {
         {!isOpen && <span className="ai-fab-badge"><Sparkles size={14} /></span>}
       </button>
 
-      {/* Chat Window */}
       {isOpen && (
         <div className="ai-chat-window">
-          {/* Header */}
           <div className="ai-chat-header">
             <div className="ai-header-info">
               <div className="ai-avatar">
@@ -197,7 +219,6 @@ export default function AIAssistant() {
             </div>
           </div>
 
-          {/* Messages Area */}
           <div className="ai-chat-body">
             {messages.map((msg, index) => (
               <div key={index} className={`ai-message-row ${msg.role === 'user' ? 'user' : 'ai'}`}>
@@ -222,7 +243,6 @@ export default function AIAssistant() {
               </div>
             ))}
             
-            {/* Quick Actions (Language Selection) */}
             {chatState === 'LANGUAGE_SELECTION' && (
               <div className="ai-quick-actions">
                 {languageOptions.map((action, idx) => (
@@ -237,7 +257,6 @@ export default function AIAssistant() {
               </div>
             )}
 
-            {/* Quick Actions (Chat Topics) */}
             {chatState === 'CHATTING' && messages.length === 3 && (
               <div className="ai-quick-actions">
                 {currentQuickActions.map((action, idx) => (
@@ -267,12 +286,24 @@ export default function AIAssistant() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
           <div className="ai-chat-input-area">
+            <button 
+              className="ai-mic-btn"
+              onClick={startListening}
+              disabled={chatState === 'LANGUAGE_SELECTION' || isListening}
+              title="Speak"
+              style={{
+                background: 'none', border: 'none', color: isListening ? 'var(--accent-danger)' : 'var(--text-muted)',
+                cursor: chatState === 'LANGUAGE_SELECTION' ? 'not-allowed' : 'pointer',
+                animation: isListening ? 'pulse 1.5s infinite' : 'none'
+              }}
+            >
+              <Mic size={20} />
+            </button>
             <input
               type="text"
               className="ai-chat-input"
-              placeholder={language === 'hindi' ? "अपना सवाल यहाँ लिखें..." : "Type your question..."}
+              placeholder={language === 'hindi' ? "अपना सवाल यहाँ लिखें या बोलें..." : "Type or speak your question..."}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputMessage)}
