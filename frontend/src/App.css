@@ -1893,11 +1893,11 @@
 /* === HOME ARENA BANNER (GAMING STYLE) === */
 .home-arena-banner-wrapper {
   position: relative;
-  background: linear-gradient(135deg, #3730a3, #4f46e5, #6366f1);
+  background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca);
   border-radius: 24px;
   padding: 40px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 40px rgba(67, 56, 202, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   color: white;
@@ -1906,7 +1906,7 @@
 
 .home-arena-banner-wrapper:hover { 
   transform: translateY(-5px); 
-  box-shadow: 0 25px 50px rgba(79, 70, 229, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.25); 
+  box-shadow: 0 25px 50px rgba(67, 56, 202, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2); 
 }
 
 .arena-bg-glow { 
