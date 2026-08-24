@@ -214,6 +214,8 @@ function AppContent() {
               <li><Link to="/internships">Frontend React Development</Link></li>
               <li><Link to="/internships">Backend API Engineering</Link></li>
               <li><Link to="/internships">Full Stack MERN Systems</Link></li>
+              <li><Link to="/internships">UI/UX & Web Design</Link></li>
+              <li><Link to="/internships">Data Science & AI</Link></li>
             </ul>
           </div>
 
@@ -223,6 +225,7 @@ function AppContent() {
             <ul className="footer-links">
               <li><Link to="/internships">Internship Programs</Link></li>
               <li><Link to="/verify">Verification Portal</Link></li>
+              <li><Link to="/arena">SkillZeno Arena</Link></li>
               <li><Link to="/quiz">Interactive Quiz Test</Link></li>
               <li><Link to="/about">About Programs</Link></li>
             </ul>
@@ -239,6 +242,10 @@ function AppContent() {
               <li>
                 <Mail size={18} className="contact-icon" />
                 <a href="mailto:skillzeno26@gmail.com" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>skillzeno26@gmail.com</a>
+              </li>
+              <li>
+                <Phone size={18} className="contact-icon" />
+                <Link to="/contact" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>Contact Us Page</Link>
               </li>
             </ul>
           </div>
