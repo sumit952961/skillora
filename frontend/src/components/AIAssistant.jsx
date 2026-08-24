@@ -3,21 +3,32 @@ import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
 
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
+  const [chatState, setChatState] = useState('LANGUAGE_SELECTION');
+  const [language, setLanguage] = useState(null);
   const [messages, setMessages] = useState([
     {
       role: 'ai',
-      content: "Welcome to SkillZeno! 👋 I am your AI Mentor. I can help you explore our internships, use the Arena, or assist you with coding and career questions.\n\nHow can I help you today?"
+      content: "Welcome to SkillZeno! 👋 I am your AI Mentor.\n\nPlease select your preferred language / कृपया अपनी भाषा चुनें:"
     }
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const quickActions = [
+  const languageOptions = ["English", "हिंदी (Hindi)"];
+  
+  const quickActionsEn = [
     "Tell me about SkillZeno",
     "How to apply for internships?",
     "Help me with a coding problem",
     "What is the Arena?"
+  ];
+
+  const quickActionsHi = [
+    "SkillZeno के बारे में बताएँ",
+    "इंटर्नशिप के लिए कैसे अप्लाई करें?",
+    "कोडिंग में मेरी मदद करें",
+    "Arena क्या है?"
   ];
 
   const scrollToBottom = () => {
@@ -30,11 +41,28 @@ export default function AIAssistant() {
     }
   }, [messages, isOpen]);
 
-  const handleSendMessage = async (text) => {
+  const handleSendMessage = async (text, isLanguageSelection = false) => {
     if (!text.trim()) return;
 
-    const userMsg = { role: 'user', content: text };
-    setMessages(prev => [...prev, userMsg]);
+    let userText = text;
+    let internalLanguage = language;
+
+    if (isLanguageSelection) {
+      if (text === "English") {
+        internalLanguage = 'english';
+        setLanguage('english');
+        userText = "I prefer English. Please communicate in English from now on.";
+      } else {
+        internalLanguage = 'hindi';
+        setLanguage('hindi');
+        userText = "मैं हिंदी पसंद करता हूँ। कृपया अब से हिंदी में बात करें।";
+      }
+      setChatState('CHATTING');
+      setMessages(prev => [...prev, { role: 'user', content: text }]);
+    } else {
+      setMessages(prev => [...prev, { role: 'user', content: text }]);
+    }
+
     setInputMessage("");
     setIsTyping(true);
 
@@ -44,7 +72,7 @@ export default function AIAssistant() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          message: text,
+          message: userText,
           history: messages 
         })
       });
@@ -62,6 +90,8 @@ export default function AIAssistant() {
       setIsTyping(false);
     }
   };
+
+  const currentQuickActions = language === 'hindi' ? quickActionsHi : quickActionsEn;
 
   return (
     <div className="ai-assistant-wrapper">
@@ -119,10 +149,25 @@ export default function AIAssistant() {
               </div>
             ))}
             
-            {/* Quick Actions (only show if it's just the welcome message) */}
-            {messages.length === 1 && (
+            {/* Quick Actions (Language Selection) */}
+            {chatState === 'LANGUAGE_SELECTION' && (
               <div className="ai-quick-actions">
-                {quickActions.map((action, idx) => (
+                {languageOptions.map((action, idx) => (
+                  <button 
+                    key={idx} 
+                    className="ai-quick-action-btn"
+                    onClick={() => handleSendMessage(action, true)}
+                  >
+                    {action}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Quick Actions (Chat Topics) */}
+            {chatState === 'CHATTING' && messages.length === 3 && (
+              <div className="ai-quick-actions">
+                {currentQuickActions.map((action, idx) => (
                   <button 
                     key={idx} 
                     className="ai-quick-action-btn"
@@ -154,15 +199,16 @@ export default function AIAssistant() {
             <input
               type="text"
               className="ai-chat-input"
-              placeholder="Type your question..."
+              placeholder={language === 'hindi' ? "अपना सवाल यहाँ लिखें..." : "Type your question..."}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputMessage)}
+              disabled={chatState === 'LANGUAGE_SELECTION'}
             />
             <button 
               className="ai-send-btn"
               onClick={() => handleSendMessage(inputMessage)}
-              disabled={!inputMessage.trim() || isTyping}
+              disabled={!inputMessage.trim() || isTyping || chatState === 'LANGUAGE_SELECTION'}
             >
               <Send size={18} />
             </button>
