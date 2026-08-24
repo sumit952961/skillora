@@ -160,7 +160,7 @@ const questionBankSchema = new mongoose.Schema({
   question: { type: String, required: true },
   options: [{ type: String, required: true }],
   correctOptionIndex: { type: Number, required: true },
-  difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' }
+  difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard', 'Difficult'], default: 'Medium' }
 }, { timestamps: true });
 
 const contestRegistrationSchema = new mongoose.Schema({
