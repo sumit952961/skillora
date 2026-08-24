@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
-import { Award, Users, Star, Briefcase, Clock, ArrowRight, Code, Bookmark, ShieldCheck, Database, Atom, Box, Layers } from 'lucide-react';
+import { Award, Users, Star, Briefcase, Clock, ArrowRight, Code, Bookmark, ShieldCheck, Database, Atom, Box, Layers, Bot, Zap } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function AnimatedCounter({ target, suffix = "", duration = 2000 }) {
@@ -120,6 +120,49 @@ export default function Dashboard() {
           </div>
           <div className="metric-label">Satisfaction Rate</div>
         </div>
+      </div>
+
+      {/* Arena Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1))',
+        border: '1px solid rgba(99, 102, 241, 0.2)',
+        borderRadius: '16px',
+        padding: '24px 32px',
+        marginBottom: '60px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '24px',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #FF6B6B, #6B66FF)',
+            color: 'white',
+            padding: '16px',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Bot size={32} />
+          </div>
+          <div>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '8px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              SkillZeno Arena <Zap size={20} color="#F59E0B" />
+            </h3>
+            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1.05rem', maxWidth: '600px' }}>
+              Test your skills against our Adaptive AI. Build your streak, earn XP, and prove your expertise in endless mode!
+            </p>
+          </div>
+        </div>
+        <button 
+          className="btn btn-primary" 
+          onClick={() => navigate('/arena')}
+          style={{ padding: '12px 28px', fontSize: '1.1rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '8px' }}
+        >
+          Play Arena <ArrowRight size={18} />
+        </button>
       </div>
 
       <div className="section-title-wrapper">
