@@ -224,6 +224,17 @@ const ContestRegistration = mongoose.model("ContestRegistration", contestRegistr
 const ArenaProgress = mongoose.model("ArenaProgress", arenaProgressSchema);
 const ArenaSession = mongoose.model("ArenaSession", arenaSessionSchema);
 
+const aiChatHistorySchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  messages: [{
+    role: { type: String, enum: ['user', 'ai'], required: true },
+    content: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now }
+  }]
+}, { timestamps: true });
+
+const AIChatHistory = mongoose.model("AIChatHistory", aiChatHistorySchema);
+
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
   .then(async () => {
@@ -1560,10 +1571,44 @@ app.get("/api/arena/progress", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch progress", error: error.message });
   }
 });
+// Get Chat History Route
+app.get("/api/chat/history", authenticateToken, async (req, res) => {
+  try {
+    const chatHistory = await AIChatHistory.findOne({ userId: req.user.id });
+    if (!chatHistory) {
+      return res.json({ messages: [] });
+    }
+    // Return only the last 20 messages to keep the payload reasonable
+    const messages = chatHistory.messages.slice(-20).map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+    res.json({ messages });
+  } catch (error) {
+    console.error("Fetch Chat History Error:", error);
+    res.status(500).json({ message: "Failed to fetch chat history" });
+  }
+});
+
 // AI Assistant Chat Route
 app.post("/api/chat", async (req, res) => {
   try {
     const { message, history } = req.body;
+    
+    // Optional Authentication for saving history
+    let userId = null;
+    const authHeader = req.headers['authorization'];
+    if (authHeader) {
+      const token = authHeader.split(" ")[1];
+      if (token) {
+        try {
+          const decoded = jwt.verify(token, JWT_SECRET);
+          userId = decoded.id;
+        } catch (err) {
+          // invalid token, treat as guest
+        }
+      }
+    }
     
     if (!message) {
       return res.status(400).json({ message: "Message is required" });
@@ -1575,6 +1620,23 @@ app.post("/api/chat", async (req, res) => {
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     
+    // Fetch live data from Database
+    const activeInternships = await Internship.find({ status: 'active' }).select('title duration skillsRequired').lean();
+    const activeContests = await Contest.find({ status: 'active' }).select('title description startDate').lean();
+    
+    let liveContext = "### LIVE DATABASE DATA (Use this to provide up-to-date answers):\n";
+    if (activeInternships.length > 0) {
+      liveContext += "- **Active Internships**: " + activeInternships.map(i => `${i.title} (${i.duration} weeks)`).join(", ") + "\n";
+    } else {
+      liveContext += "- **Active Internships**: None right now.\n";
+    }
+    
+    if (activeContests.length > 0) {
+      liveContext += "- **Active Contests**: " + activeContests.map(c => c.title).join(", ") + "\n";
+    } else {
+      liveContext += "- **Active Contests**: None right now.\n";
+    }
+
     // Construct conversation history for context
     let formattedHistory = "";
     if (history && Array.isArray(history)) {
@@ -1589,9 +1651,10 @@ Your role:
 2. Act as a coding and career mentor. Answer coding questions, explain concepts, and give interview advice.
 3. Be friendly, encouraging, and concise. Format responses with markdown for readability (bullet points, bold text).
 4. Do not mention that you are an AI trained by Google. You are 'SkillZeno AI Mentor'.
+5. **IMPORTANT RULE**: DO NOT say "Namaste", "Welcome", or repeat greetings in every single message. Only answer the user's current question directly and naturally.
 
 ### SKILLZENO KNOWLEDGE BASE (Use this to answer user queries accurately):
-- **Internships:** SkillZeno offers high-quality, hands-on internship programs across various domains (like Web Development, AI, etc.). Students can enroll, complete tasks via their dashboard, and build real-world portfolios.
+- **Internships:** SkillZeno offers high-quality, hands-on internship programs across various domains (like Web Development, AI, etc.). Students can enroll, complete tasks via their dashboard, and build real-world portfolios. All internship task submissions are done via the student dashboard under the 'My Internships' or 'Tasks' section.
 - **Arena:** An adaptive AI coding and quiz battleground. Students fight against an AI in endless mode. The difficulty adapts dynamically based on their winning streak. They earn XP, level up, and unlock badges for their performance.
 - **Quizzes:** SkillZeno features standard technical quizzes where students can test their knowledge on specific programming languages or frameworks.
 - **Contests:** Periodic coding contests and hackathons where students can compete with others to win prizes and showcase their skills on a leaderboard.
@@ -1603,20 +1666,44 @@ Your role:
   - Headquarters: NH-56 near Agrasen Chauraha Usarpurwa, Shivpur, Varanasi, Uttar Pradesh 221003
   - **Important:** If a user wants to send a direct message to the team, instruct them to visit the 'Contact Us' (/contact) page on the website and fill out the form there to send a message directly.
 
+${liveContext}
+
 Conversation History:
 ${formattedHistory}
 
 Student's new message:
 ${message}
 
-Respond appropriately based on your role and the knowledge base provided.`;
+Respond appropriately based on your role, rules, and the knowledge base provided.`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash-lite',
       contents: systemPrompt,
     });
+    
+    const replyText = response.text;
 
-    res.json({ reply: response.text });
+    // Save to History if logged in
+    if (userId) {
+      const chatUpdate = {
+        $push: {
+          messages: {
+            $each: [
+              { role: 'user', content: message },
+              { role: 'ai', content: replyText }
+            ]
+          }
+        }
+      };
+      
+      await AIChatHistory.findOneAndUpdate(
+        { userId },
+        chatUpdate,
+        { upsert: true, new: true }
+      );
+    }
+
+    res.json({ reply: replyText });
   } catch (error) {
     console.error("AI Chat Error:", error);
     res.status(500).json({ message: "Sorry, I am having trouble connecting to my brain right now. Please try again later.", error: error.message });

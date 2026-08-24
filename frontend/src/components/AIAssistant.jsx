@@ -61,6 +61,32 @@ export default function AIAssistant() {
   };
 
   useEffect(() => {
+    // Attempt to load chat history if logged in
+    const loadHistory = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+        const res = await fetch(`${API_URL}/chat/history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (data.messages && data.messages.length > 0) {
+          setMessages(data.messages);
+          setChatState('CHATTING');
+          setLanguage('english'); // Defaulting context
+        }
+      } catch (error) {
+        console.error("Failed to load chat history");
+      }
+    };
+    
+    loadHistory();
+  }, []);
+
+  useEffect(() => {
     if (isOpen) {
       scrollToBottom();
       // Speak welcome message on first open
@@ -108,10 +134,16 @@ export default function AIAssistant() {
     setIsTyping(true);
 
     try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
       const response = await fetch(`${API_URL}/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ 
           message: userText,
           history: messages 
