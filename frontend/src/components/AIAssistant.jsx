@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Sparkles, Volume2, VolumeX } from 'lucide-react';
 
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [chatState, setChatState] = useState('LANGUAGE_SELECTION');
   const [language, setLanguage] = useState(null);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
   const [messages, setMessages] = useState([
     {
       role: 'ai',
@@ -35,11 +36,51 @@ export default function AIAssistant() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const speakText = (text, langCode) => {
+    if (!isVoiceEnabled || !window.speechSynthesis) return;
+    
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    // Strip emojis and markdown formatting for cleaner speech
+    const cleanText = text.replace(/[\u{1F600}-\u{1F6FF}]/gu, '')
+                          .replace(/\*\*/g, '')
+                          .replace(/\*/g, '')
+                          .replace(/#/g, '');
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    
+    if (langCode === 'hindi') {
+      utterance.lang = 'hi-IN';
+    } else {
+      utterance.lang = 'en-IN'; // Indian English often sounds better for local contexts
+    }
+    
+    utterance.rate = 1.05; // Slightly faster so it doesn't drag
+    window.speechSynthesis.speak(utterance);
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      scrollToBottom();
+      // Speak welcome message on first open
+      if (messages.length === 1 && chatState === 'LANGUAGE_SELECTION') {
+        speakText("Welcome to SkillZeno! I am your A I Mentor. Please select your preferred language.", 'english');
+      }
+    } else {
+      // Stop speaking when closed
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    }
+  }, [isOpen]);
+
+  // Handle scroll on new messages
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
     }
-  }, [messages, isOpen]);
+  }, [messages]);
 
   const handleSendMessage = async (text, isLanguageSelection = false) => {
     if (!text.trim()) return;
@@ -81,17 +122,28 @@ export default function AIAssistant() {
       
       if (response.ok) {
         setMessages(prev => [...prev, { role: 'ai', content: data.reply }]);
+        speakText(data.reply, internalLanguage);
       } else {
         setMessages(prev => [...prev, { role: 'ai', content: data.message || "Oops! Something went wrong." }]);
+        speakText(data.message || "Oops! Something went wrong.", internalLanguage);
       }
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'ai', content: "Failed to connect to the server. Please try again later." }]);
+      const errorMsg = "Failed to connect to the server. Please try again later.";
+      setMessages(prev => [...prev, { role: 'ai', content: errorMsg }]);
+      speakText(errorMsg, internalLanguage);
     } finally {
       setIsTyping(false);
     }
   };
 
   const currentQuickActions = language === 'hindi' ? quickActionsHi : quickActionsEn;
+
+  const toggleVoice = () => {
+    if (isVoiceEnabled && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    setIsVoiceEnabled(!isVoiceEnabled);
+  };
 
   return (
     <div className="ai-assistant-wrapper">
@@ -119,9 +171,14 @@ export default function AIAssistant() {
                 <span className="ai-status">Online • Ready to help</span>
               </div>
             </div>
-            <button className="ai-close-btn" onClick={() => setIsOpen(false)}>
-              <X size={20} />
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button className="ai-close-btn" onClick={toggleVoice} title={isVoiceEnabled ? "Mute Voice" : "Unmute Voice"}>
+                {isVoiceEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+              </button>
+              <button className="ai-close-btn" onClick={() => setIsOpen(false)} title="Close Chat">
+                <X size={20} />
+              </button>
+            </div>
           </div>
 
           {/* Messages Area */}
