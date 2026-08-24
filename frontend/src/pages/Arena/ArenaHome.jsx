@@ -115,7 +115,7 @@ export default function ArenaHome() {
                 This is an endless mode. Go as far as you can!
               </p>
 
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button 
                   className="btn btn-outline"
                   onClick={() => setStep(1)}
@@ -127,7 +127,7 @@ export default function ArenaHome() {
                   className="arena-start-btn" 
                   onClick={handleStart}
                   disabled={isLoading}
-                  style={{ margin: 0, width: 'auto', padding: '1rem 3rem' }}
+                  style={{ margin: 0, width: 'auto', padding: '1rem 2rem', flex: '1 1 auto', maxWidth: '250px' }}
                 >
                   {isLoading ? 'Loading...' : '🚀 Start Challenge'}
                 </button>
