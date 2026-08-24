@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
-import { ArrowRight, Briefcase, MapPin, Clock, Award, Users, BookOpen, Shield, Zap, Code, Bookmark, Building2, ShieldCheck, Database, Atom, Box, Layers, Star, Target } from 'lucide-react';
+import { ArrowRight, Briefcase, MapPin, Clock, Award, Users, BookOpen, Shield, Zap, Code, Bookmark, Building2, ShieldCheck, Database, Atom, Box, Layers, Star, Target, Bot, Gamepad2, Swords, Sparkles } from 'lucide-react';
 import SEO from '../components/SEO';
 import ContestTicker from '../components/ContestTicker';
 
@@ -281,6 +281,47 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* Epic Arena Banner */}
+      <section style={{ marginTop: '80px', marginBottom: '40px', padding: '0 20px' }} className="container">
+        <div className="home-arena-banner-wrapper">
+          
+          {/* Animated Background Elements */}
+          <div className="arena-bg-glow"></div>
+          <div className="arena-bg-grid"></div>
+          
+          <div className="arena-banner-content">
+            <div className="arena-banner-left">
+              <div className="arena-icon-container">
+                <Swords size={36} className="swords-icon" />
+              </div>
+              <div className="arena-text-content">
+                <div className="arena-badge">
+                  <Sparkles size={14} /> NEW GAME MODE
+                </div>
+                <h2 className="arena-title">
+                  SkillZeno <span className="arena-highlight">ARENA</span> <Zap size={28} className="zap-icon" />
+                </h2>
+                <p className="arena-desc">
+                  Step into the ultimate battleground. Challenge our <strong>Adaptive AI</strong> in an endless battle of wits, build your streak, and prove your dominance.
+                </p>
+                <div className="arena-stats">
+                  <span><Gamepad2 size={16} /> Endless Mode</span>
+                  <span><Award size={16} /> Earn XP</span>
+                  <span><Target size={16} /> Dynamic Difficulty</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="arena-banner-right">
+              <button className="btn arena-play-btn" onClick={() => navigate('/arena')}>
+                Enter The Arena
+                <div className="btn-glow"></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Featured Internships Section */}
       <section style={{ marginTop: '80px' }}>
