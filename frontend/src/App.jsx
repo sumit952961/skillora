@@ -214,6 +214,7 @@ function AppContent() {
               <li><Link to="/internships">Frontend React Development</Link></li>
               <li><Link to="/internships">Backend API Engineering</Link></li>
               <li><Link to="/internships">Full Stack MERN Systems</Link></li>
+              <li><Link to="/internships">UI/UX & Web Design</Link></li>
             </ul>
           </div>
 
