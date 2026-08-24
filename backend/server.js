@@ -213,6 +213,7 @@ const arenaSessionSchema = new mongoose.Schema({
   aiBenchmark: { type: Number, default: 0 },
   result: { type: String, enum: ['win', 'loss', 'draw'], default: 'loss' },
   currentQuestionData: { type: Object },
+  pastQuestions: { type: [String], default: [] },
   startedAt: { type: Date, default: Date.now },
   endedAt: { type: Date }
 }, { timestamps: true });
@@ -1280,11 +1281,15 @@ app.post("/api/arena/question", authenticateToken, async (req, res) => {
     // Ensure English category is always in English
     const targetLanguage = session.category.toLowerCase().includes('english') ? 'English' : language;
     
+    const pastQInstruction = session.pastQuestions.length > 0 
+      ? `\nCRITICAL: Do NOT generate any of these previous questions or anything highly similar:\n${session.pastQuestions.slice(-10).map(q => `- ${q}`).join('\n')}`
+      : '';
+
     const prompt = `Generate a single multiple-choice question for a student.
 Category: ${session.category}
 Difficulty: ${session.highestDifficulty}
 Language: ${targetLanguage}
-Please write the question text, options, and explanation strictly in the ${targetLanguage} language.
+Please write the question text, options, and explanation strictly in the ${targetLanguage} language.${pastQInstruction}
 
 Respond ONLY with a valid JSON object matching this exact schema, without markdown formatting or code blocks:
 {
@@ -1328,6 +1333,71 @@ Respond ONLY with a valid JSON object matching this exact schema, without markdo
   } catch (error) {
     console.error("Arena Question Error:", error);
     res.status(500).json({ message: "Failed to generate question. Please try again.", error: error.message });
+  }
+});
+
+app.post("/api/arena/translate", authenticateToken, async (req, res) => {
+  try {
+    const { sessionId, language } = req.body;
+    if (!sessionId || !language) return res.status(400).json({ message: "Session ID and language required" });
+
+    const session = await ArenaSession.findOne({ _id: sessionId, userId: req.user.id });
+    if (!session || !session.currentQuestionData) return res.status(404).json({ message: "No active question to translate" });
+    if (session.category.toLowerCase().includes('english')) return res.json(session.currentQuestionData); // Don't translate English tests
+
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ message: "GEMINI_API_KEY is missing" });
+    }
+
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const qData = session.currentQuestionData;
+    const prompt = `Translate the following multiple-choice question strictly into ${language}.
+Keep the meaning, difficulty, and format exactly the same.
+
+Original Question:
+Question: ${qData.question}
+Options: ${JSON.stringify(qData.options)}
+Correct Answer: ${qData.correctAnswer}
+Explanation: ${qData.explanation}
+
+Respond ONLY with a valid JSON object matching this exact schema:
+{
+  "question": "Translated question text",
+  "options": ["Translated Option 1", "Translated Option 2", "Translated Option 3", "Translated Option 4"],
+  "correctAnswer": "The exact translated string of the correct answer from the translated options array",
+  "explanation": "Translated explanation"
+}`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash-lite',
+      contents: prompt,
+      config: { responseMimeType: "application/json" }
+    });
+
+    const aiData = JSON.parse(response.text);
+
+    if (!aiData.question || !aiData.options || !aiData.correctAnswer) {
+      throw new Error("Translation failed");
+    }
+
+    session.currentQuestionData = {
+      ...session.currentQuestionData,
+      question: aiData.question,
+      options: aiData.options,
+      correctAnswer: aiData.correctAnswer,
+      explanation: aiData.explanation
+    };
+    await session.save();
+
+    res.json({
+      question: session.currentQuestionData.question,
+      options: session.currentQuestionData.options,
+      category: session.currentQuestionData.category,
+      difficulty: session.currentQuestionData.difficulty
+    });
+  } catch (error) {
+    console.error("Arena Translation Error:", error);
+    res.status(500).json({ message: "Failed to translate. Please try again.", error: error.message });
   }
 });
 
@@ -1406,6 +1476,7 @@ app.post("/api/arena/answer", authenticateToken, async (req, res) => {
     progress.badges += badgesEarned;
     progress.lastArenaActivityDate = new Date();
 
+    session.pastQuestions.push(qData.question);
     session.currentQuestionData = null; // clear question
     await session.save();
     await progress.save();

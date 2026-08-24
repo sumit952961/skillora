@@ -57,6 +57,38 @@ export default function ArenaGame() {
     }
   };
 
+  const translateQuestion = async (targetLang) => {
+    if (!currentQ) return;
+    setIsLoading(true);
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+      const res = await fetch(`${API_URL}/arena/translate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ sessionId, language: targetLang })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCurrentQ(data);
+      } else {
+        alert(data.message || "Failed to translate.");
+      }
+    } catch (err) {
+      alert("Network error during translation.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLanguageToggle = () => {
+    const nextLang = language === 'English' ? 'Hindi' : 'English';
+    setLanguage(nextLang);
+    translateQuestion(nextLang);
+  };
+
   const handleOptionSelect = async (opt) => {
     if (isAnswered) return;
     setSelectedOption(opt);
@@ -140,7 +172,7 @@ export default function ArenaGame() {
               <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                 {category?.name?.toLowerCase() !== 'english' && (
                   <button 
-                    onClick={() => setLanguage(lang => lang === 'English' ? 'Hindi' : 'English')}
+                    onClick={handleLanguageToggle}
                     style={{
                       background: 'var(--bg-secondary)',
                       border: '1px solid var(--border-color)',
