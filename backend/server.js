@@ -1290,7 +1290,7 @@ Respond ONLY with a valid JSON object matching this exact schema, without markdo
 }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
+      model: 'gemini-3.5-flash-lite',
       contents: prompt,
       config: { responseMimeType: "application/json" }
     });
