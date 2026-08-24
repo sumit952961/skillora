@@ -31,7 +31,8 @@ export default function Profile() {
   useEffect(() => {
     const fetchArenaProgress = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/arena/progress`, {
+        const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+        const res = await fetch(`${API_URL}/arena/progress`, {
           headers: { 'Authorization': `Bearer ${user?.token || localStorage.getItem('token')}` }
         });
         if (res.ok) {

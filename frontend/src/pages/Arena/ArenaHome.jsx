@@ -28,7 +28,8 @@ export default function ArenaHome() {
     if (selectedCategory) {
       setIsLoading(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/arena/start`, {
+        const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+        const res = await fetch(`${API_URL}/arena/start`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

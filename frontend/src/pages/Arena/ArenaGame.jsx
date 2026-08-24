@@ -34,7 +34,8 @@ export default function ArenaGame() {
   const fetchQuestion = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/arena/question`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+      const res = await fetch(`${API_URL}/arena/question`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +62,8 @@ export default function ArenaGame() {
     setIsAnswered(true);
     
     try {
-      const res = await fetch(`http://localhost:5000/api/arena/answer`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+      const res = await fetch(`${API_URL}/arena/answer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +94,8 @@ export default function ArenaGame() {
 
   const endChallenge = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/arena/end`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+      const res = await fetch(`${API_URL}/arena/end`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
