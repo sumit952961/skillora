@@ -812,7 +812,7 @@
 .premium-footer {
   background-color: #f1f5f9; /* Slate 100 (Slightly darker than white, provides clean border) */
   color: var(--text-muted);
-  padding: 24px 24px 16px; /* Reduced vertical padding */
+  padding: 16px 24px 12px; /* Reduced vertical padding */
   border-top: 1px solid var(--border-color);
   font-family: var(--font-body);
   margin-top: 35px !important; /* Overrides default footer margin-top */
@@ -896,7 +896,7 @@
   color: var(--text-main);
   font-size: 0.95rem;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   text-align: left;
@@ -906,7 +906,7 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   padding: 0;
   text-align: left;
 }
@@ -927,7 +927,7 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   padding: 0;
   text-align: left;
 }
@@ -949,7 +949,7 @@
 .footer-divider {
   border: 0;
   border-top: 1px solid var(--border-color);
-  margin: 20px 0 14px; /* Reduced vertical space around divider */
+  margin: 16px 0 12px; /* Reduced vertical space around divider */
 }
 
 /* Trust Bar Footer Bottom */

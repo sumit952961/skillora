@@ -213,8 +213,6 @@ function AppContent() {
             <ul className="footer-links">
               <li><Link to="/internships">Frontend React Development</Link></li>
               <li><Link to="/internships">Full Stack MERN Systems</Link></li>
-              <li><Link to="/internships">UI/UX & Web Design</Link></li>
-              <li><Link to="/internships">Data Science & AI</Link></li>
             </ul>
           </div>
 
