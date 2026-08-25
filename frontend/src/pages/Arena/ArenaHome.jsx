@@ -65,7 +65,7 @@ export default function ArenaHome() {
               <Bot size={40} color="#FF6B6B" />
               WELCOME TO ARENA
             </h1>
-            <p className="arena-subtitle" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>Choose your challenge mode</p>
+            <p className="arena-subtitle">Choose your challenge mode</p>
           </div>
 
         {mode === null ? (

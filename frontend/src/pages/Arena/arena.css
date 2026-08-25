@@ -313,8 +313,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+  background: linear-gradient(135deg, #f8faff 0%, #ffffff 50%, #f0f4ff 100%);
+  background-size: 400% 400%;
+  animation: lightBgMove 15s ease infinite;
   z-index: 1;
+}
+
+@keyframes lightBgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .game-bg-animation::before {
@@ -324,15 +332,12 @@
   left: 0;
   width: 200%;
   height: 200%;
-  background-image: 
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-  transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(200px);
-  animation: gridMove 10s linear infinite;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236c63ff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  z-index: 1;
+  animation: floatBackground 40s linear infinite;
 }
 
-@keyframes gridMove {
-  0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(200px); }
-  100% { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(200px); }
+@keyframes floatBackground {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-100px, -100px); }
 }
