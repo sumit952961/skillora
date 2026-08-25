@@ -199,10 +199,10 @@ export default function ArenaWordNinja() {
             )}
 
             {gameState === 'playing' && (
-              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`} style={{ position: 'relative', height: 'calc(100vh - 80px)', background: 'var(--bg-secondary)', borderRadius: '0', overflow: 'hidden', minHeight: '500px' }}>
+              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`} style={{ position: 'relative', height: 'calc(100vh - 80px)', background: 'linear-gradient(to bottom, #1e3a8a 0%, #172554 100%)', borderRadius: '0', overflow: 'hidden', minHeight: '500px' }}>
                 
                 {/* 3D Scene Background Element (Cliff) */}
-                <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '30%', background: 'var(--text-main)', clipPath: 'polygon(0 40%, 100% 0, 100% 100%, 0% 100%)' }}></div>
+                <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '30%', background: '#0f172a', clipPath: 'polygon(0 40%, 100% 0, 100% 100%, 0% 100%)' }}></div>
 
                 {/* Top UI Info: Score, Health, and Timer (Responsive Stacking) */}
                 <div style={{ position: 'absolute', top: '10px', left: '0', width: '100%', display: 'flex', flexDirection: 'column', gap: '10px', padding: '0 1rem', zIndex: 10 }}>
@@ -210,15 +210,15 @@ export default function ArenaWordNinja() {
                   {/* Score & Timer Row */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                     {/* Score */}
-                    <div style={{ background: 'var(--bg-primary)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #3b82f6', minWidth: '80px' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #3b82f6', minWidth: '80px' }}>
                       <h3 style={{ margin: 0, color: '#60a5fa', fontSize: '0.9rem' }}>Score</h3>
-                      <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--bg-secondary)' }}>{score}</p>
+                      <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', color: '#ffffff' }}>{score}</p>
                     </div>
                     
                     {/* Timer Display */}
-                    <div style={{ background: 'var(--bg-primary)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #10b981', textAlign: 'right', minWidth: '90px' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #10b981', textAlign: 'right', minWidth: '90px' }}>
                       <h3 style={{ margin: 0, color: '#34d399', fontSize: '0.9rem' }}>Word Timer</h3>
-                      <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--bg-secondary)' }}>
+                      <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', fontFamily: 'monospace', color: '#ffffff' }}>
                         {(elapsedTime / 1000).toFixed(2)}s
                       </p>
                       {lastWordTime && <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block' }}>Last: {lastWordTime.toFixed(2)}s</span>}
@@ -268,8 +268,8 @@ export default function ArenaWordNinja() {
                         fontSize: '2rem',
                         fontFamily: 'sans-serif',
                         fontWeight: 'bold',
-                        color: idx < typedIndex ? '#94a3b8' : 'var(--bg-secondary)',
-                        background: idx < typedIndex ? 'rgba(30, 58, 138, 0.4)' : 'var(--primary)',
+                        color: idx < typedIndex ? '#94a3b8' : '#ffffff',
+                        background: idx < typedIndex ? 'rgba(30, 58, 138, 0.4)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
                         borderRadius: '8px',
                         boxShadow: idx < typedIndex ? 'none' : '0 4px 12px rgba(59,130,246,0.6)',
                         textTransform: 'lowercase',
