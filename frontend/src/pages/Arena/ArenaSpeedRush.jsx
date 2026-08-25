@@ -5,7 +5,7 @@ import './arena.css';
 import SEO from '../../components/SEO';
 import { AuthContext } from '../../context/AuthContext';
 
-const MAX_TIME = 3; // 3 seconds per question
+const MAX_TIME = 5; // 5 seconds per question
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -197,7 +197,7 @@ export default function ArenaSpeedRush() {
               <Zap size={64} color="#eab308" style={{ margin: '0 auto 1.5rem' }} />
               <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Ready for Speed Rush?</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
-                You have exactly <strong>3 seconds</strong> to solve each math problem.<br/>
+                You have exactly <strong>5 seconds</strong> to solve each problem.<br/>
                 You have <strong>3 lives (❤️)</strong>. Lose them all and it's <strong>Game Over</strong>.
               </p>
               <button className="arena-start-btn" onClick={startGame} style={{ maxWidth: '300px', margin: '0 auto' }}>

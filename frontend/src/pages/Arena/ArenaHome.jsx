@@ -97,7 +97,7 @@ export default function ArenaHome() {
               <Zap size={60} color="#eab308" style={{ marginBottom: '1rem' }} />
               <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Speed Rush</h2>
               <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '1.5rem', flex: 1 }}>
-                Extremely simple questions, but you only have 3 seconds per question! One mistake and it's Game Over.
+                Extremely simple questions, but you only have 5 seconds per question! Survive as long as possible.
               </p>
               <button className="arena-start-btn" style={{ margin: 0, padding: '0.75rem', width: '100%' }}>Select Mode</button>
             </div>
