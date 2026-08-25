@@ -116,7 +116,11 @@ export default function ArenaSpeedRush() {
   return (
     <>
       <SEO title="Speed Rush | Arena | SkillZeno" />
-      <div className="arena-container fade-in" style={{ maxWidth: '600px' }}>
+      <div className="arena-page-wrapper">
+        {/* Animated Game Background */}
+        <div className="game-bg-animation"></div>
+
+        <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '600px' }}>
         
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
           <button onClick={() => navigate('/arena')} className="btn btn-outline" style={{ border: 'none', padding: '0.5rem' }}>
@@ -205,6 +209,7 @@ export default function ArenaSpeedRush() {
           )}
 
         </div>
+      </div>
       </div>
     </>
   );

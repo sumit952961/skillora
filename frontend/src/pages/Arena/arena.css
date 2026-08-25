@@ -300,3 +300,39 @@
   .arena-title { font-size: 2rem; }
   .arena-result-grid { grid-template-columns: 1fr; }
 }
+
+.arena-page-wrapper {
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - 100px);
+}
+
+.game-bg-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+  z-index: 1;
+}
+
+.game-bg-animation::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(200px);
+  animation: gridMove 10s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(200px); }
+  100% { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(200px); }
+}

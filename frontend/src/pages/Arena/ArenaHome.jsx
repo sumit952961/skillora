@@ -55,14 +55,18 @@ export default function ArenaHome() {
   return (
     <>
       <SEO title="Arena | Can You Beat AI? | SkillZeno" />
-      <div className="arena-container fade-in">
-        <div className="arena-header">
-          <h1 className="arena-title">
-            <Bot size={40} color="#FF6B6B" />
-            WELCOME TO ARENA
-          </h1>
-          <p className="arena-subtitle">Choose your challenge mode</p>
-        </div>
+      <div className="arena-page-wrapper">
+        {/* Animated Game Background */}
+        <div className="game-bg-animation"></div>
+        
+        <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2 }}>
+          <div className="arena-header">
+            <h1 className="arena-title">
+              <Bot size={40} color="#FF6B6B" />
+              WELCOME TO ARENA
+            </h1>
+            <p className="arena-subtitle" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>Choose your challenge mode</p>
+          </div>
 
         {mode === null ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
@@ -91,7 +95,7 @@ export default function ArenaHome() {
               <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '1.5rem', flex: 1 }}>
                 Extremely simple questions, but you only have 3 seconds per question! One mistake and it's Game Over.
               </p>
-              <button className="btn btn-outline" style={{ width: '100%', padding: '0.75rem', borderRadius: '12px' }}>Select Mode</button>
+              <button className="arena-start-btn" style={{ margin: 0, padding: '0.75rem', width: '100%' }}>Select Mode</button>
             </div>
           </div>
         ) : mode === 'beat_ai' ? (
@@ -172,6 +176,7 @@ export default function ArenaHome() {
           )}
         </div>
         ) : null}
+        </div>
       </div>
     </>
   );
