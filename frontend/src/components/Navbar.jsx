@@ -2,6 +2,7 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { Award, BookOpen, LogOut, CheckCircle, User, Briefcase, LayoutDashboard, Settings, Layers, MoreVertical, Key, Shield, Menu, X, Trophy, Zap } from 'lucide-react';
+import DarkModeToggle from './DarkModeToggle';
 import '../navbar-fix.css';
 
 export default function Navbar() {
@@ -210,6 +211,9 @@ export default function Navbar() {
               </li>
             </>
           )}
+          <li style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }} className="dark-mode-nav-item">
+            <DarkModeToggle />
+          </li>
         </ul>
       </div>
     </nav>
