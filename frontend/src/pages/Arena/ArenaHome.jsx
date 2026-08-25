@@ -120,10 +120,8 @@ export default function ArenaHome() {
           <div className="arena-card">
             {step === 1 ? (
               <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <button className="btn btn-outline" onClick={() => setMode(null)} style={{ padding: '0.5rem 1rem' }}>← Back</button>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1rem' }}>
                   <h2 style={{ margin: 0, textAlign: 'center' }}>Choose Your Arena</h2>
-                  <div style={{ width: '80px' }}></div>
                 </div>
                 <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
                   Challenge yourself with adaptive questions and see how far you can go against AI.
@@ -174,13 +172,7 @@ export default function ArenaHome() {
               </p>
 
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <button 
-                  className="btn btn-outline"
-                  onClick={() => setStep(1)}
-                  style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
-                >
-                  Back
-                </button>
+
                 <button 
                   className="arena-start-btn" 
                   onClick={handleStart}

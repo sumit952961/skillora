@@ -161,15 +161,11 @@ export default function ArenaSpeedRush() {
       <div className="arena-page-wrapper">
         <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '600px' }}>
         
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
-          <button onClick={() => navigate('/arena')} className="btn btn-outline" style={{ border: 'none', padding: '0.5rem' }}>
-            <ArrowLeft size={24} />
-          </button>
-          <h1 className="arena-title" style={{ margin: '0 auto', fontSize: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '2rem' }}>
+          <h1 className="arena-title" style={{ margin: '0', fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Zap size={32} color="#eab308" />
             Speed Rush
           </h1>
-          <div style={{ width: '40px' }}></div>
         </div>
 
         <div className="arena-card" style={{ textAlign: 'center', padding: '3rem 2rem' }}>

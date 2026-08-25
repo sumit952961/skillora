@@ -164,15 +164,11 @@ export default function ArenaWordNinja() {
       <div className="arena-page-wrapper" style={{ padding: '0', margin: '0', maxWidth: '100vw', overflowX: 'hidden' }}>
         <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '100%', padding: gameState === 'playing' ? '0' : '1rem' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem', padding: '0 2rem' }}>
-            <button onClick={() => navigate('/arena')} className="btn btn-outline" style={{ border: 'none', padding: '0.5rem' }}>
-              <ArrowLeft size={24} />
-            </button>
-            <h1 className="arena-title" style={{ margin: '0 auto', fontSize: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1rem', padding: '0 2rem' }}>
+            <h1 className="arena-title" style={{ margin: '0', fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Keyboard size={32} color="#10b981" />
               Word Ninja
             </h1>
-            <div style={{ width: '40px' }}></div>
           </div>
 
           <div style={{ width: '100%' }}>
