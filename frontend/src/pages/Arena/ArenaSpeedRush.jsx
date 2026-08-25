@@ -7,33 +7,16 @@ import { AuthContext } from '../../context/AuthContext';
 
 const MAX_TIME = 3; // 3 seconds per question
 
-const QUICK_QUESTIONS = [
-  { text: "Capital of India?", options: ["New Delhi", "Mumbai", "Kolkata", "Chennai"], answer: "New Delhi" },
-  { text: "Opposite of 'Fast'?", options: ["Slow", "Quick", "Rapid", "Speed"], answer: "Slow" },
-  { text: "2, 4, 6, ?", options: ["8", "7", "10", "12"], answer: "8" },
-  { text: "HTML stands for?", options: ["HyperText Markup", "HighText Machine", "Hyperlink Text", "Home Tool"], answer: "HyperText Markup" },
-  { text: "Largest planet?", options: ["Jupiter", "Earth", "Mars", "Saturn"], answer: "Jupiter" },
-  { text: "Output of 2 + '2' in JS?", options: ["'22'", "4", "NaN", "Error"], answer: "'22'" },
-  { text: "Odd one out?", options: ["Car", "Apple", "Banana", "Orange"], answer: "Car" },
-  { text: "3 x 3 x 3 = ?", options: ["27", "9", "81", "18"], answer: "27" },
-  { text: "Synonym of 'Happy'?", options: ["Joyful", "Sad", "Angry", "Tired"], answer: "Joyful" },
-  { text: "Brain of computer?", options: ["CPU", "RAM", "Mouse", "Monitor"], answer: "CPU" },
-  { text: "National bird of India?", options: ["Peacock", "Parrot", "Pigeon", "Crow"], answer: "Peacock" },
-  { text: "Days in a Leap Year?", options: ["366", "365", "364", "360"], answer: "366" },
-  { text: "10, 20, 30, ?", options: ["40", "50", "100", "35"], answer: "40" },
-  { text: "Sun rises in the?", options: ["East", "West", "North", "South"], answer: "East" },
-  { text: "Color of blood?", options: ["Red", "Blue", "Green", "Yellow"], answer: "Red" },
-  { text: "Fastest land animal?", options: ["Cheetah", "Lion", "Tiger", "Horse"], answer: "Cheetah" },
-  { text: "Polygon with 3 sides?", options: ["Triangle", "Square", "Hexagon", "Circle"], answer: "Triangle" },
-  { text: "A, C, E, ?", options: ["G", "F", "H", "B"], answer: "G" },
-  { text: "Is Tomato a fruit?", options: ["Yes", "No", "It's a grain", "None"], answer: "Yes" },
-  { text: "1 Byte = ? bits", options: ["8", "4", "16", "32"], answer: "8" },
-  { text: "Primary color?", options: ["Red", "Purple", "Orange", "Pink"], answer: "Red" },
-  { text: "Opposite of 'Up'?", options: ["Down", "Left", "Right", "Above"], answer: "Down" },
-  { text: "Which is a vowel?", options: ["E", "B", "Z", "X"], answer: "E" },
-  { text: "Square root of 81?", options: ["9", "8", "7", "81"], answer: "9" },
-  { text: "Currency of India?", options: ["Rupee", "Dollar", "Euro", "Pound"], answer: "Rupee" }
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const COLORS = [
+  { p1: 'Red', p2: 'Blue', res: 'Purple' },
+  { p1: 'Red', p2: 'Yellow', res: 'Orange' },
+  { p1: 'Blue', p2: 'Yellow', res: 'Green' },
+  { p1: 'Black', p2: 'White', res: 'Gray' },
+  { p1: 'Red', p2: 'White', res: 'Pink' }
 ];
+const WORDS = ['APPLE', 'BANANA', 'ORANGE', 'TIGER', 'WATER', 'EARTH', 'SPACE', 'REACT', 'PYTHON', 'LAPTOP'];
 
 export default function ArenaSpeedRush() {
   const navigate = useNavigate();
@@ -45,61 +28,76 @@ export default function ArenaSpeedRush() {
   const [timeLeft, setTimeLeft] = useState(MAX_TIME);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Generate a simple question (Math or General)
+  // Massive procedural generator for infinite combinations
   const generateQuestion = useCallback(() => {
-    const isMath = Math.random() > 0.5;
-
-    if (isMath) {
-      const operators = ['+', '-', '*'];
-      const operator = operators[Math.floor(Math.random() * operators.length)];
-      let a, b, correctAnswer;
-
-      if (operator === '+') {
-        a = Math.floor(Math.random() * 50) + 1;
-        b = Math.floor(Math.random() * 50) + 1;
-        correctAnswer = a + b;
-      } else if (operator === '-') {
-        a = Math.floor(Math.random() * 50) + 20;
-        b = Math.floor(Math.random() * 20) + 1;
-        correctAnswer = a - b;
-      } else {
-        a = Math.floor(Math.random() * 12) + 2;
-        b = Math.floor(Math.random() * 10) + 2;
-        correctAnswer = a * b;
-      }
-
-      // Generate 3 wrong options close to the right answer
-      const optionsSet = new Set([correctAnswer]);
-      while (optionsSet.size < 4) {
-        const offset = Math.floor(Math.random() * 10) - 5;
-        const wrongAnswer = correctAnswer + offset;
-        if (wrongAnswer !== correctAnswer && wrongAnswer > 0) {
-          optionsSet.add(wrongAnswer);
-        } else if (wrongAnswer <= 0) {
-          optionsSet.add(correctAnswer + Math.floor(Math.random() * 10) + 1);
-        }
-      }
-
-      const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
-
-      setQuestion({
-        text: `${a} ${operator} ${b} = ?`,
-        options,
-        correctAnswer
-      });
-    } else {
-      // Pick a random general question
-      const randomQ = QUICK_QUESTIONS[Math.floor(Math.random() * QUICK_QUESTIONS.length)];
-      // Shuffle options
-      const options = [...randomQ.options].sort(() => Math.random() - 0.5);
-      
-      setQuestion({
-        text: randomQ.text,
-        options,
-        correctAnswer: randomQ.answer
-      });
-    }
+    const types = ['math_basic', 'math_divide', 'series', 'days', 'word_len', 'colors', 'compare'];
+    const type = types[Math.floor(Math.random() * types.length)];
     
+    let text = '';
+    let correctAnswer = '';
+    let optionsSet = new Set();
+
+    if (type === 'math_basic') {
+      const operators = ['+', '-', '*'];
+      const op = operators[Math.floor(Math.random() * operators.length)];
+      let a, b;
+      if (op === '+') { a = Math.floor(Math.random() * 80) + 10; b = Math.floor(Math.random() * 80) + 10; correctAnswer = String(a + b); }
+      else if (op === '-') { a = Math.floor(Math.random() * 80) + 30; b = Math.floor(Math.random() * 30) + 1; correctAnswer = String(a - b); }
+      else { a = Math.floor(Math.random() * 12) + 3; b = Math.floor(Math.random() * 12) + 3; correctAnswer = String(a * b); }
+      text = `${a} ${op} ${b} = ?`;
+      optionsSet.add(correctAnswer);
+      while(optionsSet.size < 4) { optionsSet.add(String(parseInt(correctAnswer) + Math.floor(Math.random() * 15) - 7 || parseInt(correctAnswer) + 2)); }
+    } 
+    else if (type === 'math_divide') {
+      const b = Math.floor(Math.random() * 10) + 2;
+      const ans = Math.floor(Math.random() * 12) + 2;
+      const a = b * ans;
+      correctAnswer = String(ans);
+      text = `${a} / ${b} = ?`;
+      optionsSet.add(correctAnswer);
+      while(optionsSet.size < 4) { optionsSet.add(String(ans + Math.floor(Math.random() * 6) - 2 || ans + 1)); }
+    }
+    else if (type === 'series') {
+      const diff = Math.floor(Math.random() * 10) + 2;
+      const start = Math.floor(Math.random() * 20) + 1;
+      correctAnswer = String(start + diff * 3);
+      text = `${start}, ${start + diff}, ${start + diff * 2}, ?`;
+      optionsSet.add(correctAnswer);
+      while(optionsSet.size < 4) { optionsSet.add(String(parseInt(correctAnswer) + Math.floor(Math.random() * 10) - 4 || parseInt(correctAnswer)+diff)); }
+    }
+    else if (type === 'days') {
+      const todayIdx = Math.floor(Math.random() * 7);
+      const isTomorrow = Math.random() > 0.5;
+      text = `If Today is ${DAYS[todayIdx]}, ${isTomorrow ? 'Tomorrow' : 'Yesterday'} is?`;
+      correctAnswer = isTomorrow ? DAYS[(todayIdx + 1) % 7] : DAYS[(todayIdx + 6) % 7];
+      optionsSet.add(correctAnswer);
+      while(optionsSet.size < 4) { optionsSet.add(DAYS[Math.floor(Math.random() * 7)]); }
+    }
+    else if (type === 'word_len') {
+      const word = WORDS[Math.floor(Math.random() * WORDS.length)];
+      text = `Letters in '${word}'?`;
+      correctAnswer = String(word.length);
+      optionsSet.add(correctAnswer);
+      while(optionsSet.size < 4) { optionsSet.add(String(word.length + Math.floor(Math.random() * 4) - 1 || word.length + 2)); }
+    }
+    else if (type === 'colors') {
+      const mix = COLORS[Math.floor(Math.random() * COLORS.length)];
+      text = `${mix.p1} + ${mix.p2} = ?`;
+      correctAnswer = mix.res;
+      optionsSet.add(correctAnswer);
+      while(optionsSet.size < 4) { optionsSet.add(COLORS[Math.floor(Math.random() * COLORS.length)].res); }
+    }
+    else if (type === 'compare') {
+      const a = Math.floor(Math.random() * 90) + 10;
+      const b = Math.floor(Math.random() * 90) + 10;
+      if (a === b) { text = `Which is larger?`; correctAnswer = 'Equal'; }
+      else { text = `Which is larger?`; correctAnswer = String(Math.max(a, b)); }
+      optionsSet.add(String(a)); optionsSet.add(String(b)); optionsSet.add('Equal'); optionsSet.add(String(a+b));
+    }
+
+    const options = Array.from(optionsSet).slice(0, 4).sort(() => Math.random() - 0.5);
+
+    setQuestion({ text, options, correctAnswer });  
     setTimeLeft(MAX_TIME);
   }, []);
 
