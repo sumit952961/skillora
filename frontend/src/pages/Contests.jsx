@@ -397,7 +397,7 @@ export default function Contests() {
                   {/* Banner Area */}
                   <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)', padding: '40px', color: 'var(--bg-secondary)', position: 'relative' }}>
                     <div style={{ position: 'relative', zIndex: 2 }}>
-                      <span style={{ display: 'inline-block', padding: '6px 12px', background: 'var(--bg-secondary)', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '16px', backdropFilter: 'blur(4px)' }}>
+                      <span style={{ display: 'inline-block', padding: '6px 12px', background: 'var(--bg-secondary)', color: 'var(--primary)', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '16px', backdropFilter: 'blur(4px)' }}>
                         Featured Assessment
                       </span>
                       <h2 style={{ fontSize: '2.5rem', marginBottom: '16px', color: 'var(--bg-secondary)' }}>{contest.title}</h2>
