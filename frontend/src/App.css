@@ -66,7 +66,7 @@
 
 .btn-primary-premium {
   background-color: var(--primary);
-  color: #ffffff;
+  color: var(--bg-secondary);
   padding: 12px 28px;
   border-radius: var(--radius-md);
   font-weight: 700;
@@ -179,8 +179,8 @@
 }
 
 .illustration-card {
-  background: linear-gradient(180deg, #f8faff 0%, #f0f4ff 100%);
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border: 1px solid var(--border-color);
   border-radius: 32px;
   padding: 30px 36px 32px; /* Reduced top padding */
   display: flex;
@@ -275,7 +275,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #cbd5e1;
+  background-color: var(--border-color);
   transition: var(--transition);
 }
 
@@ -362,7 +362,7 @@
 
 .premium-internship-card {
   background-color: var(--bg-secondary);
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 20px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
@@ -377,7 +377,7 @@
 .premium-internship-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.08);
-  border-color: #cbd5e1;
+  border-color: var(--border-color);
 }
 
 /* Header Top */
@@ -391,8 +391,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: #f5f3ff;
-  border: 1px solid #ede9fe;
+  background-color: var(--primary-light);
+  border: 1px solid var(--border-color);
   color: var(--primary);
   font-size: 0.7rem;
   font-weight: 800;
@@ -404,7 +404,7 @@
 
 .bookmark-btn {
   background-color: transparent;
-  color: #94a3b8;
+  color: var(--text-light);
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -417,7 +417,7 @@
 }
 
 .bookmark-btn:hover {
-  background-color: #f5f3ff;
+  background-color: var(--primary-light);
   color: var(--primary);
 }
 
@@ -425,7 +425,7 @@
 .card-title {
   font-size: 1.35rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text-main);
   line-height: 1.3;
   letter-spacing: -0.01em;
   margin-top: 2px;
@@ -435,7 +435,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -447,7 +447,7 @@
 }
 
 .card-description {
-  color: #475569;
+  color: var(--text-muted);
   font-size: 0.85rem;
   line-height: 1.5;
   flex-grow: 1; /* Pushes content down to fill height */
@@ -478,9 +478,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  color: #334155;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 4px 10px;
@@ -490,7 +490,7 @@
 
 .card-divider {
   border: 0;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-color);
   margin: 4px 0;
 }
 
@@ -513,7 +513,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: #f5f3ff;
+  background-color: var(--primary-light);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -534,7 +534,7 @@
 .card-stat-label {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--text-light);
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
@@ -542,7 +542,7 @@
 .card-stat-value {
   font-size: 0.95rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text-main);
 }
 
 .stats-divider {
@@ -560,8 +560,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 8px 12px;
   flex-grow: 1;
@@ -581,18 +581,18 @@
 .cert-title {
   font-size: 0.75rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text-main);
 }
 
 .cert-subtitle {
   font-size: 0.65rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .card-apply-btn-large {
   background-color: var(--primary);
-  color: #ffffff;
+  color: var(--bg-secondary);
   border: none;
   border-radius: 12px;
   padding: 0 20px;
@@ -873,7 +873,7 @@
 }
 
 .social-link {
-  background-color: #e2e8f0; /* Slate 200 circular buttons */
+  background-color: var(--border-color); /* Slate 200 circular buttons */
   color: var(--text-muted);
   width: 34px;
   height: 34px;
@@ -888,7 +888,7 @@
 
 .social-link:hover {
   background-color: var(--primary);
-  color: #ffffff;
+  color: var(--bg-secondary);
   transform: translateY(-2px);
 }
 
@@ -1336,7 +1336,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  color: #ffffff;
+  color: var(--bg-secondary);
   font-weight: 700;
   font-size: 0.95rem;
   display: flex;
@@ -2230,7 +2230,7 @@
   right: 0;
   width: 360px;
   height: 520px;
-  background: #ffffff; /* Solid white to stand out */
+  background: var(--bg-secondary); /* Solid white to stand out */
   border: 1px solid rgba(107, 102, 255, 0.3);
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 20px rgba(107, 102, 255, 0.1);
