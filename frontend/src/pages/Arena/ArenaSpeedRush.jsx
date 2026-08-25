@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Zap, Clock, Trophy, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { Zap, Clock, Trophy, AlertTriangle, ArrowLeft, Heart } from 'lucide-react';
 import './arena.css';
 import SEO from '../../components/SEO';
 import { AuthContext } from '../../context/AuthContext';
@@ -27,6 +27,7 @@ export default function ArenaSpeedRush() {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(MAX_TIME);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lives, setLives] = useState(3);
 
   // Massive procedural generator for infinite combinations
   const generateQuestion = useCallback(() => {
@@ -103,6 +104,7 @@ export default function ArenaSpeedRush() {
 
   const startGame = () => {
     setScore(0);
+    setLives(3);
     setGameState('playing');
     generateQuestion();
   };
@@ -134,9 +136,29 @@ export default function ArenaSpeedRush() {
       setScore(prev => prev + 1);
       generateQuestion();
     } else {
-      handleGameOver();
+      setLives(prev => {
+        if (prev > 1) {
+          generateQuestion();
+          return prev - 1;
+        } else {
+          handleGameOver();
+          return 0;
+        }
+      });
     }
   };
+
+  const handleTimeout = useCallback(() => {
+    setLives(prev => {
+      if (prev > 1) {
+        generateQuestion();
+        return prev - 1;
+      } else {
+        handleGameOver();
+        return 0;
+      }
+    });
+  }, [generateQuestion, handleGameOver]);
 
   useEffect(() => {
     let timer;
@@ -145,7 +167,7 @@ export default function ArenaSpeedRush() {
         setTimeLeft(prev => {
           if (prev <= 1) {
             clearInterval(timer);
-            handleGameOver();
+            handleTimeout();
             return 0;
           }
           return prev - 1;
@@ -153,7 +175,7 @@ export default function ArenaSpeedRush() {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [gameState, handleGameOver]);
+  }, [gameState, handleTimeout]);
 
   return (
     <>
@@ -176,7 +198,7 @@ export default function ArenaSpeedRush() {
               <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Ready for Speed Rush?</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
                 You have exactly <strong>3 seconds</strong> to solve each math problem.<br/>
-                One wrong answer or timeout = <strong>Game Over</strong>.
+                You have <strong>3 lives (❤️)</strong>. Lose them all and it's <strong>Game Over</strong>.
               </p>
               <button className="arena-start-btn" onClick={startGame} style={{ maxWidth: '300px', margin: '0 auto' }}>
                 Start Game ⚡
@@ -190,6 +212,18 @@ export default function ArenaSpeedRush() {
                 <div className="arena-streak">
                   <Trophy size={20} /> Score: {score}
                 </div>
+                
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {[...Array(3)].map((_, i) => (
+                    <Heart 
+                      key={i} 
+                      size={24} 
+                      color={i < lives ? "#ef4444" : "#4b5563"} 
+                      fill={i < lives ? "#ef4444" : "transparent"} 
+                    />
+                  ))}
+                </div>
+
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem', fontWeight: 'bold', color: timeLeft <= 1 ? 'var(--accent-danger)' : 'var(--text-main)' }}>
                   <Clock size={24} /> 00:0{timeLeft}
                 </div>
