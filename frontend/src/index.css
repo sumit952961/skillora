@@ -43,9 +43,9 @@
 
 /* === DARK MODE VARIABLES === */
 body.dark-mode {
-  --bg-primary: #121212;
-  --bg-secondary: #1e1e1e;
-  --bg-hover: #2d2d2d;
+  --bg-primary: #18181b;
+  --bg-secondary: #27272a;
+  --bg-hover: #3f3f46;
   
   --primary: #6366f1;
   --primary-hover: #818cf8;
@@ -60,12 +60,25 @@ body.dark-mode {
   --text-light: #d4d4d8;
   --text-on-primary: #ffffff;
   
-  --border-color: #333333;
+  --border-color: #3f3f46;
   
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.8);
   --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode .navbar-container {
+  background-color: rgba(39, 39, 42, 0.85) !important;
+}
+
+body.dark-mode .auth-wrapper {
+  background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, rgba(24, 24, 27, 0) 90%) !important;
+}
+
+body.dark-mode .form-input {
+  background-color: #3f3f46 !important;
+  color: var(--text-main) !important;
 }
 
 * {
