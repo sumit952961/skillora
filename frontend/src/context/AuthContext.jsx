@@ -109,10 +109,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
-    setToken('');
-    setUser(null);
-    setAppliedInternships([]);
-    setQuizApplications([]);
+    window.location.href = '/';
   };
 
   const updateProfile = async (profileData) => {
