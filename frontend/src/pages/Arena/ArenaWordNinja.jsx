@@ -33,8 +33,24 @@ export default function ArenaWordNinja() {
   const [currentMonster, setCurrentMonster] = useState(MONSTERS[0]);
   const [score, setScore] = useState(0);
   const [isAttacking, setIsAttacking] = useState(false);
+  const [isEnemyAttacking, setIsEnemyAttacking] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Timer state
+  const [wordStartTime, setWordStartTime] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [lastWordTime, setLastWordTime] = useState(null);
+
+  useEffect(() => {
+    let interval;
+    if (gameState === 'playing') {
+      interval = setInterval(() => {
+        setElapsedTime(Date.now() - wordStartTime);
+      }, 50);
+    }
+    return () => clearInterval(interval);
+  }, [gameState, wordStartTime]);
 
   const startGame = () => {
     setGameState('playing');
@@ -43,6 +59,9 @@ export default function ArenaWordNinja() {
     setScore(0);
     setCurrentWord(generateGibberish(0));
     setTypedIndex(0);
+    setWordStartTime(Date.now());
+    setElapsedTime(0);
+    setLastWordTime(null);
   };
 
   const handleGameOver = async (won) => {
@@ -81,7 +100,11 @@ export default function ArenaWordNinja() {
 
   const triggerError = () => {
     setIsShaking(true);
-    setTimeout(() => setIsShaking(false), 400); // 400ms shake animation
+    setIsEnemyAttacking(true); // Enemy shoots back!
+    setTimeout(() => {
+      setIsShaking(false);
+      setIsEnemyAttacking(false);
+    }, 400); 
   };
 
   const handleKeyDown = useCallback((e) => {
@@ -117,8 +140,11 @@ export default function ArenaWordNinja() {
         
         // Next random gibberish word
         setTimeout(() => {
+          setLastWordTime((Date.now() - wordStartTime) / 1000); // record time taken for the word
           setCurrentWord(generateGibberish(newScore));
           setTypedIndex(0);
+          setWordStartTime(Date.now());
+          setElapsedTime(0);
         }, 200); 
       }
     } else {
@@ -135,10 +161,10 @@ export default function ArenaWordNinja() {
   return (
     <>
       <SEO title="Word Ninja | Arena | SkillZeno" />
-      <div className="arena-page-wrapper">
-        <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '800px' }}>
+      <div className="arena-page-wrapper" style={{ padding: '0', margin: '0' }}>
+        <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '100%', padding: '1rem' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem', padding: '0 2rem' }}>
             <button onClick={() => navigate('/arena')} className="btn btn-outline" style={{ border: 'none', padding: '0.5rem' }}>
               <ArrowLeft size={24} />
             </button>
@@ -149,7 +175,7 @@ export default function ArenaWordNinja() {
             <div style={{ width: '40px' }}></div>
           </div>
 
-          <div className="arena-card" style={{ textAlign: 'center', padding: '3rem 2rem' }}>
+          <div style={{ width: '100%' }}>
             
             {gameState === 'start' && (
               <div>
@@ -166,29 +192,50 @@ export default function ArenaWordNinja() {
             )}
 
             {gameState === 'playing' && (
-              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`} style={{ position: 'relative', height: '400px', background: 'linear-gradient(to bottom, #1e3a8a 0%, #172554 100%)', borderRadius: '16px', overflow: 'hidden' }}>
+              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`} style={{ position: 'relative', height: 'calc(100vh - 180px)', background: 'linear-gradient(to bottom, #1e3a8a 0%, #172554 100%)', borderRadius: '16px', overflow: 'hidden', minHeight: '500px' }}>
                 
                 {/* 3D Scene Background Element (Cliff) */}
                 <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '30%', background: '#0f172a', clipPath: 'polygon(0 40%, 100% 0, 100% 100%, 0% 100%)' }}></div>
 
-                {/* Health Bar */}
-                <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', width: '250px', zIndex: 10 }}>
-                  <div style={{ width: '100%', height: '12px', background: '#333', borderRadius: '6px', overflow: 'hidden', border: '1px solid #fff' }}>
-                    <div style={{ width: `${enemyHealth}%`, height: '100%', background: enemyHealth > 30 ? '#10b981' : '#ef4444', transition: 'width 0.3s' }}></div>
+                {/* Top UI Info: Score and Timer */}
+                <div style={{ position: 'absolute', top: '20px', left: '0', width: '100%', display: 'flex', justifyContent: 'space-between', padding: '0 2rem', zIndex: 10 }}>
+                  <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #3b82f6' }}>
+                    <h3 style={{ margin: 0, color: '#60a5fa', fontSize: '1rem' }}>Score</h3>
+                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>{score}</p>
+                  </div>
+                  
+                  {/* Timer Display */}
+                  <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #10b981', textAlign: 'right' }}>
+                    <h3 style={{ margin: 0, color: '#34d399', fontSize: '1rem' }}>Word Timer</h3>
+                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'monospace' }}>
+                      {(elapsedTime / 1000).toFixed(2)}s
+                    </p>
+                    {lastWordTime && <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Last: {lastWordTime.toFixed(2)}s</span>}
+                  </div>
+                </div>
+
+                {/* Health Bar (Enemy) */}
+                <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', width: '300px', zIndex: 10, textAlign: 'center' }}>
+                  <p style={{ margin: '0 0 5px', color: '#ef4444', fontWeight: 'bold' }}>Monster Health</p>
+                  <div style={{ width: '100%', height: '16px', background: '#333', borderRadius: '8px', overflow: 'hidden', border: '2px solid #fff' }}>
+                    <div style={{ width: `${enemyHealth}%`, height: '100%', background: enemyHealth > 30 ? '#ef4444' : '#b91c1c', transition: 'width 0.3s' }}></div>
                   </div>
                 </div>
 
                 {/* Characters */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'absolute', bottom: '20%', width: '100%', padding: '0 15%' }}>
                   {/* Player Character */}
-                  <div className={`player-character ${isTypingHit ? 'attack-dash' : ''}`} style={{ fontSize: '4rem', filter: 'drop-shadow(0 0 10px rgba(56,189,248,0.6))', zIndex: 5 }}>
+                  <div className={`player-character ${isTypingHit ? 'attack-dash' : ''} ${isEnemyAttacking ? 'flash-damage' : ''}`} style={{ fontSize: '5rem', filter: 'drop-shadow(0 0 10px rgba(56,189,248,0.6))', zIndex: 5, transition: '0.2s' }}>
                     🥷
                   </div>
-                  {/* Projectile */}
+                  {/* Player Projectile */}
                   {isTypingHit && <div className="projectile-animation">✨</div>}
                   
+                  {/* Enemy Projectile (Counter-attack) */}
+                  {isEnemyAttacking && <div className="enemy-projectile-animation">🔥</div>}
+                  
                   {/* Enemy Character */}
-                  <div className={`monster-sprite ${isAttacking ? 'flash-damage' : ''}`} style={{ fontSize: '5rem', filter: 'drop-shadow(0 0 15px rgba(239,68,68,0.5))', zIndex: 5 }}>
+                  <div className={`monster-sprite ${isAttacking ? 'flash-damage' : ''}`} style={{ fontSize: '7rem', filter: 'drop-shadow(0 0 15px rgba(239,68,68,0.5))', zIndex: 5, transition: '0.2s' }}>
                     {currentMonster}
                   </div>
                 </div>
@@ -222,12 +269,11 @@ export default function ArenaWordNinja() {
                     </div>
                   ))}
                 </div>
-                <p style={{ position: 'absolute', bottom: '10px', left: '20px', color: '#94a3b8', margin: 0 }}>Score: {score}</p>
               </div>
             )}
 
             {(gameState === 'gameover' || gameState === 'victory') && (
-              <div>
+              <div className="arena-card" style={{ textAlign: 'center', padding: '3rem 2rem', maxWidth: '600px', margin: '0 auto' }}>
                 <Trophy size={64} color={gameState === 'victory' ? "#eab308" : "#ef4444"} style={{ margin: '0 auto 1.5rem' }} />
                 <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: gameState === 'victory' ? '#eab308' : '#ef4444' }}>
                   {gameState === 'victory' ? 'VICTORY!' : 'GAME OVER'}
