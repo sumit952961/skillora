@@ -1296,10 +1296,13 @@ app.post("/api/arena/question", authenticateToken, async (req, res) => {
       ? `\nCRITICAL: Do NOT generate any of these previous questions or anything highly similar:\n${session.pastQuestions.slice(-10).map(q => `- ${q}`).join('\n')}`
       : '';
 
+    const randomSeed = Math.floor(Math.random() * 1000000);
+
     const prompt = `Generate a single multiple-choice question for a student.
 Category: ${session.category}
 Difficulty: ${session.highestDifficulty}
 Language: ${targetLanguage}
+Randomization Seed: ${randomSeed} (Ensure this question is highly unique, creative, and different from typical default questions)
 Please write the question text, options, and explanation strictly in the ${targetLanguage} language.${pastQInstruction}
 
 Respond ONLY with a valid JSON object matching this exact schema, without markdown formatting or code blocks:
@@ -1315,7 +1318,10 @@ Respond ONLY with a valid JSON object matching this exact schema, without markdo
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash-lite',
       contents: prompt,
-      config: { responseMimeType: "application/json" }
+      config: { 
+        responseMimeType: "application/json",
+        temperature: 0.9
+      }
     });
 
     const aiData = JSON.parse(response.text);
