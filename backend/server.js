@@ -1711,7 +1711,11 @@ Your role:
 
 ### SKILLZENO KNOWLEDGE BASE (Use this to answer user queries accurately):
 - **Internships:** SkillZeno offers high-quality, hands-on internship programs across various domains (like Web Development, AI, etc.). Students can enroll, complete tasks via their dashboard, and build real-world portfolios. All internship task submissions are done via the student dashboard under the 'My Internships' or 'Tasks' section.
-- **Arena:** An adaptive AI coding and quiz battleground. Students fight against an AI in endless mode. The difficulty adapts dynamically based on their winning streak. They earn XP, level up, and unlock badges for their performance.
+- **Arena:** A competitive gaming and learning battleground with three distinct modes:
+  1. **Beat the AI**: An adaptive endless quiz battle where the AI learns and gets harder as you perform better.
+  2. **Speed Rush**: A fast-paced survival mode with extremely simple questions but a strict 5-second timer per question and a 3-life system.
+  3. **Word Ninja**: An endless, full-bleed typing game where users must rapidly type falling gibberish words to defeat monsters and survive.
+- **Dark Mode:** SkillZeno now features a premium, device-grade Zinc Dark Mode. Users can toggle it anytime from the top navigation bar for a comfortable, eye-friendly experience.
 - **Quizzes:** SkillZeno features standard technical quizzes where students can test their knowledge on specific programming languages or frameworks.
 - **Contests:** Periodic coding contests and hackathons where students can compete with others to win prizes and showcase their skills on a leaderboard.
 - **Certificates & Verification Portal:** Upon successfully completing internships or passing major milestones, students receive verifiable certificates with a unique Certificate ID. Anyone (like employers) can visit the SkillZeno Certificate Verification Portal, enter the Certificate ID, and instantly verify its authenticity.
