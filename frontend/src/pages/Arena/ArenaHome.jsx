@@ -73,7 +73,7 @@ export default function ArenaHome() {
           </div>
 
         {mode === null ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             {/* Mode 1: Beat AI */}
             <div 
               className="arena-card" 

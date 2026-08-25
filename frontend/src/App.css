@@ -2152,9 +2152,21 @@
   }
   .home-arena-banner-wrapper {
     padding: 20px;
+    text-align: center;
+  }
+  .arena-banner-left {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+    min-width: unset;
   }
   .arena-text-content .arena-title {
     font-size: 1.5rem;
+    justify-content: center;
+  }
+  .arena-stats {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }
 
