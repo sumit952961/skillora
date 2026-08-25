@@ -59,6 +59,10 @@ export default function AIAssistant() {
   const [isReceivingSpeech, setIsReceivingSpeech] = useState(false);
 
   const startListening = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("Your browser does not support voice input.");
@@ -356,7 +360,10 @@ export default function AIAssistant() {
               className="ai-chat-input"
               placeholder={language === 'hindi' ? "अपना सवाल यहाँ लिखें या बोलें..." : "Type or speak your question..."}
               value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
+              onChange={(e) => {
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                setInputMessage(e.target.value);
+              }}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(inputMessage)}
               disabled={chatState === 'LANGUAGE_SELECTION'}
             />
