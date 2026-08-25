@@ -57,24 +57,19 @@ export default function ArenaHome() {
       <SEO title="Arena | Can You Beat AI? | SkillZeno" />
       <div className="arena-page-wrapper">
         {/* Animated Game Background ONLY on selection screen */}
-        {mode === null && (
-          <>
-            <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'linear-gradient(to bottom, #1e3a8a 0%, #172554 100%)', zIndex: 0 }}></div>
-            <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100vw', height: '40vh', background: '#0f172a', clipPath: 'polygon(0 40%, 100% 0, 100% 100%, 0% 100%)', zIndex: 1 }}></div>
-          </>
-        )}
+        {mode === null && <div className="game-bg-animation"></div>}
         
-        <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2 }}>
+        <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '1200px' }}>
           <div className="arena-header">
-            <h1 className="arena-title" style={{ color: mode === null ? '#fff' : 'inherit' }}>
+            <h1 className="arena-title">
               <Bot size={40} color="#FF6B6B" />
               WELCOME TO ARENA
             </h1>
-            <p className="arena-subtitle" style={{ color: mode === null ? '#94a3b8' : 'inherit' }}>Choose your challenge mode</p>
+            <p className="arena-subtitle">Choose your challenge mode</p>
           </div>
 
         {mode === null ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
             {/* Mode 1: Beat AI */}
             <div 
               className="arena-card" 
