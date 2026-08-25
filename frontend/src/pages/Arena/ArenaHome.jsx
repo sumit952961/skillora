@@ -83,7 +83,7 @@ export default function ArenaHome() {
             {/* Mode 2: Speed Rush */}
             <div 
               className="arena-card" 
-              onClick={() => setMode('speed_rush')} 
+              onClick={() => navigate('/arena/speed-rush')} 
               style={{ cursor: 'pointer', border: '2px solid transparent', transition: '0.3s', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             >
               <Zap size={60} color="#eab308" style={{ marginBottom: '1rem' }} />
@@ -171,15 +171,7 @@ export default function ArenaHome() {
             </div>
           )}
         </div>
-        ) : (
-          <div className="arena-card">
-            <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>Speed Rush (Coming Soon)</h2>
-            <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-              This lightning-fast mode is currently under development. Stay tuned!
-            </p>
-            <button className="btn btn-outline" onClick={() => setMode(null)} style={{ margin: '2rem auto 0', display: 'block' }}>Go Back</button>
-          </div>
-        )}
+        ) : null}
       </div>
     </>
   );

@@ -1577,6 +1577,41 @@ app.get("/api/arena/progress", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch progress", error: error.message });
   }
 });
+app.post("/api/arena/speed-rush/submit", authenticateToken, async (req, res) => {
+  try {
+    const { score } = req.body;
+    if (typeof score !== 'number') return res.status(400).json({ message: "Invalid score" });
+
+    let progress = await ArenaProgress.findOne({ userId: req.user.id });
+    if (!progress) {
+      progress = new ArenaProgress({
+        userId: req.user.id,
+        xp: 0, level: 1, currentStreak: 0, longestStreak: 0, 
+        questionsAttempted: 0, correctAnswers: 0, badges: 0, aiWins: 0
+      });
+    }
+
+    // Speed rush gives 10 XP per point (correct answer)
+    const xpGained = score * 10;
+    progress.xp += xpGained;
+    
+    // Check if this score is better than their longest streak
+    if (score > progress.longestStreak) {
+      progress.longestStreak = score;
+    }
+
+    // Level up check
+    progress.level = Math.floor(progress.xp / 500) + 1;
+
+    await progress.save();
+
+    res.json({ message: "Score saved", xpGained, newTotalXp: progress.xp, newLevel: progress.level });
+  } catch (error) {
+    console.error("Speed Rush Submit Error:", error);
+    res.status(500).json({ message: "Failed to submit score", error: error.message });
+  }
+});
+
 // Get Chat History Route
 app.get("/api/chat/history", authenticateToken, async (req, res) => {
   try {
