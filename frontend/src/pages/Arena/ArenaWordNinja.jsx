@@ -197,33 +197,38 @@ export default function ArenaWordNinja() {
                 {/* 3D Scene Background Element (Cliff) */}
                 <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '30%', background: '#0f172a', clipPath: 'polygon(0 40%, 100% 0, 100% 100%, 0% 100%)' }}></div>
 
-                {/* Top UI Info: Score and Timer */}
-                <div style={{ position: 'absolute', top: '20px', left: '0', width: '100%', display: 'flex', justifyContent: 'space-between', padding: '0 2rem', zIndex: 10 }}>
-                  <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #3b82f6' }}>
-                    <h3 style={{ margin: 0, color: '#60a5fa', fontSize: '1rem' }}>Score</h3>
-                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#ffffff' }}>{score}</p>
-                  </div>
+                {/* Top UI Info: Score, Health, and Timer (Responsive Stacking) */}
+                <div style={{ position: 'absolute', top: '10px', left: '0', width: '100%', display: 'flex', flexDirection: 'column', gap: '10px', padding: '0 1rem', zIndex: 10 }}>
                   
-                  {/* Timer Display */}
-                  <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #10b981', textAlign: 'right' }}>
-                    <h3 style={{ margin: 0, color: '#34d399', fontSize: '1rem' }}>Word Timer</h3>
-                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'monospace', color: '#ffffff' }}>
-                      {(elapsedTime / 1000).toFixed(2)}s
-                    </p>
-                    {lastWordTime && <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Last: {lastWordTime.toFixed(2)}s</span>}
+                  {/* Score & Timer Row */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    {/* Score */}
+                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #3b82f6', minWidth: '80px' }}>
+                      <h3 style={{ margin: 0, color: '#60a5fa', fontSize: '0.9rem' }}>Score</h3>
+                      <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', color: '#ffffff' }}>{score}</p>
+                    </div>
+                    
+                    {/* Timer Display */}
+                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #10b981', textAlign: 'right', minWidth: '90px' }}>
+                      <h3 style={{ margin: 0, color: '#34d399', fontSize: '0.9rem' }}>Word Timer</h3>
+                      <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', fontFamily: 'monospace', color: '#ffffff' }}>
+                        {(elapsedTime / 1000).toFixed(2)}s
+                      </p>
+                      {lastWordTime && <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block' }}>Last: {lastWordTime.toFixed(2)}s</span>}
+                    </div>
                   </div>
-                </div>
 
-                {/* Health Bar (Enemy) */}
-                <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', width: '300px', zIndex: 10, textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 5px', color: '#ef4444', fontWeight: 'bold' }}>Monster Health</p>
-                  <div style={{ width: '100%', height: '16px', background: '#333', borderRadius: '8px', overflow: 'hidden', border: '2px solid #fff' }}>
-                    <div style={{ width: `${enemyHealth}%`, height: '100%', background: enemyHealth > 30 ? '#ef4444' : '#b91c1c', transition: 'width 0.3s' }}></div>
+                  {/* Health Bar (Enemy) */}
+                  <div style={{ width: '100%', maxWidth: '300px', margin: '0 auto', textAlign: 'center' }}>
+                    <p style={{ margin: '0 0 5px', color: '#ef4444', fontWeight: 'bold', fontSize: '0.9rem' }}>Monster Health</p>
+                    <div style={{ width: '100%', height: '12px', background: '#333', borderRadius: '6px', overflow: 'hidden', border: '2px solid #fff' }}>
+                      <div style={{ width: `${enemyHealth}%`, height: '100%', background: enemyHealth > 30 ? '#ef4444' : '#b91c1c', transition: 'width 0.3s' }}></div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Characters */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'absolute', bottom: '20%', width: '100%', padding: '0 15%' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'absolute', bottom: '15%', width: '100%', padding: '0 5%' }}>
                   {/* Player Character */}
                   <div className={`player-character ${isTypingHit ? 'attack-dash' : ''} ${isEnemyAttacking ? 'flash-damage' : ''}`} style={{ fontSize: '5rem', filter: 'drop-shadow(0 0 10px rgba(56,189,248,0.6))', zIndex: 5, transition: '0.2s' }}>
                     🥷
