@@ -140,9 +140,9 @@ export default function Home() {
 
   const getSkillIcon = (skillName) => {
     const s = skillName.toLowerCase();
-    if (s.includes('mongo') || s.includes('database')) return <Database size={14} style={{color: '#10b981'}} />;
+    if (s.includes('mongo') || s.includes('database')) return <Database size={14} style={{color: 'var(--accent-success)'}} />;
     if (s.includes('react')) return <Atom size={14} style={{color: '#0ea5e9'}} />;
-    if (s.includes('node') || s.includes('express')) return <Box size={14} style={{color: '#10b981'}} />;
+    if (s.includes('node') || s.includes('express')) return <Box size={14} style={{color: 'var(--accent-success)'}} />;
     if (s.includes('architecture') || s.includes('system')) return <Layers size={14} style={{color: '#4f46e5'}} />;
     if (s.includes('html') || s.includes('css')) return <Code size={14} style={{color: '#f59e0b'}} />;
     return <Code size={14} style={{color: 'var(--text-muted)'}} />;
@@ -477,7 +477,7 @@ export default function Home() {
                 review: "Designing database structures and working with JWT authentication gave me core production knowledge. Verifiable certificates are a huge plus!",
                 rating: 5,
                 initials: "PP",
-                gradient: "linear-gradient(135deg, #3b82f6, #06b6d4)"
+                gradient: "var(--primary)"
               },
               {
                 name: "Rohan Das",
@@ -486,7 +486,7 @@ export default function Home() {
                 review: "The self-paced tasks match actual software developer roles. Highly recommended for building a strong, recruiter-ready project portfolio.",
                 rating: 5,
                 initials: "RD",
-                gradient: "linear-gradient(135deg, #10b981, #3b82f6)"
+                gradient: "var(--accent-success)"
               },
               {
                 name: "Sneha Reddy",

@@ -43,7 +43,7 @@ export default function DarkModeToggle() {
         boxShadow: 'var(--shadow-sm)'
       }}
     >
-      {isDark ? <Sun size={18} color="#eab308" /> : <Moon size={18} color="#4f46e5" />}
+      {isDark ? <Sun size={18} color='var(--accent-warning)' /> : <Moon size={18} color="#4f46e5" />}
     </button>
   );
 }

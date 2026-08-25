@@ -185,7 +185,7 @@ export default function ArenaSpeedRush() {
         
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '2rem' }}>
           <h1 className="arena-title" style={{ margin: '0', fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Zap size={32} color="#eab308" />
+            <Zap size={32} color='var(--accent-warning)' />
             Speed Rush
           </h1>
         </div>
@@ -194,7 +194,7 @@ export default function ArenaSpeedRush() {
           
           {gameState === 'start' && (
             <div>
-              <Zap size={64} color="#eab308" style={{ margin: '0 auto 1.5rem' }} />
+              <Zap size={64} color='var(--accent-warning)' style={{ margin: '0 auto 1.5rem' }} />
               <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Ready for Speed Rush?</h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
                 You have exactly <strong>5 seconds</strong> to solve each problem.<br/>
@@ -218,8 +218,8 @@ export default function ArenaSpeedRush() {
                     <Heart 
                       key={i} 
                       size={24} 
-                      color={i < lives ? "#ef4444" : "#4b5563"} 
-                      fill={i < lives ? "#ef4444" : "transparent"} 
+                      color={i < lives ? 'var(--accent-danger)' : "#4b5563"} 
+                      fill={i < lives ? 'var(--accent-danger)' : "transparent"} 
                     />
                   ))}
                 </div>
@@ -234,7 +234,7 @@ export default function ArenaSpeedRush() {
                 <div style={{ 
                   height: '100%', 
                   width: `${(timeLeft / MAX_TIME) * 100}%`, 
-                  background: timeLeft <= 1 ? 'var(--accent-danger)' : '#eab308',
+                  background: timeLeft <= 1 ? 'var(--accent-danger)' : 'var(--accent-warning)',
                   transition: 'width 1s linear, background 0.3s'
                 }}></div>
               </div>

@@ -299,7 +299,7 @@ export default function TakeQuiz({ quiz, onBack }) {
 
         {/* Payment Modal */}
         {showPaymentModal && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', zIndex: 1000, overflowY: 'auto' }}>
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'var(--bg-primary)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', zIndex: 1000, overflowY: 'auto' }}>
             <div style={{
               background: 'var(--bg-secondary)',
               padding: '40px 32px',
@@ -391,7 +391,7 @@ export default function TakeQuiz({ quiz, onBack }) {
             gap: '10px',
             fontSize: '0.9rem',
             fontWeight: '600',
-            color: '#b91c1c'
+            color: 'var(--accent-danger)'
           }}>
             <AlertTriangle size={18} />
             ⏰ Hurry up! Only {timeLeft} seconds remaining. The quiz will auto-submit when time runs out.

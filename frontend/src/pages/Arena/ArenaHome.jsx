@@ -94,7 +94,7 @@ export default function ArenaHome() {
               onClick={() => navigate('/arena/speed-rush')} 
               style={{ cursor: 'pointer', border: '2px solid transparent', transition: '0.3s', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             >
-              <Zap size={60} color="#eab308" style={{ marginBottom: '1rem' }} />
+              <Zap size={60} color='var(--accent-warning)' style={{ marginBottom: '1rem' }} />
               <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Speed Rush</h2>
               <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '1.5rem', flex: 1 }}>
                 Extremely simple questions, but you only have 5 seconds per question! Survive as long as possible.
@@ -108,7 +108,7 @@ export default function ArenaHome() {
               onClick={() => navigate('/arena/word-ninja')} 
               style={{ cursor: 'pointer', border: '2px solid transparent', transition: '0.3s', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
             >
-              <Keyboard size={60} color="#10b981" style={{ marginBottom: '1rem' }} />
+              <Keyboard size={60} color='var(--accent-success)' style={{ marginBottom: '1rem' }} />
               <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Word Ninja</h2>
               <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '1.5rem', flex: 1 }}>
                 Type words as fast as possible to defeat the AI Monster! Fast fingers win the battle.

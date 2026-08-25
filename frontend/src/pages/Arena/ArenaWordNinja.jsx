@@ -166,7 +166,7 @@ export default function ArenaWordNinja() {
           
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1rem', padding: '0 2rem' }}>
             <h1 className="arena-title" style={{ margin: '0', fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Keyboard size={32} color="#10b981" />
+              <Keyboard size={32} color='var(--accent-success)' />
               Word Ninja
             </h1>
           </div>
@@ -175,20 +175,20 @@ export default function ArenaWordNinja() {
             
             {gameState === 'start' && (
               <div className="arena-card" style={{ textAlign: 'center', padding: '3rem 2rem', maxWidth: '600px', margin: '0 auto' }}>
-                <Sword size={64} color="#10b981" style={{ margin: '0 auto 1.5rem' }} />
+                <Sword size={64} color='var(--accent-success)' style={{ margin: '0 auto 1.5rem' }} />
                 <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Ready to Fight?</h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
                   Type the words perfectly to attack the monster. <br/>
                   Fast fingers will bring victory!
                 </p>
-                <button className="arena-start-btn" onClick={startGame} style={{ maxWidth: '300px', margin: '0 auto', background: 'linear-gradient(45deg, #10b981, #059669)' }}>
+                <button className="arena-start-btn" onClick={startGame} style={{ maxWidth: '300px', margin: '0 auto', background: 'var(--accent-success)' }}>
                   Start Game ⚔️
                 </button>
               </div>
             )}
 
             {gameState === 'playing' && (
-              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`} style={{ position: 'relative', height: 'calc(100vh - 80px)', background: 'linear-gradient(to bottom, #1e3a8a 0%, #172554 100%)', borderRadius: '0', overflow: 'hidden', minHeight: '500px' }}>
+              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`} style={{ position: 'relative', height: 'calc(100vh - 80px)', background: 'var(--bg-secondary)', borderRadius: '0', overflow: 'hidden', minHeight: '500px' }}>
                 
                 {/* 3D Scene Background Element (Cliff) */}
                 <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '30%', background: 'var(--text-main)', clipPath: 'polygon(0 40%, 100% 0, 100% 100%, 0% 100%)' }}></div>
@@ -199,13 +199,13 @@ export default function ArenaWordNinja() {
                   {/* Score & Timer Row */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                     {/* Score */}
-                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #3b82f6', minWidth: '80px' }}>
+                    <div style={{ background: 'var(--bg-primary)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #3b82f6', minWidth: '80px' }}>
                       <h3 style={{ margin: 0, color: '#60a5fa', fontSize: '0.9rem' }}>Score</h3>
                       <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--bg-secondary)' }}>{score}</p>
                     </div>
                     
                     {/* Timer Display */}
-                    <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #10b981', textAlign: 'right', minWidth: '90px' }}>
+                    <div style={{ background: 'var(--bg-primary)', padding: '0.5rem', borderRadius: '8px', border: '1px solid #10b981', textAlign: 'right', minWidth: '90px' }}>
                       <h3 style={{ margin: 0, color: '#34d399', fontSize: '0.9rem' }}>Word Timer</h3>
                       <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--bg-secondary)' }}>
                         {(elapsedTime / 1000).toFixed(2)}s
@@ -216,9 +216,9 @@ export default function ArenaWordNinja() {
 
                   {/* Health Bar (Enemy) */}
                   <div style={{ width: '100%', maxWidth: '300px', margin: '0 auto', textAlign: 'center' }}>
-                    <p style={{ margin: '0 0 5px', color: '#ef4444', fontWeight: 'bold', fontSize: '0.9rem' }}>Monster Health</p>
+                    <p style={{ margin: '0 0 5px', color: 'var(--accent-danger)', fontWeight: 'bold', fontSize: '0.9rem' }}>Monster Health</p>
                     <div style={{ width: '100%', height: '12px', background: 'var(--text-main)', borderRadius: '6px', overflow: 'hidden', border: '2px solid #fff' }}>
-                      <div style={{ width: `${enemyHealth}%`, height: '100%', background: enemyHealth > 30 ? '#ef4444' : '#b91c1c', transition: 'width 0.3s' }}></div>
+                      <div style={{ width: `${enemyHealth}%`, height: '100%', background: enemyHealth > 30 ? 'var(--accent-danger)' : 'var(--accent-danger)', transition: 'width 0.3s' }}></div>
                     </div>
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export default function ArenaWordNinja() {
                         fontFamily: 'sans-serif',
                         fontWeight: 'bold',
                         color: idx < typedIndex ? '#94a3b8' : 'var(--bg-secondary)',
-                        background: idx < typedIndex ? 'rgba(30, 58, 138, 0.4)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                        background: idx < typedIndex ? 'rgba(30, 58, 138, 0.4)' : 'var(--primary)',
                         borderRadius: '8px',
                         boxShadow: idx < typedIndex ? 'none' : '0 4px 12px rgba(59,130,246,0.6)',
                         textTransform: 'lowercase',
@@ -275,8 +275,8 @@ export default function ArenaWordNinja() {
 
             {(gameState === 'gameover' || gameState === 'victory') && (
               <div className="arena-card" style={{ textAlign: 'center', padding: '3rem 2rem', maxWidth: '600px', margin: '0 auto' }}>
-                <Trophy size={64} color={gameState === 'victory' ? "#eab308" : "#ef4444"} style={{ margin: '0 auto 1.5rem' }} />
-                <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: gameState === 'victory' ? '#eab308' : '#ef4444' }}>
+                <Trophy size={64} color={gameState === 'victory' ? 'var(--accent-warning)' : 'var(--accent-danger)'} style={{ margin: '0 auto 1.5rem' }} />
+                <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: gameState === 'victory' ? 'var(--accent-warning)' : 'var(--accent-danger)' }}>
                   {gameState === 'victory' ? 'VICTORY!' : 'GAME OVER'}
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '2rem' }}>
@@ -287,7 +287,7 @@ export default function ArenaWordNinja() {
                   <button className="btn btn-outline" onClick={() => navigate('/arena')} style={{ padding: '1rem 2rem' }}>
                     Quit
                   </button>
-                  <button className="arena-start-btn" onClick={startGame} disabled={isSubmitting} style={{ margin: 0, padding: '1rem 2rem', width: 'auto', background: 'linear-gradient(45deg, #10b981, #059669)' }}>
+                  <button className="arena-start-btn" onClick={startGame} disabled={isSubmitting} style={{ margin: 0, padding: '1rem 2rem', width: 'auto', background: 'var(--accent-success)' }}>
                     {isSubmitting ? 'Saving...' : 'Play Again 🔄'}
                   </button>
                 </div>

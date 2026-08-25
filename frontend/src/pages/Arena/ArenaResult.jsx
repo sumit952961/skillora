@@ -47,7 +47,7 @@ export default function ArenaResult() {
             
             <div className="arena-stat-box">
               <div className="arena-stat-label"><Target size={16} style={{display:'inline', verticalAlign:'text-bottom', marginRight:'4px'}}/> Correct</div>
-              <div className="arena-stat-value" style={{ color: '#10B981' }}>{session.correctAnswers}</div>
+              <div className="arena-stat-value" style={{ color: 'var(--accent-success)' }}>{session.correctAnswers}</div>
             </div>
 
             <div className="arena-stat-box">
@@ -80,10 +80,10 @@ export default function ArenaResult() {
 
           <div className="arena-result-banner" style={{
             background: aiBeat ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))' : 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05))',
-            borderColor: aiBeat ? '#10B981' : '#EF4444'
+            borderColor: aiBeat ? 'var(--accent-success)' : 'var(--accent-danger)'
           }}>
-            <BrainCircuit size={40} color={aiBeat ? "#10B981" : "#EF4444"} style={{ margin: '0 auto 10px' }} />
-            <h2 style={{ color: aiBeat ? "#10B981" : "#EF4444" }}>
+            <BrainCircuit size={40} color={aiBeat ? 'var(--accent-success)' : 'var(--accent-danger)'} style={{ margin: '0 auto 10px' }} />
+            <h2 style={{ color: aiBeat ? 'var(--accent-success)' : 'var(--accent-danger)' }}>
               {aiBeat ? '🏆 YOU BEAT AI!' : '🤖 AI BEAT YOU THIS TIME!'}
             </h2>
             

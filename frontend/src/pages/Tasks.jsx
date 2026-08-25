@@ -288,7 +288,7 @@ export default function Tasks() {
           onClick={(e) => { if (e.target === e.currentTarget) setTaskDetailModal(null); }}
           style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
+            backgroundColor: 'var(--bg-primary)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             zIndex: 1100, padding: '20px'
           }}
@@ -416,7 +416,7 @@ export default function Tasks() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.4)',
+          backgroundColor: 'var(--bg-primary)',
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'center',
@@ -488,7 +488,7 @@ export default function Tasks() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.6)',
+          backgroundColor: 'var(--bg-primary)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

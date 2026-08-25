@@ -55,9 +55,9 @@ export default function Dashboard() {
 
   const getSkillIcon = (skillName) => {
     const s = skillName.toLowerCase();
-    if (s.includes('mongo') || s.includes('database')) return <Database size={14} style={{color: '#10b981'}} />;
+    if (s.includes('mongo') || s.includes('database')) return <Database size={14} style={{color: 'var(--accent-success)'}} />;
     if (s.includes('react')) return <Atom size={14} style={{color: '#0ea5e9'}} />;
-    if (s.includes('node') || s.includes('express')) return <Box size={14} style={{color: '#10b981'}} />;
+    if (s.includes('node') || s.includes('express')) return <Box size={14} style={{color: 'var(--accent-success)'}} />;
     if (s.includes('architecture') || s.includes('system')) return <Layers size={14} style={{color: '#4f46e5'}} />;
     if (s.includes('html') || s.includes('css')) return <Code size={14} style={{color: '#f59e0b'}} />;
     return <Code size={14} style={{color: 'var(--text-muted)'}} />;
@@ -152,7 +152,7 @@ export default function Dashboard() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', zIndex: 1 }}>
           <div style={{
-            background: 'linear-gradient(135deg, #FF6B6B, #6B66FF)',
+            background: 'var(--primary)',
             color: 'var(--bg-secondary)',
             padding: '16px',
             borderRadius: '14px',

@@ -96,7 +96,7 @@ export default function AdminQuizzes() {
       </div>
 
       {isModalOpen && editingQuiz && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflowY: 'auto', padding: '40px 20px', zIndex: 1000 }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'var(--bg-primary)', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflowY: 'auto', padding: '40px 20px', zIndex: 1000 }}>
           <div style={{ background: 'var(--bg-secondary)', width: '100%', maxWidth: '800px', borderRadius: 'var(--radius-lg)', padding: '32px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h2 style={{ fontSize: '1.5rem' }}>{editingQuiz.id ? 'Edit Quiz' : 'Add New Quiz'}</h2>

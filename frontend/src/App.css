@@ -810,7 +810,7 @@
 
 /* Premium Footer CSS (Light Slate Brand Palette - Perfect Light Contrast) */
 .premium-footer {
-  background-color: #f1f5f9; /* Slate 100 (Slightly darker than white, provides clean border) */
+  background-color: var(--bg-hover); /* Slate 100 in Light, Zinc 800 in Dark */
   color: var(--text-muted);
   padding: 16px 24px 12px; /* Reduced vertical padding */
   border-top: 1px solid var(--border-color);
@@ -1957,7 +1957,7 @@
 .arena-icon-container { 
   width: 80px; 
   height: 80px; 
-  background: linear-gradient(135deg, #FF6B6B, #6B66FF); 
+  background: var(--primary); 
   border-radius: 20px; 
   display: flex; 
   align-items: center; 
@@ -2005,7 +2005,7 @@
 }
 
 .arena-highlight { 
-  background: linear-gradient(to right, #facc15, #ff6b6b); 
+  background: var(--accent-warning); 
   -webkit-background-clip: text; 
   -webkit-text-fill-color: transparent; 
 }
@@ -2056,7 +2056,7 @@
 
 .arena-play-btn { 
   position: relative; 
-  background: linear-gradient(135deg, #FF6B6B, #6B66FF); 
+  background: var(--primary); 
   border: none; 
   padding: 18px 40px; 
   font-size: 1.25rem; 
