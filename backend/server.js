@@ -1302,7 +1302,7 @@ app.post("/api/arena/question", authenticateToken, async (req, res) => {
 Category: ${session.category}
 Difficulty: ${session.highestDifficulty}
 Language: ${targetLanguage}
-Randomization Seed: ${randomSeed} (Ensure this question is highly unique, creative, and different from typical default questions)
+Randomization Seed: ${randomSeed}
 Please write the question text, options, and explanation strictly in the ${targetLanguage} language.${pastQInstruction}
 
 Respond ONLY with a valid JSON object matching this exact schema, without markdown formatting or code blocks:
@@ -1320,7 +1320,7 @@ Respond ONLY with a valid JSON object matching this exact schema, without markdo
       contents: prompt,
       config: { 
         responseMimeType: "application/json",
-        temperature: 0.9
+        temperature: 0.7
       }
     });
 
