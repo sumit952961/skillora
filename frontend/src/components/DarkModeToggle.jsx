@@ -3,12 +3,13 @@ import { Sun, Moon } from 'lucide-react';
 
 export default function DarkModeToggle() {
   const [isDark, setIsDark] = useState(() => {
-    // Check local storage or system preference on initial load
+    // Check local storage on initial load
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       return savedTheme === 'dark';
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Default to light mode for first-time visitors
+    return false;
   });
 
   useEffect(() => {
