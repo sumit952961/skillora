@@ -117,9 +117,6 @@ export default function ArenaSpeedRush() {
     <>
       <SEO title="Speed Rush | Arena | SkillZeno" />
       <div className="arena-page-wrapper">
-        {/* Animated Game Background */}
-        <div className="game-bg-animation"></div>
-
         <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '600px' }}>
         
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>

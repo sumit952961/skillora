@@ -56,8 +56,8 @@ export default function ArenaHome() {
     <>
       <SEO title="Arena | Can You Beat AI? | SkillZeno" />
       <div className="arena-page-wrapper">
-        {/* Animated Game Background */}
-        <div className="game-bg-animation"></div>
+        {/* Animated Game Background ONLY on selection screen */}
+        {mode === null && <div className="game-bg-animation"></div>}
         
         <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2 }}>
           <div className="arena-header">
@@ -65,7 +65,7 @@ export default function ArenaHome() {
               <Bot size={40} color="#FF6B6B" />
               WELCOME TO ARENA
             </h1>
-            <p className="arena-subtitle">Choose your challenge mode</p>
+            <p className="arena-subtitle" style={{ color: mode === null ? 'rgba(255, 255, 255, 0.8)' : 'var(--text-muted)' }}>Choose your challenge mode</p>
           </div>
 
         {mode === null ? (
