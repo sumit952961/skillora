@@ -36,6 +36,7 @@ import ArenaHome from './pages/Arena/ArenaHome'
 import ArenaGame from './pages/Arena/ArenaGame'
 import ArenaResult from './pages/Arena/ArenaResult'
 import ArenaSpeedRush from './pages/Arena/ArenaSpeedRush'
+import ArenaWordNinja from './pages/Arena/ArenaWordNinja'
 import { MapPin, Phone, Mail, BookOpen, ShieldCheck, Award } from 'lucide-react'
 import SEO from './components/SEO'
 import './App.css'
@@ -133,6 +134,11 @@ function AppContent() {
           <Route path="/arena/speed-rush" element={
             <ProtectedRoute>
               <ArenaSpeedRush />
+            </ProtectedRoute>
+          } />
+          <Route path="/arena/word-ninja" element={
+            <ProtectedRoute>
+              <ArenaWordNinja />
             </ProtectedRoute>
           } />
 

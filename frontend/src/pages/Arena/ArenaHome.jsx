@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, Zap } from 'lucide-react';
+import { Bot, Zap, Keyboard } from 'lucide-react';
 import './arena.css';
 import SEO from '../../components/SEO';
 import { AuthContext } from '../../context/AuthContext';
@@ -94,6 +94,20 @@ export default function ArenaHome() {
               <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Speed Rush</h2>
               <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '1.5rem', flex: 1 }}>
                 Extremely simple questions, but you only have 3 seconds per question! One mistake and it's Game Over.
+              </p>
+              <button className="arena-start-btn" style={{ margin: 0, padding: '0.75rem', width: '100%' }}>Select Mode</button>
+            </div>
+
+            {/* Mode 3: Word Ninja */}
+            <div 
+              className="arena-card" 
+              onClick={() => navigate('/arena/word-ninja')} 
+              style={{ cursor: 'pointer', border: '2px solid transparent', transition: '0.3s', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+            >
+              <Keyboard size={60} color="#10b981" style={{ marginBottom: '1rem' }} />
+              <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Word Ninja</h2>
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '1.5rem', flex: 1 }}>
+                Type words as fast as possible to defeat the AI Monster! Fast fingers win the battle.
               </p>
               <button className="arena-start-btn" style={{ margin: 0, padding: '0.75rem', width: '100%' }}>Select Mode</button>
             </div>
