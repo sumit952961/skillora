@@ -179,7 +179,18 @@ export default function ArenaSpeedRush() {
 
   return (
     <>
-      <SEO title="Speed Rush | Arena | SkillZeno" />
+      <SEO 
+        title="Speed Rush | 5-Second Brain Challenge | SkillZeno"
+        description="Think you have fast reflexes? Survive the Speed Rush with only 5 seconds per question and 3 lives. Test your math, logic, and reasoning skills."
+        canonical="/arena/speed-rush"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Speed Rush - SkillZeno Arena",
+          "description": "Think you have fast reflexes? Survive the Speed Rush with only 5 seconds per question and 3 lives.",
+          "url": "https://skillzeno.in/arena/speed-rush"
+        }}
+      />
       <div className="arena-page-wrapper">
         <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '600px' }}>
         

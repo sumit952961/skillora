@@ -58,7 +58,18 @@ export default function ArenaHome() {
 
   return (
     <>
-      <SEO title="Arena | Can You Beat AI? | SkillZeno" />
+      <SEO 
+        title="Arena | Play & Learn with AI | SkillZeno"
+        description="Challenge the SkillZeno AI in the Arena. Play adaptive quizzes, survive the 5-second Speed Rush, or type fast in Word Ninja. Earn XP and level up your skills!"
+        canonical="/arena"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "SkillZeno Arena",
+          "description": "Challenge the SkillZeno AI in the Arena. Play adaptive quizzes, survive the 5-second Speed Rush, or type fast in Word Ninja.",
+          "url": "https://skillzeno.in/arena"
+        }}
+      />
       <div className="arena-page-wrapper">
         {/* Animated Game Background ONLY on selection screen */}
         {mode === null && <div className="game-bg-animation"></div>}

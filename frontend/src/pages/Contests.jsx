@@ -245,8 +245,16 @@ export default function Contests() {
   return (
     <>
       <SEO 
-        title="Live Contests & Competitions | Skillzeno" 
-        description="Participate in skill-based contests and national assessments. Win certificates and boost your portfolio."
+        title="Live Contests & Competitions | SkillZeno" 
+        description="Participate in skill-based coding contests and national assessments on SkillZeno. Compete on the leaderboard, win verifiable certificates, and boost your portfolio."
+        canonical="/contests"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Live Contests - SkillZeno",
+          "description": "Participate in skill-based coding contests and national assessments on SkillZeno. Compete on the leaderboard, win verifiable certificates, and boost your portfolio.",
+          "url": "https://skillzeno.in/contests"
+        }}
       />
       <div className="container fade-in" style={{ padding: '20px 20px 40px' }}>
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>

@@ -160,7 +160,18 @@ export default function ArenaWordNinja() {
 
   return (
     <>
-      <SEO title="Word Ninja | Arena | SkillZeno" />
+      <SEO 
+        title="Word Ninja | Fast Typing Game | SkillZeno Arena"
+        description="Type fast to survive! Play Word Ninja in the SkillZeno Arena, a typing battle where you defeat monsters by typing falling words accurately."
+        canonical="/arena/word-ninja"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Word Ninja - SkillZeno Arena",
+          "description": "Type fast to survive! Play Word Ninja in the SkillZeno Arena, a typing battle where you defeat monsters by typing falling words accurately.",
+          "url": "https://skillzeno.in/arena/word-ninja"
+        }}
+      />
       <div className="arena-page-wrapper" style={{ padding: '0', margin: '0', maxWidth: '100vw', overflowX: 'hidden' }}>
         <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '100%', padding: gameState === 'playing' ? '0' : '1rem' }}>
           
