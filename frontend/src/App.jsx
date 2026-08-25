@@ -116,31 +116,11 @@ function AppContent() {
           } />
           
           {/* Arena Routes */}
-          <Route path="/arena" element={
-            <ProtectedRoute>
-              <ArenaHome />
-            </ProtectedRoute>
-          } />
-          <Route path="/arena/play" element={
-            <ProtectedRoute>
-              <ArenaGame />
-            </ProtectedRoute>
-          } />
-          <Route path="/arena/result" element={
-            <ProtectedRoute>
-              <ArenaResult />
-            </ProtectedRoute>
-          } />
-          <Route path="/arena/speed-rush" element={
-            <ProtectedRoute>
-              <ArenaSpeedRush />
-            </ProtectedRoute>
-          } />
-          <Route path="/arena/word-ninja" element={
-            <ProtectedRoute>
-              <ArenaWordNinja />
-            </ProtectedRoute>
-          } />
+          <Route path="/arena" element={<ArenaHome />} />
+          <Route path="/arena/play" element={<ArenaGame />} />
+          <Route path="/arena/result" element={<ArenaResult />} />
+          <Route path="/arena/speed-rush" element={<ArenaSpeedRush />} />
+          <Route path="/arena/word-ninja" element={<ArenaWordNinja />} />
 
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={

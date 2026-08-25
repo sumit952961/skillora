@@ -27,6 +27,10 @@ export default function ArenaHome() {
 
   const handleStart = async () => {
     if (selectedCategory) {
+      if (!token) {
+        navigate(`/arena/play`, { state: { category: selectedCategory, sessionId: 'guest-session' } });
+        return;
+      }
       setIsLoading(true);
       try {
         const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
