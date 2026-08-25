@@ -178,7 +178,7 @@ export default function ArenaWordNinja() {
           <div style={{ width: '100%' }}>
             
             {gameState === 'start' && (
-              <div>
+              <div className="arena-card" style={{ textAlign: 'center', padding: '3rem 2rem', maxWidth: '600px', margin: '0 auto' }}>
                 <Sword size={64} color="#10b981" style={{ margin: '0 auto 1.5rem' }} />
                 <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Ready to Fight?</h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
