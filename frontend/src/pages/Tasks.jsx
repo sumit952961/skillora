@@ -496,7 +496,7 @@ export default function Tasks() {
           padding: '20px'
         }}>
           <div style={{
-            background: '#fff',
+            background: 'var(--bg-secondary)',
             padding: '40px 32px',
             borderRadius: '24px',
             width: '100%',
@@ -507,7 +507,7 @@ export default function Tasks() {
           }}>
             <button 
               onClick={handleMaybeLater}
-              style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#888' }}
+              style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--text-muted)' }}
             >
               ✕
             </button>
@@ -516,7 +516,7 @@ export default function Tasks() {
               Unlock your verified completion certificate & premium benefits instantly.
             </p>
 
-            <div style={{ background: '#f8f9ff', padding: '24px', borderRadius: '16px', marginBottom: '24px', border: '1px solid #eef0ff' }}>
+            <div style={{ background: 'var(--bg-primary)', padding: '24px', borderRadius: '16px', marginBottom: '24px', border: '1px solid #eef0ff' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
                 <span style={{ fontSize: '1rem', color: '#666' }}>Amount to pay</span>
                 <span style={{ fontSize: '2rem', fontWeight: '800', color: '#111' }}>₹{settings?.processingFee || '499'}</span>

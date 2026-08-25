@@ -270,7 +270,7 @@ export default function ContestArena() {
                   }}
                 >
                   <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${isSelected ? 'var(--primary)' : 'var(--text-muted)'}`, background: isSelected ? 'var(--primary)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {isSelected && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'white' }} />}
+                    {isSelected && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--bg-secondary)' }} />}
                   </div>
                   <span style={{ fontSize: '1.05rem', color: isSelected ? 'var(--primary-dark)' : 'var(--text-main)' }}>{opt}</span>
                 </div>

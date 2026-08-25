@@ -301,7 +301,7 @@ export default function TakeQuiz({ quiz, onBack }) {
         {showPaymentModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', zIndex: 1000, overflowY: 'auto' }}>
             <div style={{
-              background: '#fff',
+              background: 'var(--bg-secondary)',
               padding: '40px 32px',
               borderRadius: '24px',
               width: '100%',
@@ -312,7 +312,7 @@ export default function TakeQuiz({ quiz, onBack }) {
             }}>
               <button 
                 onClick={handleMaybeLater}
-                style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#888' }}
+                style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--text-muted)' }}
               >
                 ✕
               </button>
@@ -321,7 +321,7 @@ export default function TakeQuiz({ quiz, onBack }) {
                 Unlock your verified completion certificate & premium benefits instantly.
               </p>
 
-              <div style={{ background: '#f8f9ff', padding: '24px', borderRadius: '16px', marginBottom: '24px', border: '1px solid #eef0ff' }}>
+              <div style={{ background: 'var(--bg-primary)', padding: '24px', borderRadius: '16px', marginBottom: '24px', border: '1px solid #eef0ff' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
                   <span style={{ fontSize: '1rem', color: '#666' }}>Amount to pay</span>
                   <span style={{ fontSize: '2rem', fontWeight: '800', color: '#111' }}>₹{settings?.quizProcessingFee || '199'}</span>
@@ -367,7 +367,7 @@ export default function TakeQuiz({ quiz, onBack }) {
           </div>
           <span style={{ 
             display: 'flex', alignItems: 'center', gap: '6px', 
-            color: timeLeft <= 30 ? '#fff' : timeLeft <= 60 ? 'var(--accent-danger)' : 'var(--primary)',
+            color: timeLeft <= 30 ? 'var(--bg-secondary)' : timeLeft <= 60 ? 'var(--accent-danger)' : 'var(--primary)',
             background: timeLeft <= 30 ? 'var(--accent-danger)' : 'transparent',
             padding: timeLeft <= 30 ? '6px 14px' : '0',
             borderRadius: timeLeft <= 30 ? '8px' : '0',

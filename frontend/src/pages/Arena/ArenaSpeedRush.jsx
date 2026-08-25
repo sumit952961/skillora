@@ -13,8 +13,8 @@ const COLORS = [
   { p1: 'Red', p2: 'Blue', res: 'Purple' },
   { p1: 'Red', p2: 'Yellow', res: 'Orange' },
   { p1: 'Blue', p2: 'Yellow', res: 'Green' },
-  { p1: 'Black', p2: 'White', res: 'Gray' },
-  { p1: 'Red', p2: 'White', res: 'Pink' }
+  { p1: 'var(--text-main)', p2: 'var(--bg-secondary)', res: 'Gray' },
+  { p1: 'Red', p2: 'var(--bg-secondary)', res: 'Pink' }
 ];
 const WORDS = ['APPLE', 'BANANA', 'ORANGE', 'TIGER', 'WATER', 'EARTH', 'SPACE', 'REACT', 'PYTHON', 'LAPTOP'];
 

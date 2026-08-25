@@ -60,7 +60,7 @@ export default function Dashboard() {
     if (s.includes('node') || s.includes('express')) return <Box size={14} style={{color: '#10b981'}} />;
     if (s.includes('architecture') || s.includes('system')) return <Layers size={14} style={{color: '#4f46e5'}} />;
     if (s.includes('html') || s.includes('css')) return <Code size={14} style={{color: '#f59e0b'}} />;
-    return <Code size={14} style={{color: '#64748b'}} />;
+    return <Code size={14} style={{color: 'var(--text-muted)'}} />;
   };
 
   return (
@@ -153,7 +153,7 @@ export default function Dashboard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', zIndex: 1 }}>
           <div style={{
             background: 'linear-gradient(135deg, #FF6B6B, #6B66FF)',
-            color: 'white',
+            color: 'var(--bg-secondary)',
             padding: '16px',
             borderRadius: '14px',
             display: 'flex',

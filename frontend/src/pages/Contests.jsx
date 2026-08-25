@@ -87,7 +87,7 @@ const MassiveLiveCountdown = ({ targetDate, onComplete }) => {
   }
 
   const TimeBlock = ({ value, label }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'white', padding: '20px', borderRadius: 'var(--radius-md)', minWidth: '100px', boxShadow: 'var(--shadow-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'var(--bg-secondary)', padding: '20px', borderRadius: 'var(--radius-md)', minWidth: '100px', boxShadow: 'var(--shadow-md)' }}>
       <span style={{ fontSize: '3.5rem', fontWeight: '900', color: 'var(--primary)', lineHeight: '1' }}>{value}</span>
       <span style={{ fontSize: '1rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '8px', fontWeight: '600' }}>{label}</span>
     </div>
@@ -281,7 +281,7 @@ export default function Contests() {
                 // ---- REGISTERED DASHBOARD ----
                 return (
                   <div key={contest._id} className="internship-card" style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)', overflow: 'hidden', border: '1px solid var(--border-color)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', borderRadius: 'var(--radius-lg)' }}>
-                    <div style={{ padding: '30px', textAlign: 'center', borderBottom: '1px solid var(--border-color)', background: 'white' }}>
+                    <div style={{ padding: '30px', textAlign: 'center', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-secondary)' }}>
                       <h2 style={{ fontSize: '1.8rem', color: 'var(--text-main)', marginBottom: '8px' }}>Your Contest Dashboard</h2>
                       <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', margin: 0 }}>{contest.title}</p>
                     </div>
@@ -387,18 +387,18 @@ export default function Contests() {
               return (
                 <div key={contest._id} className="internship-card" style={{ display: 'flex', flexDirection: 'column', background: 'var(--bg-secondary)', overflow: 'hidden', border: '1px solid var(--primary-light)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
                   {/* Banner Area */}
-                  <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)', padding: '40px', color: 'white', position: 'relative' }}>
+                  <div style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)', padding: '40px', color: 'var(--bg-secondary)', position: 'relative' }}>
                     <div style={{ position: 'relative', zIndex: 2 }}>
                       <span style={{ display: 'inline-block', padding: '6px 12px', background: 'rgba(255,255,255,0.2)', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '16px', backdropFilter: 'blur(4px)' }}>
                         Featured Assessment
                       </span>
-                      <h2 style={{ fontSize: '2.5rem', marginBottom: '16px', color: 'white' }}>{contest.title}</h2>
+                      <h2 style={{ fontSize: '2.5rem', marginBottom: '16px', color: 'var(--bg-secondary)' }}>{contest.title}</h2>
                       {contest.description && (
                         <p style={{ fontSize: '1.1rem', opacity: 0.9, maxWidth: '600px', margin: 0, lineHeight: 1.5 }}>{contest.description}</p>
                       )}
                     </div>
                     {/* Decorative elements */}
-                    <Trophy size={160} style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)', opacity: 0.1, color: 'white' }} />
+                    <Trophy size={160} style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)', opacity: 0.1, color: 'var(--bg-secondary)' }} />
                   </div>
 
                   <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '32px' }}>

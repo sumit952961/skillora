@@ -43,29 +43,29 @@
 
 /* === DARK MODE VARIABLES === */
 body.dark-mode {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-hover: #334155;
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-hover: #2d2d2d;
   
   --primary: #6366f1;
   --primary-hover: #818cf8;
-  --primary-light: rgba(99, 102, 241, 0.2);
+  --primary-light: rgba(99, 102, 241, 0.15);
   
   --secondary: #38bdf8;
   --secondary-hover: #7dd3fc;
-  --secondary-light: rgba(56, 189, 248, 0.2);
+  --secondary-light: rgba(56, 189, 248, 0.15);
 
   --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-light: #cbd5e1;
+  --text-muted: #a1a1aa;
+  --text-light: #d4d4d8;
   --text-on-primary: #ffffff;
   
-  --border-color: #334155;
+  --border-color: #333333;
   
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.8);
-  --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.8);
 }
 
 * {

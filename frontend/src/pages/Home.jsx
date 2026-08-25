@@ -105,9 +105,9 @@ export default function Home() {
           <line x1="23" y1="74" x2="52" y2="74" stroke="#a5b4fc" strokeWidth="3" strokeLinecap="round" />
           <line x1="23" y1="86" x2="45" y2="86" stroke="#a5b4fc" strokeWidth="3" strokeLinecap="round" />
           <line x1="23" y1="98" x2="37" y2="98" stroke="#a5b4fc" strokeWidth="3" strokeLinecap="round" />
-          <rect x="85" y="38" width="112" height="74" rx="8" fill="#0f172a" />
+          <rect x="85" y="38" width="112" height="74" rx="8" fill='var(--text-main)' />
           <rect x="91" y="44" width="100" height="62" rx="4" fill="#1e293b" />
-          <rect x="75" y="112" width="132" height="8" rx="4" fill="#475569" />
+          <rect x="75" y="112" width="132" height="8" rx="4" fill='var(--text-muted)' />
           <path d="M136 65l-8 8 8 8M152 65l8-8-8-8" stroke="#a5b4fc" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
           <line x1="148" y1="58" x2="140" y2="78" stroke="#38bdf8" strokeWidth="3" />
           <circle cx="215" cy="55" r="4" fill="#a5b4fc" />
@@ -122,10 +122,10 @@ export default function Home() {
       graphic: (
         <svg width="220" height="150" viewBox="35 25 170 120" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="40" y="30" width="160" height="110" rx="12" fill="#e0e7ff" />
-          <rect x="50" y="40" width="140" height="90" rx="8" fill="#ffffff" />
+          <rect x="50" y="40" width="140" height="90" rx="8" fill='var(--bg-secondary)' />
           <circle cx="120" cy="85" r="22" fill="#fbbf24" />
           <circle cx="120" cy="85" r="17" fill="#f59e0b" />
-          <path d="M114 85l4 4 8-8" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M114 85l4 4 8-8" stroke='var(--bg-secondary)' strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
           <line x1="65" y1="55" x2="120" y2="55" stroke="#cbd5e1" strokeWidth="4" strokeLinecap="round" />
           <line x1="65" y1="65" x2="105" y2="65" stroke="#cbd5e1" strokeWidth="4" strokeLinecap="round" />
           <line x1="65" y1="115" x2="175" y2="115" stroke="#cbd5e1" strokeWidth="4" strokeLinecap="round" />
@@ -145,7 +145,7 @@ export default function Home() {
     if (s.includes('node') || s.includes('express')) return <Box size={14} style={{color: '#10b981'}} />;
     if (s.includes('architecture') || s.includes('system')) return <Layers size={14} style={{color: '#4f46e5'}} />;
     if (s.includes('html') || s.includes('css')) return <Code size={14} style={{color: '#f59e0b'}} />;
-    return <Code size={14} style={{color: '#64748b'}} />;
+    return <Code size={14} style={{color: 'var(--text-muted)'}} />;
   };
 
   return (

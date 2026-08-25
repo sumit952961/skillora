@@ -82,7 +82,7 @@ export default function Certificates() {
           onClick={() => setActiveTab('internship')}
           style={{
             background: activeTab === 'internship' ? 'var(--primary)' : 'var(--bg-secondary)',
-            color: activeTab === 'internship' ? '#fff' : 'var(--text-main)',
+            color: activeTab === 'internship' ? 'var(--bg-secondary)' : 'var(--text-main)',
             border: `1px solid ${activeTab === 'internship' ? 'var(--primary)' : 'var(--border-color)'}`,
             padding: '10px 20px',
             borderRadius: '20px',
@@ -100,7 +100,7 @@ export default function Certificates() {
           onClick={() => setActiveTab('quiz')}
           style={{
             background: activeTab === 'quiz' ? 'var(--primary)' : 'var(--bg-secondary)',
-            color: activeTab === 'quiz' ? '#fff' : 'var(--text-main)',
+            color: activeTab === 'quiz' ? 'var(--bg-secondary)' : 'var(--text-main)',
             border: `1px solid ${activeTab === 'quiz' ? 'var(--primary)' : 'var(--border-color)'}`,
             padding: '10px 20px',
             borderRadius: '20px',
@@ -118,7 +118,7 @@ export default function Certificates() {
           onClick={() => setActiveTab('contest')}
           style={{
             background: activeTab === 'contest' ? 'var(--primary)' : 'var(--bg-secondary)',
-            color: activeTab === 'contest' ? '#fff' : 'var(--text-main)',
+            color: activeTab === 'contest' ? 'var(--bg-secondary)' : 'var(--text-main)',
             border: `1px solid ${activeTab === 'contest' ? 'var(--primary)' : 'var(--border-color)'}`,
             padding: '10px 20px',
             borderRadius: '20px',
@@ -236,7 +236,7 @@ export default function Certificates() {
                           <Lock size={16} /> Complete all tasks to unlock
                         </Link>
                       ) : !app.finalSubmitted ? (
-                        <Link to={`/tasks?internshipId=${app.internshipId}`} className="btn btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '8px', fontSize: '0.85rem', background: 'var(--accent-warning)', color: '#000' }}>
+                        <Link to={`/tasks?internshipId=${app.internshipId}`} className="btn btn-secondary" style={{ width: '100%', display: 'flex', justifyContent: 'center', gap: '8px', fontSize: '0.85rem', background: 'var(--accent-warning)', color: 'var(--text-main)' }}>
                           <Lock size={16} /> Pending Final Submission
                         </Link>
                       ) : (!isTimePassed ? (
