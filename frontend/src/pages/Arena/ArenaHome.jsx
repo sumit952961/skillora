@@ -22,6 +22,7 @@ export default function ArenaHome() {
   const { token } = useContext(AuthContext);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [step, setStep] = useState(1);
+  const [mode, setMode] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleStart = async () => {
@@ -58,40 +59,75 @@ export default function ArenaHome() {
         <div className="arena-header">
           <h1 className="arena-title">
             <Bot size={40} color="#FF6B6B" />
-            CAN YOU BEAT AI?
+            WELCOME TO ARENA
           </h1>
-          <p className="arena-subtitle">Think smarter. Answer faster. Beat the AI.</p>
+          <p className="arena-subtitle">Choose your challenge mode</p>
         </div>
 
-        <div className="arena-card">
-          {step === 1 ? (
-            <>
-              <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>Choose Your Arena</h2>
-              <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                Challenge yourself with adaptive questions and see how far you can go against AI.
+        {mode === null ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+            {/* Mode 1: Beat AI */}
+            <div 
+              className="arena-card" 
+              onClick={() => setMode('beat_ai')} 
+              style={{ cursor: 'pointer', border: '2px solid transparent', transition: '0.3s', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+            >
+              <Bot size={60} color="#FF6B6B" style={{ marginBottom: '1rem' }} />
+              <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Beat the AI</h2>
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '1.5rem', flex: 1 }}>
+                Challenge yourself with adaptive questions. The AI learns and gets harder as you perform better. Endless mode!
               </p>
-              
-              <div className="arena-categories">
-                {CATEGORIES.map(cat => (
-                  <button
-                    key={cat.id}
-                    className={`arena-category-btn ${selectedCategory?.id === cat.id ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory(cat)}
-                  >
-                    <span style={{ fontSize: '1.5rem' }}>{cat.icon}</span>
-                    {cat.name}
-                  </button>
-                ))}
-              </div>
+              <button className="arena-start-btn" style={{ margin: 0, padding: '0.75rem' }}>Select Mode</button>
+            </div>
 
-              <button 
-                className="arena-start-btn" 
-                onClick={() => setStep(2)}
-                disabled={!selectedCategory}
-              >
-                Continue
-              </button>
-            </>
+            {/* Mode 2: Speed Rush */}
+            <div 
+              className="arena-card" 
+              onClick={() => setMode('speed_rush')} 
+              style={{ cursor: 'pointer', border: '2px solid transparent', transition: '0.3s', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+            >
+              <Zap size={60} color="#eab308" style={{ marginBottom: '1rem' }} />
+              <h2 style={{ marginBottom: '1rem', textAlign: 'center' }}>Speed Rush</h2>
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '1.5rem', flex: 1 }}>
+                Extremely simple questions, but you only have 3 seconds per question! One mistake and it's Game Over.
+              </p>
+              <button className="btn btn-outline" style={{ width: '100%', padding: '0.75rem', borderRadius: '12px' }}>Select Mode</button>
+            </div>
+          </div>
+        ) : mode === 'beat_ai' ? (
+          <div className="arena-card">
+            {step === 1 ? (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <button className="btn btn-outline" onClick={() => setMode(null)} style={{ padding: '0.5rem 1rem' }}>← Back</button>
+                  <h2 style={{ margin: 0, textAlign: 'center' }}>Choose Your Arena</h2>
+                  <div style={{ width: '80px' }}></div>
+                </div>
+                <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+                  Challenge yourself with adaptive questions and see how far you can go against AI.
+                </p>
+                
+                <div className="arena-categories">
+                  {CATEGORIES.map(cat => (
+                    <button
+                      key={cat.id}
+                      className={`arena-category-btn ${selectedCategory?.id === cat.id ? 'active' : ''}`}
+                      onClick={() => setSelectedCategory(cat)}
+                    >
+                      <span style={{ fontSize: '1.5rem' }}>{cat.icon}</span>
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+
+                <button 
+                  className="arena-start-btn" 
+                  onClick={() => setStep(2)}
+                  disabled={!selectedCategory}
+                >
+                  Continue
+                </button>
+              </>
           ) : (
             <div style={{ textAlign: 'center' }}>
               <Bot size={40} color="#FF6B6B" style={{ margin: '0 auto 0.5rem' }} />
@@ -135,6 +171,15 @@ export default function ArenaHome() {
             </div>
           )}
         </div>
+        ) : (
+          <div className="arena-card">
+            <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>Speed Rush (Coming Soon)</h2>
+            <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+              This lightning-fast mode is currently under development. Stay tuned!
+            </p>
+            <button className="btn btn-outline" onClick={() => setMode(null)} style={{ margin: '2rem auto 0', display: 'block' }}>Go Back</button>
+          </div>
+        )}
       </div>
     </>
   );
