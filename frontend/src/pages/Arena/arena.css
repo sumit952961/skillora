@@ -376,3 +376,36 @@
 .monster-sprite {
   user-select: none;
 }
+
+@keyframes attackDash {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(40px) rotate(15deg); }
+  100% { transform: translateX(0); }
+}
+
+.attack-dash {
+  animation: attackDash 0.15s ease-out;
+}
+
+@keyframes projectileShoot {
+  0% { transform: translateX(0) scale(1); opacity: 1; }
+  100% { transform: translateX(300px) scale(0.5); opacity: 0; }
+}
+
+.projectile-animation {
+  position: absolute;
+  left: 20%;
+  bottom: 10%;
+  font-size: 2rem;
+  animation: projectileShoot 0.15s linear;
+}
+
+@keyframes flashDamage {
+  0% { filter: brightness(1) drop-shadow(0 0 15px rgba(239,68,68,0.5)); transform: translateX(0); }
+  50% { filter: brightness(3) sepia(1) hue-rotate(-50deg) saturate(5) drop-shadow(0 0 30px red); transform: translateX(10px); }
+  100% { filter: brightness(1) drop-shadow(0 0 15px rgba(239,68,68,0.5)); transform: translateX(0); }
+}
+
+.flash-damage {
+  animation: flashDamage 0.2s ease-in-out;
+}

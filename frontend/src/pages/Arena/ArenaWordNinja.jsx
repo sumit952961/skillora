@@ -63,9 +63,16 @@ export default function ArenaWordNinja() {
     setIsSubmitting(false);
   };
 
-  const triggerAttack = () => {
+  const [isTypingHit, setIsTypingHit] = useState(false);
+
+  const triggerWordComplete = () => {
     setIsAttacking(true);
-    setTimeout(() => setIsAttacking(false), 300); // 300ms slash animation
+    setTimeout(() => setIsAttacking(false), 400); // 400ms slash animation
+  };
+
+  const triggerTypingHit = () => {
+    setIsTypingHit(true);
+    setTimeout(() => setIsTypingHit(false), 150); // very quick hit per letter
   };
 
   const triggerError = () => {
@@ -86,10 +93,11 @@ export default function ArenaWordNinja() {
       // Correct character
       const nextIndex = typedIndex + 1;
       setTypedIndex(nextIndex);
+      triggerTypingHit(); // trigger small attack per letter
 
       if (nextIndex === currentWord.length) {
-        // Word completed! Attack!
-        triggerAttack();
+        // Word completed! Big Attack!
+        triggerWordComplete();
         setScore(s => s + 10);
         const newHealth = Math.max(0, enemyHealth - DAMAGE_PER_WORD);
         setEnemyHealth(newHealth);
@@ -149,35 +157,63 @@ export default function ArenaWordNinja() {
             )}
 
             {gameState === 'playing' && (
-              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`}>
-                {/* Enemy Area */}
-                <div className="enemy-area" style={{ marginBottom: '3rem', position: 'relative' }}>
-                  <div className="health-bar-container" style={{ width: '200px', height: '20px', background: '#333', borderRadius: '10px', margin: '0 auto 1rem', overflow: 'hidden' }}>
-                    <div className="health-bar-fill" style={{ width: `${enemyHealth}%`, height: '100%', background: enemyHealth > 30 ? '#10b981' : '#ef4444', transition: 'width 0.3s ease, background 0.3s ease' }}></div>
+              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`} style={{ position: 'relative', height: '400px', background: 'linear-gradient(to bottom, #1e3a8a 0%, #172554 100%)', borderRadius: '16px', overflow: 'hidden' }}>
+                
+                {/* 3D Scene Background Element (Cliff) */}
+                <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '30%', background: '#0f172a', clipPath: 'polygon(0 40%, 100% 0, 100% 100%, 0% 100%)' }}></div>
+
+                {/* Health Bar */}
+                <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', width: '250px', zIndex: 10 }}>
+                  <div style={{ width: '100%', height: '12px', background: '#333', borderRadius: '6px', overflow: 'hidden', border: '1px solid #fff' }}>
+                    <div style={{ width: `${enemyHealth}%`, height: '100%', background: enemyHealth > 30 ? '#10b981' : '#ef4444', transition: 'width 0.3s' }}></div>
                   </div>
-                  <div className={`monster-sprite ${isAttacking ? 'flash-damage' : ''}`} style={{ fontSize: '6rem', transition: '0.2s', filter: isAttacking ? 'brightness(2) sepia(1) hue-rotate(-50deg) saturate(5)' : 'none' }}>
-                    👾
-                  </div>
-                  {/* Slash Effect overlay */}
-                  {isAttacking && <div className="slash-animation"></div>}
                 </div>
 
-                {/* Word Typing Area */}
-                <div className="word-area" style={{ fontSize: '3rem', fontFamily: 'monospace', letterSpacing: '4px', fontWeight: 'bold' }}>
+                {/* Characters */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', position: 'absolute', bottom: '20%', width: '100%', padding: '0 15%' }}>
+                  {/* Player Character */}
+                  <div className={`player-character ${isTypingHit ? 'attack-dash' : ''}`} style={{ fontSize: '4rem', filter: 'drop-shadow(0 0 10px rgba(56,189,248,0.6))', zIndex: 5 }}>
+                    🥷
+                  </div>
+                  {/* Projectile */}
+                  {isTypingHit && <div className="projectile-animation">✨</div>}
+                  
+                  {/* Enemy Character */}
+                  <div className={`monster-sprite ${isAttacking ? 'flash-damage' : ''}`} style={{ fontSize: '5rem', filter: 'drop-shadow(0 0 15px rgba(239,68,68,0.5))', zIndex: 5 }}>
+                    👹
+                  </div>
+                </div>
+                {/* Big Slash Effect overlay */}
+                {isAttacking && <div className="slash-animation"></div>}
+
+                {/* Word Typing Area (Floating Blue Boxes) */}
+                <div className="word-area" style={{ position: 'absolute', top: '30%', left: '0', width: '100%', display: 'flex', justifyContent: 'center', gap: '8px', zIndex: 10 }}>
                   {currentWord.split('').map((char, idx) => (
-                    <span 
+                    <div 
                       key={idx} 
                       style={{ 
-                        color: idx < typedIndex ? '#10b981' : 'var(--text-color)',
-                        textShadow: idx < typedIndex ? '0 0 10px rgba(16,185,129,0.5)' : 'none',
-                        borderBottom: idx === typedIndex ? '3px solid #10b981' : 'none'
+                        width: '45px',
+                        height: '55px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '2rem',
+                        fontFamily: 'sans-serif',
+                        fontWeight: 'bold',
+                        color: idx < typedIndex ? '#94a3b8' : '#ffffff',
+                        background: idx < typedIndex ? 'rgba(30, 58, 138, 0.4)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                        borderRadius: '8px',
+                        boxShadow: idx < typedIndex ? 'none' : '0 4px 12px rgba(59,130,246,0.6)',
+                        textTransform: 'lowercase',
+                        transition: 'all 0.1s',
+                        transform: idx === typedIndex ? 'scale(1.1)' : 'scale(1)'
                       }}
                     >
                       {char}
-                    </span>
+                    </div>
                   ))}
                 </div>
-                <p style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>Score: {score}</p>
+                <p style={{ position: 'absolute', bottom: '10px', left: '20px', color: '#94a3b8', margin: 0 }}>Score: {score}</p>
               </div>
             )}
 
