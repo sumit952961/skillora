@@ -5,16 +5,22 @@ import SEO from '../../components/SEO';
 import { AuthContext } from '../../context/AuthContext';
 import './arena.css';
 
-const WORDS_BANK = [
-  "javascript", "react", "frontend", "cyber", "ninja", "developer",
-  "skillzeno", "programming", "database", "algorithm", "interface",
-  "component", "server", "authentication", "deployment", "function",
-  "variable", "constant", "iteration", "execution", "compilation",
-  "warrior", "sword", "shield", "blade", "strike", "power", "magic"
-];
-
 const INITIAL_HEALTH = 100;
-const DAMAGE_PER_WORD = 15;
+const DAMAGE_PER_WORD = 20;
+
+const MONSTERS = ["👾", "👹", "👽", "👻", "🤖", "🤡", "🧟"];
+
+// Generate random string of characters (gibberish)
+const generateGibberish = (score) => {
+  const chars = 'abcdefghijklmnopqrstuvwxyz';
+  // Length increases as score gets higher
+  const length = Math.min(10, Math.max(4, Math.floor(score / 50) + 4));
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
 
 export default function ArenaWordNinja() {
   const navigate = useNavigate();
@@ -24,20 +30,18 @@ export default function ArenaWordNinja() {
   const [currentWord, setCurrentWord] = useState('');
   const [typedIndex, setTypedIndex] = useState(0);
   const [enemyHealth, setEnemyHealth] = useState(INITIAL_HEALTH);
+  const [currentMonster, setCurrentMonster] = useState(MONSTERS[0]);
   const [score, setScore] = useState(0);
   const [isAttacking, setIsAttacking] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const getRandomWord = () => {
-    return WORDS_BANK[Math.floor(Math.random() * WORDS_BANK.length)];
-  };
-
   const startGame = () => {
     setGameState('playing');
     setEnemyHealth(INITIAL_HEALTH);
+    setCurrentMonster(MONSTERS[Math.floor(Math.random() * MONSTERS.length)]);
     setScore(0);
-    setCurrentWord(getRandomWord());
+    setCurrentWord(generateGibberish(0));
     setTypedIndex(0);
   };
 
@@ -98,19 +102,24 @@ export default function ArenaWordNinja() {
       if (nextIndex === currentWord.length) {
         // Word completed! Big Attack!
         triggerWordComplete();
-        setScore(s => s + 10);
-        const newHealth = Math.max(0, enemyHealth - DAMAGE_PER_WORD);
+        const newScore = score + 10;
+        setScore(newScore);
+        
+        let newHealth = enemyHealth - DAMAGE_PER_WORD;
+        
+        if (newHealth <= 0) {
+          // Monster defeated, respawn a new one immediately!
+          newHealth = INITIAL_HEALTH;
+          setCurrentMonster(MONSTERS[Math.floor(Math.random() * MONSTERS.length)]);
+        }
+        
         setEnemyHealth(newHealth);
         
-        if (newHealth === 0) {
-          setTimeout(() => handleGameOver(true), 500);
-        } else {
-          // Next word
-          setTimeout(() => {
-            setCurrentWord(getRandomWord());
-            setTypedIndex(0);
-          }, 200); // Slight delay for attack effect to register
-        }
+        // Next random gibberish word
+        setTimeout(() => {
+          setCurrentWord(generateGibberish(newScore));
+          setTypedIndex(0);
+        }, 200); 
       }
     } else {
       // Wrong character
@@ -180,7 +189,7 @@ export default function ArenaWordNinja() {
                   
                   {/* Enemy Character */}
                   <div className={`monster-sprite ${isAttacking ? 'flash-damage' : ''}`} style={{ fontSize: '5rem', filter: 'drop-shadow(0 0 15px rgba(239,68,68,0.5))', zIndex: 5 }}>
-                    👹
+                    {currentMonster}
                   </div>
                 </div>
                 {/* Big Slash Effect overlay */}
