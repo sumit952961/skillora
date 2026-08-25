@@ -161,8 +161,8 @@ export default function ArenaWordNinja() {
   return (
     <>
       <SEO title="Word Ninja | Arena | SkillZeno" />
-      <div className="arena-page-wrapper" style={{ padding: '0', margin: '0' }}>
-        <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '100%', padding: '1rem' }}>
+      <div className="arena-page-wrapper" style={{ padding: '0', margin: '0', maxWidth: '100vw', overflowX: 'hidden' }}>
+        <div className="arena-container fade-in" style={{ position: 'relative', zIndex: 2, maxWidth: '100%', padding: gameState === 'playing' ? '0' : '1rem' }}>
           
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem', padding: '0 2rem' }}>
             <button onClick={() => navigate('/arena')} className="btn btn-outline" style={{ border: 'none', padding: '0.5rem' }}>
@@ -192,7 +192,7 @@ export default function ArenaWordNinja() {
             )}
 
             {gameState === 'playing' && (
-              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`} style={{ position: 'relative', height: 'calc(100vh - 180px)', background: 'linear-gradient(to bottom, #1e3a8a 0%, #172554 100%)', borderRadius: '16px', overflow: 'hidden', minHeight: '500px' }}>
+              <div className={`ninja-battlefield ${isShaking ? 'shake-error' : ''}`} style={{ position: 'relative', height: 'calc(100vh - 80px)', background: 'linear-gradient(to bottom, #1e3a8a 0%, #172554 100%)', borderRadius: '0', overflow: 'hidden', minHeight: '500px' }}>
                 
                 {/* 3D Scene Background Element (Cliff) */}
                 <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '30%', background: '#0f172a', clipPath: 'polygon(0 40%, 100% 0, 100% 100%, 0% 100%)' }}></div>
@@ -201,13 +201,13 @@ export default function ArenaWordNinja() {
                 <div style={{ position: 'absolute', top: '20px', left: '0', width: '100%', display: 'flex', justifyContent: 'space-between', padding: '0 2rem', zIndex: 10 }}>
                   <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #3b82f6' }}>
                     <h3 style={{ margin: 0, color: '#60a5fa', fontSize: '1rem' }}>Score</h3>
-                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>{score}</p>
+                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#ffffff' }}>{score}</p>
                   </div>
                   
                   {/* Timer Display */}
                   <div style={{ background: 'rgba(0,0,0,0.5)', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #10b981', textAlign: 'right' }}>
                     <h3 style={{ margin: 0, color: '#34d399', fontSize: '1rem' }}>Word Timer</h3>
-                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'monospace' }}>
+                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', fontFamily: 'monospace', color: '#ffffff' }}>
                       {(elapsedTime / 1000).toFixed(2)}s
                     </p>
                     {lastWordTime && <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Last: {lastWordTime.toFixed(2)}s</span>}
