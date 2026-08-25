@@ -7,6 +7,34 @@ import { AuthContext } from '../../context/AuthContext';
 
 const MAX_TIME = 3; // 3 seconds per question
 
+const QUICK_QUESTIONS = [
+  { text: "Capital of India?", options: ["New Delhi", "Mumbai", "Kolkata", "Chennai"], answer: "New Delhi" },
+  { text: "Opposite of 'Fast'?", options: ["Slow", "Quick", "Rapid", "Speed"], answer: "Slow" },
+  { text: "2, 4, 6, ?", options: ["8", "7", "10", "12"], answer: "8" },
+  { text: "HTML stands for?", options: ["HyperText Markup", "HighText Machine", "Hyperlink Text", "Home Tool"], answer: "HyperText Markup" },
+  { text: "Largest planet?", options: ["Jupiter", "Earth", "Mars", "Saturn"], answer: "Jupiter" },
+  { text: "Output of 2 + '2' in JS?", options: ["'22'", "4", "NaN", "Error"], answer: "'22'" },
+  { text: "Odd one out?", options: ["Car", "Apple", "Banana", "Orange"], answer: "Car" },
+  { text: "3 x 3 x 3 = ?", options: ["27", "9", "81", "18"], answer: "27" },
+  { text: "Synonym of 'Happy'?", options: ["Joyful", "Sad", "Angry", "Tired"], answer: "Joyful" },
+  { text: "Brain of computer?", options: ["CPU", "RAM", "Mouse", "Monitor"], answer: "CPU" },
+  { text: "National bird of India?", options: ["Peacock", "Parrot", "Pigeon", "Crow"], answer: "Peacock" },
+  { text: "Days in a Leap Year?", options: ["366", "365", "364", "360"], answer: "366" },
+  { text: "10, 20, 30, ?", options: ["40", "50", "100", "35"], answer: "40" },
+  { text: "Sun rises in the?", options: ["East", "West", "North", "South"], answer: "East" },
+  { text: "Color of blood?", options: ["Red", "Blue", "Green", "Yellow"], answer: "Red" },
+  { text: "Fastest land animal?", options: ["Cheetah", "Lion", "Tiger", "Horse"], answer: "Cheetah" },
+  { text: "Polygon with 3 sides?", options: ["Triangle", "Square", "Hexagon", "Circle"], answer: "Triangle" },
+  { text: "A, C, E, ?", options: ["G", "F", "H", "B"], answer: "G" },
+  { text: "Is Tomato a fruit?", options: ["Yes", "No", "It's a grain", "None"], answer: "Yes" },
+  { text: "1 Byte = ? bits", options: ["8", "4", "16", "32"], answer: "8" },
+  { text: "Primary color?", options: ["Red", "Purple", "Orange", "Pink"], answer: "Red" },
+  { text: "Opposite of 'Up'?", options: ["Down", "Left", "Right", "Above"], answer: "Down" },
+  { text: "Which is a vowel?", options: ["E", "B", "Z", "X"], answer: "E" },
+  { text: "Square root of 81?", options: ["9", "8", "7", "81"], answer: "9" },
+  { text: "Currency of India?", options: ["Rupee", "Dollar", "Euro", "Pound"], answer: "Rupee" }
+];
+
 export default function ArenaSpeedRush() {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
@@ -17,45 +45,61 @@ export default function ArenaSpeedRush() {
   const [timeLeft, setTimeLeft] = useState(MAX_TIME);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Generate a simple math question
+  // Generate a simple question (Math or General)
   const generateQuestion = useCallback(() => {
-    const operators = ['+', '-', '*'];
-    const operator = operators[Math.floor(Math.random() * operators.length)];
-    let a, b, correctAnswer;
+    const isMath = Math.random() > 0.5;
 
-    if (operator === '+') {
-      a = Math.floor(Math.random() * 50) + 1;
-      b = Math.floor(Math.random() * 50) + 1;
-      correctAnswer = a + b;
-    } else if (operator === '-') {
-      a = Math.floor(Math.random() * 50) + 20;
-      b = Math.floor(Math.random() * 20) + 1;
-      correctAnswer = a - b;
-    } else {
-      a = Math.floor(Math.random() * 12) + 2;
-      b = Math.floor(Math.random() * 10) + 2;
-      correctAnswer = a * b;
-    }
+    if (isMath) {
+      const operators = ['+', '-', '*'];
+      const operator = operators[Math.floor(Math.random() * operators.length)];
+      let a, b, correctAnswer;
 
-    // Generate 3 wrong options close to the right answer
-    const optionsSet = new Set([correctAnswer]);
-    while (optionsSet.size < 4) {
-      const offset = Math.floor(Math.random() * 10) - 5;
-      const wrongAnswer = correctAnswer + offset;
-      if (wrongAnswer !== correctAnswer && wrongAnswer > 0) {
-        optionsSet.add(wrongAnswer);
-      } else if (wrongAnswer <= 0) {
-        optionsSet.add(correctAnswer + Math.floor(Math.random() * 10) + 1);
+      if (operator === '+') {
+        a = Math.floor(Math.random() * 50) + 1;
+        b = Math.floor(Math.random() * 50) + 1;
+        correctAnswer = a + b;
+      } else if (operator === '-') {
+        a = Math.floor(Math.random() * 50) + 20;
+        b = Math.floor(Math.random() * 20) + 1;
+        correctAnswer = a - b;
+      } else {
+        a = Math.floor(Math.random() * 12) + 2;
+        b = Math.floor(Math.random() * 10) + 2;
+        correctAnswer = a * b;
       }
+
+      // Generate 3 wrong options close to the right answer
+      const optionsSet = new Set([correctAnswer]);
+      while (optionsSet.size < 4) {
+        const offset = Math.floor(Math.random() * 10) - 5;
+        const wrongAnswer = correctAnswer + offset;
+        if (wrongAnswer !== correctAnswer && wrongAnswer > 0) {
+          optionsSet.add(wrongAnswer);
+        } else if (wrongAnswer <= 0) {
+          optionsSet.add(correctAnswer + Math.floor(Math.random() * 10) + 1);
+        }
+      }
+
+      const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+
+      setQuestion({
+        text: `${a} ${operator} ${b} = ?`,
+        options,
+        correctAnswer
+      });
+    } else {
+      // Pick a random general question
+      const randomQ = QUICK_QUESTIONS[Math.floor(Math.random() * QUICK_QUESTIONS.length)];
+      // Shuffle options
+      const options = [...randomQ.options].sort(() => Math.random() - 0.5);
+      
+      setQuestion({
+        text: randomQ.text,
+        options,
+        correctAnswer: randomQ.answer
+      });
     }
-
-    const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
-
-    setQuestion({
-      text: `${a} ${operator} ${b} = ?`,
-      options,
-      correctAnswer
-    });
+    
     setTimeLeft(MAX_TIME);
   }, []);
 
