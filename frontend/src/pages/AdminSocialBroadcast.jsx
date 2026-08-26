@@ -1,13 +1,16 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { Send, Image as ImageIcon, MessageCircle, AlertCircle, CheckCircle, Loader, Share2, Camera, Briefcase } from 'lucide-react';
+import { Send, Image as ImageIcon, MessageCircle, AlertCircle, CheckCircle, Loader, Share2, Camera, Briefcase, Upload, X } from 'lucide-react';
 import SEO from '../components/SEO';
 
 export default function AdminSocialBroadcast() {
   const { token } = useContext(AuthContext);
   
   const [caption, setCaption] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [mediaFile, setMediaFile] = useState(null);
+  const [mediaPreview, setMediaPreview] = useState(null);
+  const fileInputRef = useRef(null);
+
   const [platforms, setPlatforms] = useState({
     facebook: true,
     instagram: true,
@@ -20,6 +23,21 @@ export default function AdminSocialBroadcast() {
   
   const handleToggle = (platform) => {
     setPlatforms(prev => ({ ...prev, [platform]: !prev[platform] }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMediaFile(file);
+      const url = URL.createObjectURL(file);
+      setMediaPreview({ url, type: file.type });
+    }
+  };
+
+  const clearFile = () => {
+    setMediaFile(null);
+    setMediaPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
   
   const handleBroadcast = async () => {
@@ -38,19 +56,27 @@ export default function AdminSocialBroadcast() {
     setResults(null);
     
     try {
+      const formData = new FormData();
+      formData.append('caption', caption);
+      formData.append('platforms', JSON.stringify(platforms));
+      if (mediaFile) {
+        formData.append('media', mediaFile);
+      }
+
       const res = await fetch(`http://localhost:5000/api/social/broadcast`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ caption, imageUrl, platforms })
+        body: formData
       });
       
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Broadcast failed');
       
       setResults(data.results);
+      setCaption('');
+      clearFile();
     } catch (error) {
       alert(error.message);
     } finally {
@@ -75,40 +101,70 @@ export default function AdminSocialBroadcast() {
           {/* Editor Column */}
           <div className="card" style={{ padding: '30px' }}>
             <div className="form-group">
-              <label>Post Caption *</label>
+              <label style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>Post Caption *</label>
               <textarea 
                 className="form-control" 
-                rows="6"
-                placeholder="What do you want to share with your audience?"
+                placeholder="What do you want to share with your audience? Type here..."
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                style={{ resize: 'vertical' }}
+                style={{ 
+                  resize: 'vertical', 
+                  minHeight: '200px',
+                  padding: '16px',
+                  fontSize: '1rem',
+                  lineHeight: '1.5'
+                }}
               ></textarea>
             </div>
             
-            <div className="form-group" style={{ marginTop: '20px' }}>
-              <label>Image URL (Optional)</label>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <div style={{ position: 'relative', flex: 1 }}>
-                  <ImageIcon size={18} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
+            <div className="form-group" style={{ marginTop: '30px' }}>
+              <label style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>Media Upload (Photo / Video)</label>
+              
+              {!mediaPreview ? (
+                <div 
+                  onClick={() => fileInputRef.current.click()}
+                  style={{ 
+                    border: '2px dashed var(--border-color)', 
+                    borderRadius: 'var(--radius-md)', 
+                    padding: '40px', 
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    background: 'var(--bg-secondary)',
+                    transition: 'all 0.2s',
+                    marginTop: '10px'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
+                  onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
+                >
+                  <Upload size={40} color="var(--text-muted)" style={{ marginBottom: '15px' }} />
+                  <p style={{ fontWeight: 'bold', fontSize: '1.1rem', margin: '0 0 5px' }}>Click to upload media</p>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0 }}>Supports JPG, PNG, MP4</p>
                   <input 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="https://example.com/image.png"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    style={{ paddingLeft: '40px' }}
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleFileChange} 
+                    accept="image/*,video/mp4" 
+                    style={{ display: 'none' }} 
                   />
                 </div>
-              </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>For best results across all platforms, use a 1:1 or 4:5 aspect ratio image.</p>
+              ) : (
+                <div style={{ marginTop: '10px', position: 'relative', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border-color)', width: '100%', maxWidth: '100%', background: '#000' }}>
+                  <button 
+                    onClick={clearFile}
+                    style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10 }}
+                  >
+                    <X size={16} />
+                  </button>
+                  
+                  {mediaPreview.type.startsWith('video/') ? (
+                    <video src={mediaPreview.url} controls style={{ width: '100%', maxHeight: '400px', display: 'block' }}></video>
+                  ) : (
+                    <img src={mediaPreview.url} alt="Preview" style={{ width: '100%', maxHeight: '400px', objectFit: 'contain', display: 'block' }} />
+                  )}
+                </div>
+              )}
+              
             </div>
-            
-            {imageUrl && (
-              <div style={{ marginTop: '20px', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border-color)', width: '100%', maxWidth: '300px' }}>
-                <img src={imageUrl} alt="Preview" style={{ width: '100%', height: 'auto', display: 'block' }} onError={(e) => e.target.style.display = 'none'} />
-              </div>
-            )}
           </div>
           
           {/* Settings & Status Column */}

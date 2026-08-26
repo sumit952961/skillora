@@ -8,6 +8,8 @@ import nodemailer from "nodemailer";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import { GoogleGenAI } from "@google/genai";
+import multer from "multer";
+import path from "path";
 import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification } from "./emailService.js";
 
 dotenv.config();
@@ -23,6 +25,13 @@ const razorpay = new Razorpay({
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/social/"),
+  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+});
+const upload = multer({ storage });
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.get("/", (req, res) => res.json({ message: "Skillzeno API is running successfully!" }));
@@ -1795,9 +1804,23 @@ const getTelegramToken = () => process.env.TELEGRAM_BOT_TOKEN || null;
 const getMetaToken = () => process.env.META_ACCESS_TOKEN || null;
 const getLinkedInToken = () => process.env.LINKEDIN_ACCESS_TOKEN || null;
 
-app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, async (req, res) => {
+app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.single('media'), async (req, res) => {
   try {
-    const { caption, imageUrl, platforms } = req.body;
+    const { caption } = req.body;
+    let platforms = {};
+    
+    // Parse platforms if it comes from FormData (as a string)
+    try {
+      platforms = typeof req.body.platforms === 'string' ? JSON.parse(req.body.platforms) : req.body.platforms;
+    } catch(e) {
+      platforms = req.body.platforms || {};
+    }
+    
+    // Determine the image path to use
+    let imageUrl = req.body.imageUrl || null;
+    if (req.file) {
+      imageUrl = `http://localhost:${PORT}/uploads/social/${req.file.filename}`;
+    }
     
     if (!caption) {
       return res.status(400).json({ message: "Caption is required" });
