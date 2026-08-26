@@ -37,6 +37,7 @@ import ArenaGame from './pages/Arena/ArenaGame'
 import ArenaResult from './pages/Arena/ArenaResult'
 import ArenaSpeedRush from './pages/Arena/ArenaSpeedRush'
 import ArenaWordNinja from './pages/Arena/ArenaWordNinja'
+import AdminSocialBroadcast from './pages/AdminSocialBroadcast'
 import { MapPin, Phone, Mail, BookOpen, ShieldCheck, Award } from 'lucide-react'
 import SEO from './components/SEO'
 import './App.css'
@@ -126,6 +127,11 @@ function AppContent() {
           <Route path="/admin/dashboard" element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          } />
+          <Route path="/admin/broadcast" element={
+            <AdminRoute>
+              <AdminSocialBroadcast />
             </AdminRoute>
           } />
           <Route path="/admin/internships" element={

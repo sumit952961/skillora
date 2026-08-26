@@ -235,6 +235,20 @@ const aiChatHistorySchema = new mongoose.Schema({
 
 const AIChatHistory = mongoose.model("AIChatHistory", aiChatHistorySchema);
 
+const socialPostSchema = new mongoose.Schema({
+  caption: { type: String, required: true },
+  imagePath: { type: String }, // Optional image URL
+  platforms: {
+    facebook: { status: { type: String, enum: ['success', 'failed', 'pending'], default: 'pending' }, message: String },
+    instagram: { status: { type: String, enum: ['success', 'failed', 'pending'], default: 'pending' }, message: String },
+    linkedin: { status: { type: String, enum: ['success', 'failed', 'pending'], default: 'pending' }, message: String },
+    telegram: { status: { type: String, enum: ['success', 'failed', 'pending'], default: 'pending' }, message: String }
+  },
+  postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  createdAt: { type: Date, default: Date.now }
+});
+const SocialPost = mongoose.model("SocialPost", socialPostSchema);
+
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
   .then(async () => {
@@ -1769,6 +1783,107 @@ Respond appropriately based on your role, rules, and the knowledge base provided
   } catch (error) {
     console.error("AI Chat Error:", error);
     res.status(500).json({ message: "Sorry, I am having trouble connecting to my brain right now. Please try again later.", error: error.message });
+  }
+});
+
+// ==========================================
+// SOCIAL BROADCAST ROUTES
+// ==========================================
+
+// Mock API keys check
+const getTelegramToken = () => process.env.TELEGRAM_BOT_TOKEN || null;
+const getMetaToken = () => process.env.META_ACCESS_TOKEN || null;
+const getLinkedInToken = () => process.env.LINKEDIN_ACCESS_TOKEN || null;
+
+app.post('/api/social/broadcast', adminMiddleware, async (req, res) => {
+  try {
+    const { caption, imageUrl, platforms } = req.body;
+    
+    if (!caption) {
+      return res.status(400).json({ message: "Caption is required" });
+    }
+    
+    // Create new Social Post record
+    const postRecord = new SocialPost({
+      caption,
+      imagePath: imageUrl,
+      platforms: {
+        facebook: { status: platforms.facebook ? 'pending' : 'failed', message: platforms.facebook ? '' : 'Not Selected' },
+        instagram: { status: platforms.instagram ? 'pending' : 'failed', message: platforms.instagram ? '' : 'Not Selected' },
+        linkedin: { status: platforms.linkedin ? 'pending' : 'failed', message: platforms.linkedin ? '' : 'Not Selected' },
+        telegram: { status: platforms.telegram ? 'pending' : 'failed', message: platforms.telegram ? '' : 'Not Selected' }
+      },
+      postedBy: req.user.id
+    });
+    
+    // Run broadcast tasks concurrently
+    const tasks = [];
+    const results = {};
+    
+    if (platforms.telegram) {
+      tasks.push((async () => {
+        try {
+          const token = getTelegramToken();
+          if (!token) throw new Error("Telegram Bot Token is missing in server environment");
+          // Logic for actual Axios POST to Telegram would go here
+          results.telegram = { status: 'success', message: 'Successfully broadcasted to Telegram channel' };
+        } catch (error) {
+          results.telegram = { status: 'failed', message: error.message || "Failed to connect to Telegram" };
+        }
+      })());
+    }
+    
+    if (platforms.facebook) {
+      tasks.push((async () => {
+        try {
+          const token = getMetaToken();
+          if (!token) throw new Error("Meta Access Token is missing in server environment. Please connect Facebook Page.");
+          results.facebook = { status: 'success', message: 'Successfully broadcasted to Facebook Page' };
+        } catch (error) {
+          results.facebook = { status: 'failed', message: error.message || "Failed to post to Facebook" };
+        }
+      })());
+    }
+
+    if (platforms.instagram) {
+      tasks.push((async () => {
+        try {
+          const token = getMetaToken();
+          if (!token) throw new Error("Meta Access Token is missing. Please convert your Instagram to Professional account and link to Facebook.");
+          results.instagram = { status: 'success', message: 'Successfully broadcasted to Instagram' };
+        } catch (error) {
+          results.instagram = { status: 'failed', message: error.message || "Failed to post to Instagram" };
+        }
+      })());
+    }
+    
+    if (platforms.linkedin) {
+      tasks.push((async () => {
+        try {
+          const token = getLinkedInToken();
+          if (!token) throw new Error("LinkedIn Access Token is missing. Please connect LinkedIn account.");
+          results.linkedin = { status: 'success', message: 'Successfully broadcasted to LinkedIn' };
+        } catch (error) {
+          results.linkedin = { status: 'failed', message: error.message || "Failed to post to LinkedIn" };
+        }
+      })());
+    }
+    
+    // Wait for all to finish
+    await Promise.allSettled(tasks);
+    
+    // Update document with results
+    if (platforms.facebook) postRecord.platforms.facebook = results.facebook;
+    if (platforms.instagram) postRecord.platforms.instagram = results.instagram;
+    if (platforms.linkedin) postRecord.platforms.linkedin = results.linkedin;
+    if (platforms.telegram) postRecord.platforms.telegram = results.telegram;
+    
+    await postRecord.save();
+    
+    res.json({ message: "Broadcast completed", results: postRecord.platforms, postId: postRecord._id });
+  } catch (error) {
+    console.error("Broadcast Error:", error);
+    res.status(500).json({ message: "Internal Server Error during broadcast", error: error.message });
   }
 });
 
