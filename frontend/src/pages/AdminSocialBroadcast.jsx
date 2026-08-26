@@ -4,7 +4,7 @@ import { Send, Image as ImageIcon, MessageCircle, AlertCircle, CheckCircle, Load
 import SEO from '../components/SEO';
 
 export default function AdminSocialBroadcast() {
-  const { token } = useContext(AuthContext);
+  const { API_URL, token } = useContext(AuthContext);
   
   const [caption, setCaption] = useState('');
   const [mediaFile, setMediaFile] = useState(null);
@@ -63,7 +63,7 @@ export default function AdminSocialBroadcast() {
         formData.append('media', mediaFile);
       }
 
-      const res = await fetch(`http://localhost:5000/api/social/broadcast`, {
+      const res = await fetch(`${API_URL}/social/broadcast`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
