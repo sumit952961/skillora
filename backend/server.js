@@ -1795,7 +1795,7 @@ const getTelegramToken = () => process.env.TELEGRAM_BOT_TOKEN || null;
 const getMetaToken = () => process.env.META_ACCESS_TOKEN || null;
 const getLinkedInToken = () => process.env.LINKEDIN_ACCESS_TOKEN || null;
 
-app.post('/api/social/broadcast', adminMiddleware, async (req, res) => {
+app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, async (req, res) => {
   try {
     const { caption, imageUrl, platforms } = req.body;
     
