@@ -247,8 +247,6 @@ const aiChatHistorySchema = new mongoose.Schema({
 
 const AIChatHistory = mongoose.model("AIChatHistory", aiChatHistorySchema);
 
-const AIChatHistory = mongoose.model("AIChatHistory", aiChatHistorySchema);
-
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
   .then(async () => {
