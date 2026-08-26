@@ -11,6 +11,8 @@ import { GoogleGenAI } from "@google/genai";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import axios from "axios";
+import FormData from "form-data";
 import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification } from "./emailService.js";
 
 dotenv.config();
@@ -1788,8 +1790,9 @@ Respond appropriately based on your role, rules, and the knowledge base provided
 // SOCIAL BROADCAST ROUTES
 // ==========================================
 
-// Mock API keys check
+// Social Media API Mock / Keys
 const getTelegramToken = () => process.env.TELEGRAM_BOT_TOKEN || null;
+const getTelegramChatId = () => process.env.TELEGRAM_CHAT_ID || null;
 const getMetaToken = () => process.env.META_ACCESS_TOKEN || null;
 const getLinkedInToken = () => process.env.LINKEDIN_ACCESS_TOKEN || null;
 
@@ -1824,11 +1827,36 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
       tasks.push((async () => {
         try {
           const token = getTelegramToken();
-          if (!token) throw new Error("Telegram Bot Token is missing in server environment");
-          // Logic for actual Axios POST to Telegram would go here
+          const chatId = getTelegramChatId();
+          if (!token || !chatId) throw new Error("Telegram Token or Chat ID is missing in environment");
+          
+          const telegramApiUrl = `https://api.telegram.org/bot${token}`;
+          let endpoint = '/sendMessage';
+          
+          const formData = new FormData();
+          formData.append('chat_id', chatId);
+          formData.append('caption', caption);
+          formData.append('text', caption); // for text only
+          
+          if (req.file) {
+             const fileStream = fs.createReadStream(req.file.path);
+             if (req.file.mimetype.startsWith('video/')) {
+               endpoint = '/sendVideo';
+               formData.append('video', fileStream);
+             } else {
+               endpoint = '/sendPhoto';
+               formData.append('photo', fileStream);
+             }
+          }
+          
+          await axios.post(`${telegramApiUrl}${endpoint}`, formData, {
+            headers: formData.getHeaders()
+          });
+
           results.telegram = { status: 'success', message: 'Successfully broadcasted to Telegram channel' };
         } catch (error) {
-          results.telegram = { status: 'failed', message: error.message || "Failed to connect to Telegram" };
+          console.error("Telegram API Error:", error.response?.data || error.message);
+          results.telegram = { status: 'failed', message: error.response?.data?.description || error.message || "Failed to connect to Telegram" };
         }
       })());
     }
