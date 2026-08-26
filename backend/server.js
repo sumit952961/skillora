@@ -245,19 +245,7 @@ const aiChatHistorySchema = new mongoose.Schema({
 
 const AIChatHistory = mongoose.model("AIChatHistory", aiChatHistorySchema);
 
-const socialPostSchema = new mongoose.Schema({
-  caption: { type: String, required: true },
-  imagePath: { type: String }, // Optional image URL
-  platforms: {
-    facebook: { status: { type: String, enum: ['success', 'failed', 'pending'], default: 'pending' }, message: String },
-    instagram: { status: { type: String, enum: ['success', 'failed', 'pending'], default: 'pending' }, message: String },
-    linkedin: { status: { type: String, enum: ['success', 'failed', 'pending'], default: 'pending' }, message: String },
-    telegram: { status: { type: String, enum: ['success', 'failed', 'pending'], default: 'pending' }, message: String }
-  },
-  postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  createdAt: { type: Date, default: Date.now }
-});
-const SocialPost = mongoose.model("SocialPost", socialPostSchema);
+const AIChatHistory = mongoose.model("AIChatHistory", aiChatHistorySchema);
 
 
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/skillzeno")
@@ -1827,18 +1815,6 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
       return res.status(400).json({ message: "Caption is required" });
     }
     
-    // Create new Social Post record
-    const postRecord = new SocialPost({
-      caption,
-      imagePath: imageUrl,
-      platforms: {
-        facebook: { status: platforms.facebook ? 'pending' : 'failed', message: platforms.facebook ? '' : 'Not Selected' },
-        instagram: { status: platforms.instagram ? 'pending' : 'failed', message: platforms.instagram ? '' : 'Not Selected' },
-        linkedin: { status: platforms.linkedin ? 'pending' : 'failed', message: platforms.linkedin ? '' : 'Not Selected' },
-        telegram: { status: platforms.telegram ? 'pending' : 'failed', message: platforms.telegram ? '' : 'Not Selected' }
-      },
-      postedBy: req.user.id
-    });
     
     // Run broadcast tasks concurrently
     const tasks = [];
@@ -1896,14 +1872,6 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
     // Wait for all to finish
     await Promise.allSettled(tasks);
     
-    // Update document with results
-    if (platforms.facebook) postRecord.platforms.facebook = results.facebook;
-    if (platforms.instagram) postRecord.platforms.instagram = results.instagram;
-    if (platforms.linkedin) postRecord.platforms.linkedin = results.linkedin;
-    if (platforms.telegram) postRecord.platforms.telegram = results.telegram;
-    
-    await postRecord.save();
-    
     // Auto-delete the uploaded file to save server memory (500mb limit on free tier)
     if (req.file && req.file.path) {
       fs.unlink(req.file.path, (err) => {
@@ -1911,7 +1879,7 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
       });
     }
     
-    res.json({ message: "Broadcast completed", results: postRecord.platforms, postId: postRecord._id });
+    res.json({ message: "Broadcast completed", results: results });
   } catch (error) {
     console.error("Broadcast Error:", error);
     res.status(500).json({ message: "Internal Server Error during broadcast", error: error.message });
