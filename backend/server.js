@@ -10,6 +10,7 @@ import crypto from "crypto";
 import { GoogleGenAI } from "@google/genai";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification } from "./emailService.js";
 
 dotenv.config();
@@ -1902,6 +1903,13 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
     if (platforms.telegram) postRecord.platforms.telegram = results.telegram;
     
     await postRecord.save();
+    
+    // Auto-delete the uploaded file to save server memory (500mb limit on free tier)
+    if (req.file && req.file.path) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error("Failed to delete media file:", err);
+      });
+    }
     
     res.json({ message: "Broadcast completed", results: postRecord.platforms, postId: postRecord._id });
   } catch (error) {
