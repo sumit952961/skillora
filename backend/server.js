@@ -1912,15 +1912,36 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           if (!token || !instaId) throw new Error("Meta Access Token or Instagram Account ID missing");
           if (!req.file) throw new Error("Instagram strictly requires an Image or Video to post");
           
-          // Instagram requires a public URL for media. Since Render deletes files locally, 
-          // we use the Facebook API to upload as an unpublished photo first, or just throw for now.
-          // For a robust implementation, images should be uploaded to S3 first. 
-          throw new Error("Direct local file upload to Instagram API is unsupported without an S3 bucket or public URL. Use Facebook/Telegram for now.");
+          // Construct public URL for Render
+          const publicUrl = `${req.protocol}://${req.get('host')}/uploads/social/${req.file.filename}`;
+          const isVideo = req.file.mimetype.startsWith('video/');
           
-          // results.instagram = { status: 'success', message: 'Successfully broadcasted to Instagram' };
+          let uploadPayload = {
+            caption: caption,
+            access_token: token,
+          };
+          
+          if (isVideo) {
+             uploadPayload.video_url = publicUrl;
+             uploadPayload.media_type = 'VIDEO';
+          } else {
+             uploadPayload.image_url = publicUrl;
+          }
+          
+          // 1. Create Media Container
+          const mediaRes = await axios.post(`https://graph.facebook.com/v19.0/${instaId}/media`, uploadPayload);
+          const creationId = mediaRes.data.id;
+          
+          // 2. Publish Media
+          await axios.post(`https://graph.facebook.com/v19.0/${instaId}/media_publish`, {
+             creation_id: creationId,
+             access_token: token
+          });
+          
+          results.instagram = { status: 'success', message: 'Successfully broadcasted to Instagram' };
         } catch (error) {
-          console.error("Instagram API Error:", error.message);
-          results.instagram = { status: 'failed', message: error.message || "Failed to post to Instagram" };
+          console.error("Instagram API Error:", error.response?.data || error.message);
+          results.instagram = { status: 'failed', message: error.response?.data?.error?.message || error.message || "Failed to post to Instagram" };
         }
       })());
     }
@@ -1945,8 +1966,32 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           };
 
           if (req.file) {
-            // Complex LinkedIn Binary Upload would go here. For now, text only.
-            throw new Error("LinkedIn Binary Upload requires complex 3-step OAuth logic. Text-only is supported currently.");
+            // 1. Register Upload
+            const registerRes = await axios.post('https://api.linkedin.com/v2/assets?action=registerUpload', {
+               registerUploadRequest: {
+                  recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
+                  owner: authorUrn,
+                  serviceRelationships: [{ relationshipType: "OWNER", identifier: "urn:li:userGeneratedContent" }]
+               }
+            }, { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }});
+            
+            const uploadUrl = registerRes.data.value.uploadMechanism["com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"].uploadUrl;
+            const assetUrn = registerRes.data.value.asset;
+            
+            // 2. Upload Binary
+            const fileData = fs.readFileSync(req.file.path);
+            await axios.put(uploadUrl, fileData, {
+               headers: {
+                 'Authorization': `Bearer ${token}`,
+                 'Content-Type': 'application/octet-stream'
+               }
+            });
+            
+            // 3. Attach to Post Data
+            postData.specificContent["com.linkedin.ugc.ShareContent"].shareMediaCategory = "IMAGE";
+            postData.specificContent["com.linkedin.ugc.ShareContent"].media = [
+              { status: "READY", description: { text: caption }, media: assetUrn, title: { text: caption } }
+            ];
           }
           
           await axios.post('https://api.linkedin.com/v2/ugcPosts', postData, {
@@ -1968,11 +2013,16 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
     // Wait for all to finish
     await Promise.allSettled(tasks);
     
-    // Auto-delete the uploaded file to save server memory (500mb limit on free tier)
+    // Auto-delete the uploaded file with a 5-minute delay
+    // This allows Instagram's asynchronous servers enough time to fetch the image from our public URL
+    // before we wipe it to save memory!
     if (req.file && req.file.path) {
-      fs.unlink(req.file.path, (err) => {
-        if (err) console.error("Failed to delete media file:", err);
-      });
+      setTimeout(() => {
+        fs.unlink(req.file.path, (err) => {
+          if (err) console.error("Failed to delete media file after delay:", err);
+          else console.log(`Auto-deleted media file to save memory: ${req.file.path}`);
+        });
+      }, 5 * 60 * 1000); // 300,000 ms = 5 minutes
     }
     
     res.json({ message: "Broadcast completed", results: results });
