@@ -1797,7 +1797,10 @@ Respond appropriately based on your role, rules, and the knowledge base provided
 const getTelegramToken = () => process.env.TELEGRAM_BOT_TOKEN || null;
 const getTelegramChatId = () => process.env.TELEGRAM_CHAT_ID || null;
 const getMetaToken = () => process.env.META_ACCESS_TOKEN || null;
+const getFacebookPageId = () => process.env.FACEBOOK_PAGE_ID || null;
+const getInstagramAccountId = () => process.env.INSTAGRAM_ACCOUNT_ID || null;
 const getLinkedInToken = () => process.env.LINKEDIN_ACCESS_TOKEN || null;
+const getLinkedInAuthorUrn = () => process.env.LINKEDIN_AUTHOR_URN || null;
 
 app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.single('media'), async (req, res) => {
   try {
@@ -1868,10 +1871,35 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
       tasks.push((async () => {
         try {
           const token = getMetaToken();
-          if (!token) throw new Error("Meta Access Token is missing in server environment. Please connect Facebook Page.");
+          const pageId = getFacebookPageId();
+          if (!token || !pageId) throw new Error("Meta Access Token or Facebook Page ID is missing in environment");
+          
+          let endpoint = `https://graph.facebook.com/v19.0/${pageId}/feed`;
+          const formData = new FormData();
+          
+          if (req.file) {
+             const fileStream = fs.createReadStream(req.file.path);
+             if (req.file.mimetype.startsWith('video/')) {
+               endpoint = `https://graph.facebook.com/v19.0/${pageId}/videos`;
+               formData.append('source', fileStream);
+               formData.append('description', caption);
+             } else {
+               endpoint = `https://graph.facebook.com/v19.0/${pageId}/photos`;
+               formData.append('source', fileStream);
+               formData.append('message', caption);
+             }
+          } else {
+             formData.append('message', caption);
+          }
+          
+          await axios.post(endpoint, formData, {
+            headers: { ...formData.getHeaders(), Authorization: `Bearer ${token}` }
+          });
+          
           results.facebook = { status: 'success', message: 'Successfully broadcasted to Facebook Page' };
         } catch (error) {
-          results.facebook = { status: 'failed', message: error.message || "Failed to post to Facebook" };
+          console.error("Facebook API Error:", error.response?.data || error.message);
+          results.facebook = { status: 'failed', message: error.response?.data?.error?.message || error.message || "Failed to post to Facebook" };
         }
       })());
     }
@@ -1880,9 +1908,18 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
       tasks.push((async () => {
         try {
           const token = getMetaToken();
-          if (!token) throw new Error("Meta Access Token is missing. Please convert your Instagram to Professional account and link to Facebook.");
-          results.instagram = { status: 'success', message: 'Successfully broadcasted to Instagram' };
+          const instaId = getInstagramAccountId();
+          if (!token || !instaId) throw new Error("Meta Access Token or Instagram Account ID missing");
+          if (!req.file) throw new Error("Instagram strictly requires an Image or Video to post");
+          
+          // Instagram requires a public URL for media. Since Render deletes files locally, 
+          // we use the Facebook API to upload as an unpublished photo first, or just throw for now.
+          // For a robust implementation, images should be uploaded to S3 first. 
+          throw new Error("Direct local file upload to Instagram API is unsupported without an S3 bucket or public URL. Use Facebook/Telegram for now.");
+          
+          // results.instagram = { status: 'success', message: 'Successfully broadcasted to Instagram' };
         } catch (error) {
+          console.error("Instagram API Error:", error.message);
           results.instagram = { status: 'failed', message: error.message || "Failed to post to Instagram" };
         }
       })());
@@ -1892,10 +1929,38 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
       tasks.push((async () => {
         try {
           const token = getLinkedInToken();
-          if (!token) throw new Error("LinkedIn Access Token is missing. Please connect LinkedIn account.");
+          const authorUrn = getLinkedInAuthorUrn();
+          if (!token || !authorUrn) throw new Error("LinkedIn Access Token or Author URN is missing");
+          
+          let postData = {
+            author: authorUrn,
+            lifecycleState: "PUBLISHED",
+            specificContent: {
+              "com.linkedin.ugc.ShareContent": {
+                shareCommentary: { text: caption },
+                shareMediaCategory: "NONE"
+              }
+            },
+            visibility: { "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC" }
+          };
+
+          if (req.file) {
+            // Complex LinkedIn Binary Upload would go here. For now, text only.
+            throw new Error("LinkedIn Binary Upload requires complex 3-step OAuth logic. Text-only is supported currently.");
+          }
+          
+          await axios.post('https://api.linkedin.com/v2/ugcPosts', postData, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'X-Restli-Protocol-Version': '2.0.0'
+            }
+          });
+          
           results.linkedin = { status: 'success', message: 'Successfully broadcasted to LinkedIn' };
         } catch (error) {
-          results.linkedin = { status: 'failed', message: error.message || "Failed to post to LinkedIn" };
+          console.error("LinkedIn API Error:", error.response?.data || error.message);
+          results.linkedin = { status: 'failed', message: error.response?.data?.message || error.message || "Failed to post to LinkedIn" };
         }
       })());
     }
