@@ -62,7 +62,9 @@ const userSchema = new mongoose.Schema({
 const notificationSchema = new mongoose.Schema({
   title: { type: String, required: true },
   message: { type: String, required: true },
-  date: { type: Date, default: Date.now }
+  mediaUrl: { type: String, default: null },
+  mediaType: { type: String, enum: ['image', 'audio', null], default: null },
+  date: { type: Date, default: Date.now, expires: 2592000 } // Auto delete after 30 days
 });
 
 const applicationSchema = new mongoose.Schema({
@@ -1825,20 +1827,58 @@ app.post('/api/notifications/read', authenticateToken, async (req, res) => {
   }
 });
 
-// POST new notification (Admin only)
-app.post('/api/notifications', authenticateToken, authorizeAdmin, async (req, res) => {
+// POST new notification (Admin only) - supports media upload
+app.post('/api/notifications', authenticateToken, authorizeAdmin, upload.single('media'), async (req, res) => {
   try {
-    const { title, message } = req.body;
+    const { title, message, mediaType } = req.body;
     if (!title || !message) {
       return res.status(400).json({ message: "Title and message are required" });
     }
-    const newNotification = new Notification({ title, message });
+    
+    let mediaUrl = null;
+    let finalMediaType = null;
+    
+    if (req.file) {
+      mediaUrl = `/uploads/${req.file.filename}`;
+      finalMediaType = mediaType === 'audio' ? 'audio' : 'image';
+    }
+    
+    const newNotification = new Notification({ title, message, mediaUrl, mediaType: finalMediaType });
     await newNotification.save();
     res.status(201).json({ message: "Notification sent successfully", notification: newNotification });
   } catch (error) {
     res.status(500).json({ message: "Failed to send notification", error: error.message });
   }
 });
+
+// Auto-delete media files after 10 days
+const cleanupOldMedia = async () => {
+  try {
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+    
+    const oldNotifs = await Notification.find({
+      date: { $lt: tenDaysAgo },
+      mediaUrl: { $ne: null }
+    });
+    
+    for (const notif of oldNotifs) {
+      const filePath = path.join(process.cwd(), notif.mediaUrl);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      notif.mediaUrl = null;
+      notif.mediaType = null;
+      await notif.save();
+    }
+  } catch (error) {
+    console.error("Error during media cleanup:", error);
+  }
+};
+// Run cleanup every 24 hours
+setInterval(cleanupOldMedia, 24 * 60 * 60 * 1000);
+// Also run on startup
+cleanupOldMedia();
 
 // ==========================================
 // SOCIAL BROADCAST ROUTES
