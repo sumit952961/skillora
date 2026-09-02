@@ -55,8 +55,15 @@ const userSchema = new mongoose.Schema({
   semester: { type: String, default: "" },
   college: { type: String, default: "" },
   mobileNumber: { type: String, default: "" },
-  skills: { type: String, default: "" }
+  skills: { type: String, default: "" },
+  lastNotificationReadAt: { type: Date, default: null }
 }, { timestamps: true });
+
+const notificationSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  message: { type: String, required: true },
+  date: { type: Date, default: Date.now }
+});
 
 const applicationSchema = new mongoose.Schema({
   appNumber: { type: String, required: true },
@@ -147,6 +154,7 @@ const otpSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);
+const Notification = mongoose.model("Notification", notificationSchema);
 const Application = mongoose.model("Application", applicationSchema);
 const QuizApplication = mongoose.model("QuizApplication", quizApplicationSchema);
 const Certificate = mongoose.model("Certificate", certificateSchema);
@@ -1786,6 +1794,49 @@ Respond appropriately based on your role, rules, and the knowledge base provided
   } catch (error) {
     console.error("AI Chat Error:", error);
     res.status(500).json({ message: "Sorry, I am having trouble connecting to my brain right now. Please try again later.", error: error.message });
+  }
+});
+
+// ==========================================
+// NOTIFICATIONS API
+// ==========================================
+
+// GET all notifications and user's read status
+app.get('/api/notifications', authenticateToken, async (req, res) => {
+  try {
+    const notifications = await Notification.find().sort({ date: -1 }).limit(50);
+    const user = await User.findById(req.user.id);
+    res.json({
+      notifications,
+      lastReadAt: user.lastNotificationReadAt
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// POST mark notifications as read
+app.post('/api/notifications/read', authenticateToken, async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, { lastNotificationReadAt: Date.now() });
+    res.json({ message: "Notifications marked as read" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// POST new notification (Admin only)
+app.post('/api/notifications', authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const { title, message } = req.body;
+    if (!title || !message) {
+      return res.status(400).json({ message: "Title and message are required" });
+    }
+    const newNotification = new Notification({ title, message });
+    await newNotification.save();
+    res.status(201).json({ message: "Notification sent successfully", notification: newNotification });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to send notification", error: error.message });
   }
 });
 

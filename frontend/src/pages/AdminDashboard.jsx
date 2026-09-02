@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
-import { Users, Briefcase, Settings, ArrowRight, BookOpen, Award, Key, Shield } from 'lucide-react';
+import { Users, Briefcase, Settings, ArrowRight, BookOpen, Award, Key, Shield, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
@@ -77,12 +77,22 @@ export default function AdminDashboard() {
         </div>
 
         <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
-          <h3 style={{ marginBottom: '16px' }}>Platform Settings</h3>
+          <h3 style={{ marginBottom: '16px' }}>Manage Settings</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
-            Update payment configurations like processing fees, UPI IDs, and QR Codes.
+            Configure global platform settings, API keys, and notification emails.
           </p>
           <Link to="/admin/settings" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
             <Settings size={16} /> Go to Settings
+          </Link>
+        </div>
+
+        <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ marginBottom: '16px' }}>Global Notifications</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
+            Send real-time updates and push notifications to all users on the platform.
+          </p>
+          <Link to="/admin/notifications" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderColor: 'var(--primary)', color: 'var(--primary)' }}>
+            <Bell size={16} /> Send Notifications
           </Link>
         </div>
 

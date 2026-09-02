@@ -30,6 +30,7 @@ import AdminQuizCertificates from './pages/AdminQuizCertificates'
 import AdminSettings from './pages/AdminSettings'
 import AdminContests from './pages/AdminContests'
 import AdminCertificateVerification from './pages/AdminCertificateVerification'
+import AdminNotifications from './pages/AdminNotifications'
 import PaymentSuccess from './pages/PaymentSuccess'
 import AdminPasswordReset from './pages/AdminPasswordReset'
 import ArenaHome from './pages/Arena/ArenaHome'
@@ -38,6 +39,7 @@ import ArenaResult from './pages/Arena/ArenaResult'
 import ArenaSpeedRush from './pages/Arena/ArenaSpeedRush'
 import ArenaWordNinja from './pages/Arena/ArenaWordNinja'
 import AdminSocialBroadcast from './pages/AdminSocialBroadcast'
+import NotificationWidget from './components/NotificationWidget'
 import { MapPin, Phone, Mail, BookOpen, ShieldCheck, Award } from 'lucide-react'
 import SEO from './components/SEO'
 import './App.css'
@@ -78,6 +80,7 @@ function AppContent() {
     <>
       <ScrollToTop />
       <Navbar />
+      <NotificationWidget />
       <AIAssistant />
       <main style={{ minHeight: 'calc(100vh - 220px)' }}>
         <Routes>
@@ -124,6 +127,11 @@ function AppContent() {
           <Route path="/arena/word-ninja" element={<ArenaWordNinja />} />
 
           {/* Admin Routes */}
+          <Route path="/admin/notifications" element={
+            <AdminRoute>
+              <AdminNotifications />
+            </AdminRoute>
+          } />
           <Route path="/admin/dashboard" element={
             <AdminRoute>
               <AdminDashboard />
