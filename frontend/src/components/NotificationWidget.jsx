@@ -150,7 +150,7 @@ export default function NotificationWidget() {
             right: '0',
             width: '320px',
             maxHeight: '400px',
-            background: 'var(--bg-secondary)',
+            background: 'var(--bg-primary)',
             border: '1px solid var(--border-color)',
             borderRadius: 'var(--radius-lg)',
             boxShadow: 'var(--shadow-premium)',
@@ -167,7 +167,7 @@ export default function NotificationWidget() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            background: 'var(--bg-primary)'
+            background: 'var(--bg-secondary)'
           }}>
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>Notifications</h3>
             <button 
@@ -202,7 +202,8 @@ export default function NotificationWidget() {
                       padding: '16px',
                       borderRadius: 'var(--radius-md)',
                       background: isUnreadLocally ? 'rgba(79, 70, 229, 0.05)' : 'var(--bg-secondary)',
-                      border: `1px solid ${isUnreadLocally ? 'rgba(79, 70, 229, 0.2)' : 'transparent'}`,
+                      border: `1px solid ${isUnreadLocally ? 'var(--primary)' : 'var(--border-color)'}`,
+                      boxShadow: 'var(--shadow-sm)',
                       position: 'relative'
                     }}
                   >
