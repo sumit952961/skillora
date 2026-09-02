@@ -1953,10 +1953,12 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           let authorUrn = getLinkedInAuthorUrn();
           if (!token || !authorUrn) throw new Error("LinkedIn Access Token or Author URN is missing");
           
-          let personUrn = authorUrn.replace(/['"]/g, '').trim().replace(':member:', ':person:');
+          let baseUrn = authorUrn.replace(/['"]/g, '').trim();
+          let personUrn = baseUrn.replace(':member:', ':person:');
+          let memberUrn = baseUrn.replace(':person:', ':member:');
           
           let postData = {
-            author: personUrn,
+            author: memberUrn,
             lifecycleState: "PUBLISHED",
             specificContent: {
               "com.linkedin.ugc.ShareContent": {
@@ -1999,7 +2001,8 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           await axios.post('https://api.linkedin.com/v2/ugcPosts', postData, {
             headers: {
               'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'X-Restli-Protocol-Version': '2.0.0'
             }
           });
           
