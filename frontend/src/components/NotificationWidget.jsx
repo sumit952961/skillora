@@ -8,6 +8,7 @@ export default function NotificationWidget() {
   const [lastReadAt, setLastReadAt] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
@@ -27,6 +28,14 @@ export default function NotificationWidget() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [isOpen, notifications]);
 
   const fetchNotifications = async () => {
     try {
@@ -192,7 +201,7 @@ export default function NotificationWidget() {
                 <p style={{ margin: 0 }}>No notifications yet.</p>
               </div>
             ) : (
-              notifications.map((notif) => {
+              [...notifications].reverse().map((notif) => {
                 const isUnreadLocally = !lastReadAt || new Date(notif.date) > lastReadAt;
                 
                 return (
@@ -249,6 +258,7 @@ export default function NotificationWidget() {
                 );
               })
             )}
+            <div ref={messagesEndRef} />
           </div>
         </div>
       )}

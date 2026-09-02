@@ -7,6 +7,7 @@ export default function AdminNotifications() {
   const [notifications, setNotifications] = useState([]);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
+  const messagesEndRef = useRef(null);
   
   const [mediaFile, setMediaFile] = useState(null);
   const [mediaType, setMediaType] = useState(null); // 'image' or 'audio'
@@ -33,12 +34,19 @@ export default function AdminNotifications() {
       if (res.ok) {
         const data = await res.json();
         setNotifications(data.notifications || []);
+        scrollToBottom();
       }
     } catch (error) {
       console.error("Failed to fetch notifications");
     } finally {
       setFetching(false);
     }
+  };
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   const handleImageSelect = (e) => {
@@ -197,7 +205,7 @@ export default function AdminNotifications() {
             ) : notifications.length === 0 ? (
               <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginTop: '40px' }}>No notifications sent yet.</p>
             ) : (
-              notifications.map(notif => (
+              [...notifications].reverse().map(notif => (
                 <div key={notif._id} style={{ 
                   alignSelf: 'flex-end', 
                   maxWidth: '85%', 
@@ -241,6 +249,7 @@ export default function AdminNotifications() {
                 </div>
               ))
             )}
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
