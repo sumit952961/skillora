@@ -1965,11 +1965,10 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           
           if (!token || !authorUrn) throw new Error("LinkedIn Access Token or Author URN is missing");
           
-          let baseUrn = authorUrn.replace(/['"]/g, '').trim();
-          let personUrn = baseUrn.replace(':member:', ':person:');
+          let cleanUrn = authorUrn.replace(/['"]/g, '').trim();
           
           let postData = {
-            owner: personUrn,
+            owner: cleanUrn,
             text: {
               text: caption
             },
@@ -1983,7 +1982,7 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
             const registerRes = await axios.post('https://api.linkedin.com/v2/assets?action=registerUpload', {
                registerUploadRequest: {
                   recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
-                  owner: personUrn,
+                  owner: cleanUrn,
                   serviceRelationships: [{ relationshipType: "OWNER", identifier: "urn:li:userGeneratedContent" }]
                }
             }, { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }});
