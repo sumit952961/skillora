@@ -22,11 +22,13 @@ export default function AdminNotifications() {
 
   useEffect(() => {
     fetchNotifications();
+    const interval = setInterval(() => fetchNotifications(true), 5000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = async (isPolling = false) => {
     try {
-      setFetching(true);
+      if (!isPolling) setFetching(true);
       const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
