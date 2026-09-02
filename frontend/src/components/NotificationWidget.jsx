@@ -83,22 +83,23 @@ export default function NotificationWidget() {
       className="notification-widget-container" 
       style={{
         position: 'fixed',
-        bottom: '90px',
+        bottom: '100px',
         right: '24px',
-        zIndex: 9999
+        zIndex: 99999
       }}
       ref={dropdownRef}
     >
       <button 
+        className="notification-bell-btn"
         onClick={toggleDropdown}
         style={{
-          width: '56px',
-          height: '56px',
+          width: '48px',
+          height: '48px',
           borderRadius: '50%',
           background: 'var(--primary)',
           color: 'white',
           border: 'none',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          boxShadow: 'var(--shadow-lg)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -108,14 +109,14 @@ export default function NotificationWidget() {
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.05)';
-          e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-premium)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
         }}
       >
-        <Bell size={24} />
+        <Bell size={20} />
         {unreadCount > 0 && (
           <span style={{
             position: 'absolute',
@@ -142,29 +143,31 @@ export default function NotificationWidget() {
 
       {isOpen && (
         <div 
+          className="notification-dropdown-panel"
           style={{
             position: 'absolute',
-            bottom: '70px',
+            bottom: '60px',
             right: '0',
-            width: '350px',
+            width: '320px',
             maxHeight: '400px',
-            background: 'var(--bg-card)',
+            background: 'var(--bg-secondary)',
             border: '1px solid var(--border-color)',
             borderRadius: 'var(--radius-lg)',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+            boxShadow: 'var(--shadow-premium)',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
-            animation: 'slideUp 0.3s ease forwards'
+            animation: 'slideUp 0.3s ease forwards',
+            zIndex: 100000
           }}
         >
           <div style={{
-            padding: '16px 20px',
+            padding: '16px',
             borderBottom: '1px solid var(--border-color)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            background: 'var(--bg-secondary)'
+            background: 'var(--bg-primary)'
           }}>
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>Notifications</h3>
             <button 
@@ -261,8 +264,16 @@ export default function NotificationWidget() {
         }
         @media (max-width: 768px) {
           .notification-widget-container {
-            bottom: 80px !important;
+            bottom: 90px !important;
             right: 16px !important;
+          }
+          .notification-dropdown-panel {
+            width: 280px !important;
+            max-height: 350px !important;
+          }
+          .notification-bell-btn {
+            width: 44px !important;
+            height: 44px !important;
           }
         }
       `}} />
