@@ -1950,8 +1950,11 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
       tasks.push((async () => {
         try {
           const token = getLinkedInToken();
-          const authorUrn = getLinkedInAuthorUrn();
+          let authorUrn = getLinkedInAuthorUrn();
           if (!token || !authorUrn) throw new Error("LinkedIn Access Token or Author URN is missing");
+          
+          // Auto-clean the URN in case it has quotes, spaces, or uses 'member' instead of 'person'
+          authorUrn = authorUrn.replace(/['"]/g, '').trim().replace(':member:', ':person:');
           
           let postData = {
             author: authorUrn,
