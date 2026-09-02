@@ -40,8 +40,6 @@ export default function AdminNotifications() {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(() => fetchNotifications(true), 60000);
-    return () => clearInterval(interval);
   }, []);
 
   const fetchNotifications = async (isPolling = false) => {
