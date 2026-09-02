@@ -1967,18 +1967,15 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           
           let baseUrn = authorUrn.replace(/['"]/g, '').trim();
           let personUrn = baseUrn.replace(':member:', ':person:');
-          let memberUrn = baseUrn.replace(':person:', ':member:');
           
           let postData = {
-            author: memberUrn,
-            lifecycleState: "PUBLISHED",
-            specificContent: {
-              "com.linkedin.ugc.ShareContent": {
-                shareCommentary: { text: caption },
-                shareMediaCategory: "NONE"
-              }
+            owner: personUrn,
+            text: {
+              text: caption
             },
-            visibility: { "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC" }
+            distribution: {
+              linkedInDistributionTarget: {}
+            }
           };
 
           if (req.file) {
@@ -2004,17 +2001,19 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
             });
             
             // 3. Attach to Post Data
-            postData.specificContent["com.linkedin.ugc.ShareContent"].shareMediaCategory = "IMAGE";
-            postData.specificContent["com.linkedin.ugc.ShareContent"].media = [
-              { status: "READY", description: { text: caption }, media: assetUrn, title: { text: caption } }
-            ];
+            postData.content = {
+              contentEntities: [{ entity: assetUrn }],
+              title: caption,
+              shareMediaCategory: "IMAGE"
+            };
+          } else {
+             postData.content = { shareMediaCategory: "NONE" };
           }
           
-          await axios.post('https://api.linkedin.com/v2/ugcPosts', postData, {
+          await axios.post('https://api.linkedin.com/v2/shares', postData, {
             headers: {
               'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'X-Restli-Protocol-Version': '2.0.0'
+              'Content-Type': 'application/json'
             }
           });
           
