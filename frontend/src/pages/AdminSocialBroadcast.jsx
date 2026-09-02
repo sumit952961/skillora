@@ -14,7 +14,6 @@ export default function AdminSocialBroadcast() {
   const [platforms, setPlatforms] = useState({
     facebook: true,
     instagram: true,
-    linkedin: true,
     telegram: true
   });
   
@@ -47,7 +46,7 @@ export default function AdminSocialBroadcast() {
     }
     
     // Ensure at least one platform is selected
-    if (!platforms.facebook && !platforms.instagram && !platforms.linkedin && !platforms.telegram) {
+    if (!platforms.facebook && !platforms.instagram && !platforms.telegram) {
       alert("Please select at least one platform to broadcast to.");
       return;
     }
@@ -58,7 +57,12 @@ export default function AdminSocialBroadcast() {
     try {
       const formData = new FormData();
       formData.append('caption', caption);
-      formData.append('platforms', JSON.stringify(platforms));
+      // Send platform selection to backend
+      formData.append('platforms', JSON.stringify({
+        facebook: platforms.facebook,
+        instagram: platforms.instagram,
+        telegram: platforms.telegram
+      }));
       if (mediaFile) {
         formData.append('media', mediaFile);
       }
@@ -190,12 +194,6 @@ export default function AdminSocialBroadcast() {
                   icon={<Camera size={20} color="#E4405F" />} 
                   active={platforms.instagram} 
                   onToggle={() => handleToggle('instagram')} 
-                />
-                <PlatformToggle 
-                  name="LinkedIn Page" 
-                  icon={<Briefcase size={20} color="#0A66C2" />} 
-                  active={platforms.linkedin} 
-                  onToggle={() => handleToggle('linkedin')} 
                 />
               </div>
               
