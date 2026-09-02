@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bell, Clock, Paperclip, Mic, Image as ImageIcon, Smile, X, Trash2 } from 'lucide-react';
-import api from '../utils/api';
+
+const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
 export default function AdminNotifications() {
   const [notifications, setNotifications] = useState([]);
@@ -25,8 +26,14 @@ export default function AdminNotifications() {
   const fetchNotifications = async () => {
     try {
       setFetching(true);
-      const res = await api.get('/api/notifications');
-      setNotifications(res.data.notifications || []);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/notifications`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data.notifications || []);
+      }
     } catch (error) {
       console.error("Failed to fetch notifications");
     } finally {
@@ -101,18 +108,27 @@ export default function AdminNotifications() {
         formData.append('mediaType', mediaType);
       }
 
-      const res = await api.post('/api/notifications', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/notifications`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
       });
       
-      alert(res.data.message || "Notification sent successfully!");
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to send notification.");
+      }
+      
+      alert(data.message || "Notification sent successfully!");
       setTitle('');
       setMessage('');
       removeMedia();
       fetchNotifications();
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.message || "Failed to send notification.");
+      alert(error.message || "Failed to send notification.");
     } finally {
       setLoading(false);
     }
