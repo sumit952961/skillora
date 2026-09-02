@@ -1802,6 +1802,17 @@ const getInstagramAccountId = () => process.env.INSTAGRAM_ACCOUNT_ID || null;
 const getLinkedInToken = () => process.env.LINKEDIN_ACCESS_TOKEN || null;
 const getLinkedInAuthorUrn = () => process.env.LINKEDIN_AUTHOR_URN || null;
 
+  app.get('/api/social/my-urn', async (req, res) => {
+    try {
+      const token = getLinkedInToken();
+      if (!token) return res.send("No LinkedIn token found in environment variables.");
+      const meRes = await axios.get('https://api.linkedin.com/v2/userinfo', { headers: { Authorization: `Bearer ${token}` } });
+      res.send(`SUCCESS! Your API URN is: urn:li:person:${meRes.data.sub}`);
+    } catch (e) {
+      res.send(`ERROR: ${e.response?.data?.message || e.message}`);
+    }
+  });
+
 app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.single('media'), async (req, res) => {
   try {
     const { caption } = req.body;
