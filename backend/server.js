@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const notificationSchema = new mongoose.Schema({
-  title: { type: String, required: true },
+  title: { type: String, default: "" },
   message: { type: String, required: true },
   mediaUrl: { type: String, default: null },
   mediaType: { type: String, enum: ['image', 'audio', null], default: null },
@@ -1831,8 +1831,8 @@ app.post('/api/notifications/read', authenticateToken, async (req, res) => {
 app.post('/api/notifications', authenticateToken, authorizeAdmin, upload.single('media'), async (req, res) => {
   try {
     const { title, message, mediaType } = req.body;
-    if (!title || !message) {
-      return res.status(400).json({ message: "Title and message are required" });
+    if (!message) {
+      return res.status(400).json({ message: "Message is required" });
     }
     
     let mediaUrl = null;
@@ -1843,11 +1843,32 @@ app.post('/api/notifications', authenticateToken, authorizeAdmin, upload.single(
       finalMediaType = mediaType === 'audio' ? 'audio' : 'image';
     }
     
-    const newNotification = new Notification({ title, message, mediaUrl, mediaType: finalMediaType });
+    const newNotification = new Notification({ title: title || "", message, mediaUrl, mediaType: finalMediaType });
     await newNotification.save();
     res.status(201).json({ message: "Notification sent successfully", notification: newNotification });
   } catch (error) {
     res.status(500).json({ message: "Failed to send notification", error: error.message });
+  }
+});
+
+// DELETE a notification (Delete for Everyone)
+app.delete('/api/notifications/:id', authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const notif = await Notification.findById(req.params.id);
+    if (!notif) return res.status(404).json({ message: "Notification not found" });
+
+    // Delete associated media file if it exists
+    if (notif.mediaUrl) {
+      const filePath = path.join(process.cwd(), notif.mediaUrl);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    await Notification.findByIdAndDelete(req.params.id);
+    res.json({ message: "Notification deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete notification", error: error.message });
   }
 });
 

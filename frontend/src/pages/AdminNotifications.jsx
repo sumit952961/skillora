@@ -92,8 +92,8 @@ export default function AdminNotifications() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim() || !message.trim()) {
-      alert("Title and message are required.");
+    if (!message.trim() && !mediaFile) {
+      alert("Please enter a message or record audio.");
       return;
     }
 
@@ -131,6 +131,26 @@ export default function AdminNotifications() {
       alert(error.message || "Failed to send notification.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this notification for everyone?")) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/notifications/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        fetchNotifications();
+      } else {
+        alert("Failed to delete notification.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting notification.");
     }
   };
 
@@ -173,9 +193,19 @@ export default function AdminNotifications() {
                   background: 'var(--primary-light)', 
                   padding: '12px 16px', 
                   borderRadius: '16px 16px 0 16px',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                  position: 'relative',
+                  group: 'hover'
                 }}>
-                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--primary-dark)' }}>{notif.title}</h4>
+                  <button 
+                    onClick={() => handleDelete(notif._id)}
+                    style={{ position: 'absolute', top: '8px', right: '8px', background: 'transparent', border: 'none', color: 'var(--accent-danger)', cursor: 'pointer', padding: '4px' }}
+                    title="Delete for Everyone"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                  
+                  {notif.title && <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--primary-dark)', paddingRight: '20px' }}>{notif.title}</h4>}
                   
                   {notif.mediaType === 'image' && notif.mediaUrl && (
                     <img 
@@ -231,10 +261,9 @@ export default function AdminNotifications() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <input 
               type="text" 
-              placeholder="Notification Title..." 
+              placeholder="Notification Title (Optional)..." 
               value={title} 
               onChange={(e) => setTitle(e.target.value)} 
-              required 
               style={{ padding: '12px 16px', borderRadius: '24px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', fontSize: '1rem' }}
             />
             
