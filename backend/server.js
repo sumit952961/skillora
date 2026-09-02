@@ -1839,7 +1839,7 @@ app.post('/api/notifications', authenticateToken, authorizeAdmin, upload.single(
     let finalMediaType = null;
     
     if (req.file) {
-      mediaUrl = `/uploads/${req.file.filename}`;
+      mediaUrl = `/uploads/social/${req.file.filename}`;
       finalMediaType = mediaType === 'audio' ? 'audio' : 'image';
     }
     
