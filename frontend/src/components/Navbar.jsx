@@ -1,7 +1,7 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Award, BookOpen, LogOut, CheckCircle, User, Briefcase, LayoutDashboard, Settings, Layers, MoreVertical, Key, Shield, Menu, X, Trophy, Zap, Send } from 'lucide-react';
+import { Award, BookOpen, LogOut, CheckCircle, User, Briefcase, LayoutDashboard, Settings, MoreVertical, Key, Shield, Menu, X, Trophy, Zap, Send, Bell } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
 import '../navbar-fix.css';
 
@@ -126,6 +126,9 @@ export default function Navbar() {
                     </NavLink>
                     <NavLink to="/admin/certificate-verification" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)' }}>
                       <Shield size={16} /> Certificate Verification
+                    </NavLink>
+                    <NavLink to="/admin/notifications" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--primary)', borderBottom: '1px solid var(--border-color)' }}>
+                      <Bell size={16} /> Global Notifications
                     </NavLink>
                     <NavLink to="/admin/settings" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)' }}>
                       <Settings size={16} /> Settings
