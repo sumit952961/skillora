@@ -177,7 +177,16 @@ export default function AdminNotifications() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px', margin: '0 auto' }}>
         
         {/* Chat History View */}
-        <div className="admin-card" style={{ height: '50vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ 
+          height: '50vh', 
+          display: 'flex', 
+          flexDirection: 'column',
+          background: 'var(--bg-secondary)', 
+          padding: '24px', 
+          borderRadius: 'var(--radius-lg)', 
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
           <h2 style={{ paddingBottom: '16px', borderBottom: '1px solid var(--border-color)', margin: '0 0 16px 0' }}>Sent Broadcasts</h2>
           
           <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px', paddingRight: '10px' }}>
@@ -235,7 +244,13 @@ export default function AdminNotifications() {
         </div>
 
         {/* WhatsApp-Style Input Bar */}
-        <div className="admin-card" style={{ padding: '16px' }}>
+        <div style={{ 
+          padding: '24px',
+          background: 'var(--bg-secondary)', 
+          borderRadius: 'var(--radius-lg)', 
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
           
           {mediaPreview && (
             <div style={{ marginBottom: '16px', position: 'relative', display: 'inline-block', background: 'var(--bg-secondary)', padding: '12px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
