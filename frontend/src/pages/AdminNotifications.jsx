@@ -202,21 +202,20 @@ export default function AdminNotifications() {
                   alignSelf: 'flex-end', 
                   maxWidth: '85%', 
                   background: 'var(--primary-light)', 
-                  padding: '12px 16px', 
+                  padding: '12px 32px 12px 16px', /* Increased right padding for the trash icon */
                   borderRadius: '16px 16px 0 16px',
                   boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
-                  position: 'relative',
-                  group: 'hover'
+                  position: 'relative'
                 }}>
                   <button 
                     onClick={() => handleDelete(notif._id)}
-                    style={{ position: 'absolute', top: '8px', right: '8px', background: 'transparent', border: 'none', color: 'var(--accent-danger)', cursor: 'pointer', padding: '4px' }}
+                    style={{ position: 'absolute', top: '8px', right: '4px', background: 'transparent', border: 'none', color: 'var(--accent-danger)', cursor: 'pointer', padding: '4px' }}
                     title="Delete for Everyone"
                   >
                     <Trash2 size={14} />
                   </button>
                   
-                  {notif.title && <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--primary-dark)', paddingRight: '20px' }}>{notif.title}</h4>}
+                  {notif.title && <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', color: 'var(--primary-dark)' }}>{notif.title}</h4>}
                   
                   {notif.mediaType === 'image' && notif.mediaUrl && (
                     <img 
