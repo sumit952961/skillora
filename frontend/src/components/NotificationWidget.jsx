@@ -32,7 +32,7 @@ export default function NotificationWidget() {
   useEffect(() => {
     if (user && token) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 5000); // Polling every 5 seconds for live feel
+      const interval = setInterval(fetchNotifications, 60000); // Polled every 1 minute
       return () => clearInterval(interval);
     }
   }, [user, token]);
