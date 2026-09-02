@@ -168,10 +168,12 @@ export default function AdminNotifications() {
   const popularEmojis = ["😀", "😂", "🥰", "😎", "🔥", "🎉", "🚀", "💡", "📢", "🏆", "✅", "⚠️"];
 
   return (
-    <div className="admin-page fade-in">
-      <div className="admin-header">
-        <h1><Bell className="header-icon" /> Global Notifications</h1>
-        <p>Send real-time updates with Images, Audio, and Emojis!</p>
+    <div className="container fade-in">
+      <div style={{ marginBottom: '40px' }}>
+        <h1 style={{ fontSize: '2rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Bell size={32} color="var(--primary)" /> Global Notifications
+        </h1>
+        <p style={{ color: 'var(--text-muted)' }}>Send real-time updates with Images, Audio, and Emojis!</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px', margin: '0 auto' }}>
