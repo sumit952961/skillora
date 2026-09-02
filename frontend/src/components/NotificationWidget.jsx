@@ -12,6 +12,23 @@ export default function NotificationWidget() {
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
 
+  const renderTextWithLinks = (text) => {
+    if (!text) return null;
+    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+    return text.split(urlRegex).map((part, index) => {
+      if (part.match(urlRegex)) {
+        let href = part;
+        if (part.startsWith('www.')) href = 'https://' + part;
+        return (
+          <a key={index} href={href} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   useEffect(() => {
     if (user && token) {
       fetchNotifications();
@@ -231,7 +248,7 @@ export default function NotificationWidget() {
                     )}
                     {notif.title && <h4 style={{ margin: '0 0 6px 0', fontSize: '1rem', paddingLeft: isUnreadLocally ? '12px' : '0' }}>{notif.title}</h4>}
                     <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5', paddingLeft: isUnreadLocally ? '12px' : '0', whiteSpace: 'pre-wrap' }}>
-                      {notif.message}
+                      {renderTextWithLinks(notif.message)}
                     </p>
                     {notif.mediaType === 'image' && notif.mediaUrl && (
                       <div style={{ marginTop: '10px', paddingLeft: isUnreadLocally ? '12px' : '0' }}>

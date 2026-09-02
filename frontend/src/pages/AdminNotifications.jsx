@@ -19,6 +19,24 @@ export default function AdminNotifications() {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const fileInputRef = useRef(null);
+
+  const renderTextWithLinks = (text) => {
+    if (!text) return null;
+    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+    return text.split(urlRegex).map((part, index) => {
+      if (part.match(urlRegex)) {
+        let href = part;
+        if (part.startsWith('www.')) href = 'https://' + part;
+        return (
+          <a key={index} href={href} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
 
   useEffect(() => {
     fetchNotifications();
@@ -238,12 +256,14 @@ export default function AdminNotifications() {
                   {notif.mediaType === 'audio' && notif.mediaUrl && (
                     <audio 
                       controls 
-                      src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://skillora-api-mw5c.onrender.com'}${notif.mediaUrl}`} 
-                      style={{ width: '100%', height: '40px', marginBottom: '8px' }}
+                      src={`${API_URL.replace('/api', '')}${notif.mediaUrl}`} 
+                      style={{ marginTop: '8px', maxWidth: '100%', height: '40px' }}
                     />
                   )}
 
-                  <p style={{ margin: '0 0 8px 0', fontSize: '0.95rem', color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>{notif.message}</p>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '0.95rem', color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>
+                    {renderTextWithLinks(notif.message)}
+                  </p>
                   
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     <Clock size={12} /> {formatDate(notif.date)}
