@@ -1953,14 +1953,10 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           let authorUrn = getLinkedInAuthorUrn();
           if (!token || !authorUrn) throw new Error("LinkedIn Access Token or Author URN is missing");
           
-          // API strictly requires 'member' instead of 'person' for Rest.li 2.0.0 (ugcPosts)
-          // But 'person' for standard endpoints like registerUpload!
-          let baseUrn = authorUrn.replace(/['"]/g, '').trim();
-          let personUrn = baseUrn.replace(':member:', ':person:');
-          let memberUrn = baseUrn.replace(':person:', ':member:');
+          let personUrn = authorUrn.replace(/['"]/g, '').trim().replace(':member:', ':person:');
           
           let postData = {
-            author: memberUrn, // ugcPosts uses Rest.li 2.0.0 which requires 'member'
+            author: personUrn,
             lifecycleState: "PUBLISHED",
             specificContent: {
               "com.linkedin.ugc.ShareContent": {
@@ -1976,7 +1972,7 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
             const registerRes = await axios.post('https://api.linkedin.com/v2/assets?action=registerUpload', {
                registerUploadRequest: {
                   recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
-                  owner: personUrn, // registerUpload uses standard Rest.li 1.0 which requires 'person'
+                  owner: personUrn,
                   serviceRelationships: [{ relationshipType: "OWNER", identifier: "urn:li:userGeneratedContent" }]
                }
             }, { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }});
@@ -2003,8 +1999,7 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           await axios.post('https://api.linkedin.com/v2/ugcPosts', postData, {
             headers: {
               'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'X-Restli-Protocol-Version': '2.0.0'
+              'Content-Type': 'application/json'
             }
           });
           
