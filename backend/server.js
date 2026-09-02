@@ -1951,6 +1951,20 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
         try {
           const token = getLinkedInToken();
           let authorUrn = getLinkedInAuthorUrn();
+          
+          // If URN is missing, or is the old company one, or the wrong scraped one, auto-fetch it!
+          if (!authorUrn || authorUrn.includes("144491963") || authorUrn.includes("1576047730")) {
+            try {
+              const meRes = await axios.get('https://api.linkedin.com/v2/userinfo', { 
+                headers: { 'Authorization': `Bearer ${token}` } 
+              });
+              authorUrn = `urn:li:person:${meRes.data.sub}`;
+              console.log("Auto-fetched LinkedIn URN:", authorUrn);
+            } catch (err) {
+              throw new Error("Could not auto-fetch LinkedIn URN. Please ensure your token has 'openid' and 'profile' permissions.");
+            }
+          }
+          
           if (!token || !authorUrn) throw new Error("LinkedIn Access Token or Author URN is missing");
           
           let baseUrn = authorUrn.replace(/['"]/g, '').trim();
