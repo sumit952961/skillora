@@ -7,8 +7,10 @@ export default function AdminQuizzes() {
   const { quizzes, addQuiz, updateQuiz, deleteQuiz } = useContext(DataContext);
   const [editingQuiz, setEditingQuiz] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const openModal = (quiz = null) => {
+    setUploadSuccess(false);
     if (quiz) {
       setEditingQuiz({ ...quiz });
     } else {
@@ -68,7 +70,9 @@ export default function AdminQuizzes() {
           ...prev,
           questions: [...prev.questions, ...newQuestions]
         }));
+        setUploadSuccess(true);
         alert(`Successfully added ${newQuestions.length} questions from Excel!`);
+        setTimeout(() => setUploadSuccess(false), 3000); // Revert back after 3 seconds
       } catch (err) {
         console.error(err);
         alert("Failed to parse Excel file. Please check the format.");
@@ -176,8 +180,8 @@ export default function AdminQuizzes() {
                     style={{ display: 'none' }}
                     onChange={handleFileUpload}
                   />
-                  <label htmlFor="excel-upload-quiz" className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Upload size={14} /> Upload Excel
+                  <label htmlFor="excel-upload-quiz" className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', borderColor: uploadSuccess ? 'var(--accent-success)' : '', color: uploadSuccess ? 'var(--accent-success)' : '' }}>
+                    <Upload size={14} /> {uploadSuccess ? 'Uploaded ✓' : 'Upload Excel'}
                   </label>
                   <button type="button" onClick={addQuestion} className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>+ Add Question</button>
                 </div>
