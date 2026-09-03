@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { DataContext } from '../context/DataContext';
-import { Plus, Edit2, Trash2, Clock, HelpCircle, Save, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Clock, HelpCircle, Save, X, Upload } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 export default function AdminQuizzes() {
   const { quizzes, addQuiz, updateQuiz, deleteQuiz } = useContext(DataContext);
@@ -36,6 +37,45 @@ export default function AdminQuizzes() {
       ...prev,
       questions: [...prev.questions, { question: '', options: ['', '', '', ''], answer: 0 }]
     }));
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const bstr = evt.target.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws);
+
+        const newQuestions = data.map(row => ({
+          question: row.question || '',
+          options: [
+            row.option1 || '',
+            row.option2 || '',
+            row.option3 || '',
+            row.option4 || ''
+          ],
+          answer: parseInt(row.answer) || 0
+        })).filter(q => q.question && q.options.some(opt => opt !== ''));
+
+        setEditingQuiz(prev => ({
+          ...prev,
+          questions: [...prev.questions, ...newQuestions]
+        }));
+        alert(`Successfully added ${newQuestions.length} questions from Excel!`);
+      } catch (err) {
+        console.error(err);
+        alert("Failed to parse Excel file. Please check the format.");
+      } finally {
+        e.target.value = null;
+      }
+    };
+    reader.readAsBinaryString(file);
   };
 
   const updateQuestion = (idx, field, value) => {
@@ -121,7 +161,19 @@ export default function AdminQuizzes() {
 
               <div style={{ marginTop: '32px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ fontSize: '1.2rem' }}>Questions</h3>
-                <button type="button" onClick={addQuestion} className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>+ Add Question</button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input 
+                    type="file" 
+                    accept=".xlsx, .xls, .csv" 
+                    id="excel-upload-quiz" 
+                    style={{ display: 'none' }}
+                    onChange={handleFileUpload}
+                  />
+                  <label htmlFor="excel-upload-quiz" className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Upload size={14} /> Upload Excel
+                  </label>
+                  <button type="button" onClick={addQuestion} className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>+ Add Question</button>
+                </div>
               </div>
 
               {editingQuiz.questions.map((q, qIdx) => (
