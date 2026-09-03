@@ -129,14 +129,25 @@ export const sendPasswordResetConfirmation = async (name, email) => {
 export const sendPasswordChangeConfirmation = async (name, email) => {
   const time = new Date().toLocaleString();
   const content = `
-    <h2 style="color:#1f2937;margin-top:0;">Password Changed Successfully</h2>
-    <p>Hi ${name},</p>
-    <p>You have successfully changed the password for your ${APP_NAME} profile on <strong>${time}</strong>.</p>
-    <p style="font-size:14px;color:#6b7280;margin-top:24px;">Security Notice: If you did not make this change, please contact us immediately to secure your account.</p>
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="background-color: #d1fae5; color: #059669; width: 64px; height: 64px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto;">
+        ✅
+      </div>
+    </div>
+    <h2 style="color:#1f2937;margin-top:0;text-align:center;">Password Changed Successfully!</h2>
+    <p>Hi <strong>${name}</strong>,</p>
+    <p>This is a quick confirmation that you have successfully changed the password for your <strong>${APP_NAME}</strong> account on <strong>${time}</strong>.</p>
+    <p>You can now use your new password to log in and continue your learning journey with us. 🚀</p>
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${LOGIN_URL}" style="background:#4f46e5;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold;display:inline-block;">Go to Login</a>
+    </div>
+    <div style="background:#fef2f2; border-left: 4px solid #ef4444; padding: 12px 16px; margin-top: 32px; border-radius: 4px;">
+      <p style="font-size:14px;color:#991b1b;margin:0;"><strong>Security Notice:</strong> If you did not make this change, please contact our support team immediately to secure your account.</p>
+    </div>
   `;
   await sendEmail({
     to: email,
-    subject: `Your ${APP_NAME} Profile Password Was Changed`,
+    subject: `🔐 Your ${APP_NAME} Password Was Changed`,
     html: baseTemplate(content),
   }).catch(console.error);
 };
