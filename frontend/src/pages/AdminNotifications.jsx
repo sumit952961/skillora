@@ -259,7 +259,7 @@ export default function AdminNotifications() {
                     />
                   )}
 
-                  <p style={{ margin: '0 0 8px 0', fontSize: '0.95rem', color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '0.95rem', color: 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {renderTextWithLinks(notif.message)}
                   </p>
                   

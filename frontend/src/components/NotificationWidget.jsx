@@ -247,7 +247,7 @@ export default function NotificationWidget() {
                       }} />
                     )}
                     {notif.title && <h4 style={{ margin: '0 0 6px 0', fontSize: '1rem', paddingLeft: isUnreadLocally ? '12px' : '0' }}>{notif.title}</h4>}
-                    <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5', paddingLeft: isUnreadLocally ? '12px' : '0', whiteSpace: 'pre-wrap' }}>
+                    <p style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5', paddingLeft: isUnreadLocally ? '12px' : '0', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                       {renderTextWithLinks(notif.message)}
                     </p>
                     {notif.mediaType === 'image' && notif.mediaUrl && (
