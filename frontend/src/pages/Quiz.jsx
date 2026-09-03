@@ -48,7 +48,7 @@ export default function Quiz() {
                 <Clock size={16} color="var(--primary)" /> {quiz.timeLimit} mins
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-main)' }}>
-                <HelpCircle size={16} color="var(--primary)" /> {quiz.questions.length} Qs
+                <HelpCircle size={16} color="var(--primary)" /> {quiz.questionsPerStudent || 20} Qs
               </div>
             </div>
 
