@@ -126,6 +126,7 @@ const quizSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   timeLimit: { type: Number, required: true },
+  questionsPerStudent: { type: Number, default: 20 },
   questions: [{
     question: String,
     options: [String],
@@ -872,7 +873,7 @@ app.put("/api/admin/tasks/verify", authenticateToken, authorizeAdmin, async (req
 
 app.get("/api/admin/quiz-applications", authenticateToken, authorizeAdmin, async (req, res) => {
   try {
-    const apps = await QuizApplication.find().sort({ _id: -1 });
+    const apps = await QuizApplication.find({ paymentSubmitted: true }).sort({ _id: -1 });
     res.json(apps.map(app => ({ ...app.toObject(), id: app.appNumber || app._id.toString() })));
   } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
 });

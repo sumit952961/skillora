@@ -51,7 +51,7 @@ export default function PaymentSuccess() {
                 studentName: data.studentName || user?.name || 'N/A',
                 studentEmail: data.studentEmail || user?.email || 'N/A',
                 quizTitle: data.quizTitle || 'N/A',
-                score: 'See Dashboard',
+                score: data.score || 'See Dashboard',
                 submittedDate: new Date().toLocaleDateString('en-IN')
               });
               localStorage.removeItem('pendingPayment');

@@ -20,6 +20,7 @@ export default function TakeQuiz({ quiz, onBack }) {
   const [timeWarningShown, setTimeWarningShown] = useState(false);
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [activeQuestions, setActiveQuestions] = useState(quiz.questions || []);
 
   // Check if student already attempted
   const existingApp = quizApplications.find(a => a.quizId === quiz.id);
@@ -51,14 +52,14 @@ export default function TakeQuiz({ quiz, onBack }) {
       // Merge current selection into answers and calculate final score
       const finalAnswers = { ...userAnswers, [currentIdx]: selectedOpt };
       let finalScore = 0;
-      quiz.questions.forEach((q, idx) => {
+      activeQuestions.forEach((q, idx) => {
         if (finalAnswers[idx] === q.answer) finalScore += 1;
       });
       setScore(finalScore);
-      submitQuiz(quiz, finalScore, sessionAppId);
+      submitQuiz(quiz, finalScore, sessionAppId, activeQuestions.length);
     }
     return () => clearInterval(timer);
-  }, [hasStarted, isFinished, timeLeft, timeWarningShown, selectedOpt, currentIdx, userAnswers, submitQuiz, quiz, sessionAppId]);
+  }, [hasStarted, isFinished, timeLeft, timeWarningShown, selectedOpt, currentIdx, userAnswers, submitQuiz, quiz, sessionAppId, activeQuestions]);
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -98,6 +99,13 @@ export default function TakeQuiz({ quiz, onBack }) {
       navigate('/login?redirect=quiz');
       return;
     }
+    
+    // Shuffle and select random questions based on questionsPerStudent limit
+    const limit = quiz.questionsPerStudent || 20;
+    const shuffled = [...quiz.questions].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, limit);
+    setActiveQuestions(selected);
+
     setSessionAppId('QAPP-' + Math.random().toString(36).substring(2, 10).toUpperCase());
     setHasStarted(true);
     localStorage.removeItem('pendingQuizId');
@@ -107,7 +115,7 @@ export default function TakeQuiz({ quiz, onBack }) {
     const updatedAnswers = { ...userAnswers, [currentIdx]: selectedOpt };
     setUserAnswers(updatedAnswers);
     
-    if (currentIdx + 1 < quiz.questions.length) {
+    if (currentIdx + 1 < activeQuestions.length) {
       setCurrentIdx(prev => prev + 1);
       setSelectedOpt(userAnswers[currentIdx + 1] !== undefined ? userAnswers[currentIdx + 1] : null);
     } else {
@@ -115,11 +123,11 @@ export default function TakeQuiz({ quiz, onBack }) {
       
       // Calculate final score
       let finalScore = 0;
-      quiz.questions.forEach((q, idx) => {
+      activeQuestions.forEach((q, idx) => {
         if (updatedAnswers[idx] === q.answer) finalScore += 1;
       });
       setScore(finalScore);
-      submitQuiz(quiz, finalScore, sessionAppId);
+      submitQuiz(quiz, finalScore, sessionAppId, activeQuestions.length);
     }
   };
 
@@ -159,6 +167,7 @@ export default function TakeQuiz({ quiz, onBack }) {
             type: 'quiz',
             quizId: quiz.id,
             quizTitle: quiz.title,
+            score: `${score}/${activeQuestions.length}`,
             studentName: user?.name || '',
             studentEmail: user?.email || '',
             verificationData: response
@@ -250,7 +259,7 @@ export default function TakeQuiz({ quiz, onBack }) {
           <h1 style={{ fontSize: '2.5rem', marginBottom: '16px' }}>Quiz Completed!</h1>
           
           <div style={{ fontSize: '4rem', fontWeight: 'bold', color: 'var(--primary)', marginBottom: '8px' }}>
-            {score} <span style={{ fontSize: '2rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>/ {quiz.questions.length}</span>
+            {score} <span style={{ fontSize: '2rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>/ {activeQuestions.length}</span>
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '16px' }}>Your final score has been recorded.</p>
           {existingApp && (
@@ -362,7 +371,7 @@ export default function TakeQuiz({ quiz, onBack }) {
       <div className="quiz-container" style={{ maxWidth: '800px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '32px', paddingBottom: '16px', borderBottom: '1px solid var(--border-color)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>Question {currentIdx + 1} of {quiz.questions.length}</span>
+            <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>Question {currentIdx + 1} of {activeQuestions.length}</span>
             <span style={{ fontSize: '0.8rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} /> App No: {sessionAppId}</span>
           </div>
           <span style={{ 
@@ -399,11 +408,11 @@ export default function TakeQuiz({ quiz, onBack }) {
         )}
 
         <h3 style={{ fontSize: '1.35rem', marginBottom: '32px', lineHeight: '1.5' }}>
-          {quiz.questions[currentIdx].question}
+          {activeQuestions[currentIdx].question}
         </h3>
 
         <div className="option-list">
-          {quiz.questions[currentIdx].options.map((opt, i) => (
+          {activeQuestions[currentIdx].options.map((opt, i) => (
             <button 
               key={i} 
               onClick={() => setSelectedOpt(i)} 
@@ -429,8 +438,8 @@ export default function TakeQuiz({ quiz, onBack }) {
             onClick={handleNext}
             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
           >
-            {currentIdx + 1 === quiz.questions.length ? 'Submit Quiz' : 'Next Question'}
-            {currentIdx + 1 < quiz.questions.length && <ChevronRight size={16} />}
+            {currentIdx + 1 === activeQuestions.length ? 'Submit Quiz' : 'Next Question'}
+            {currentIdx + 1 < activeQuestions.length && <ChevronRight size={16} />}
           </button>
         </div>
       </div>

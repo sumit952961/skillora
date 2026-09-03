@@ -16,6 +16,7 @@ export default function AdminQuizzes() {
         title: '',
         description: '',
         timeLimit: 10,
+        questionsPerStudent: 20,
         questions: []
       });
     }
@@ -154,9 +155,15 @@ export default function AdminQuizzes() {
                 <textarea required className="form-input" rows="3" value={editingQuiz.description} onChange={e => setEditingQuiz({...editingQuiz, description: e.target.value})}></textarea>
               </div>
 
-              <div className="form-group">
-                <label>Time Limit (minutes)</label>
-                <input required type="number" min="1" className="form-input" value={editingQuiz.timeLimit} onChange={e => setEditingQuiz({...editingQuiz, timeLimit: Number(e.target.value)})} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-group">
+                  <label>Time Limit (minutes)</label>
+                  <input required type="number" min="1" className="form-input" value={editingQuiz.timeLimit} onChange={e => setEditingQuiz({...editingQuiz, timeLimit: Number(e.target.value)})} />
+                </div>
+                <div className="form-group">
+                  <label>Questions per Student</label>
+                  <input required type="number" min="1" className="form-input" value={editingQuiz.questionsPerStudent || 20} onChange={e => setEditingQuiz({...editingQuiz, questionsPerStudent: Number(e.target.value)})} />
+                </div>
               </div>
 
               <div style={{ marginTop: '32px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
