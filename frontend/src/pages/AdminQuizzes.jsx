@@ -170,12 +170,15 @@ export default function AdminQuizzes() {
       {isModalOpen && editingQuiz && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'var(--bg-primary)', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflowY: 'auto', padding: '40px 20px', zIndex: 1000 }}>
           <div style={{ background: 'var(--bg-secondary)', width: '100%', maxWidth: '800px', borderRadius: 'var(--radius-lg)', padding: '32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 style={{ fontSize: '1.5rem' }}>{editingQuiz.id ? 'Edit Quiz' : 'Add New Quiz'}</h2>
-              <button onClick={() => setIsModalOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={24} /></button>
-            </div>
-            
             <form onSubmit={handleSave}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', position: 'sticky', top: '-32px', background: 'var(--bg-secondary)', padding: '16px 0', zIndex: 10, borderBottom: '1px solid var(--border-color)' }}>
+                <h2 style={{ fontSize: '1.5rem', margin: 0 }}>{editingQuiz.id ? 'Edit Quiz' : 'Add New Quiz'}</h2>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-outline">Cancel</button>
+                  <button type="submit" className="btn btn-primary">Save Quiz</button>
+                </div>
+              </div>
+            
               <div className="form-group">
                 <label>Quiz Title</label>
                 <input required className="form-input" value={editingQuiz.title} onChange={e => setEditingQuiz({...editingQuiz, title: e.target.value})} />
@@ -233,11 +236,6 @@ export default function AdminQuizzes() {
                   </div>
                 </div>
               ))}
-
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px' }}>
-                <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-outline">Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Quiz</button>
-              </div>
             </form>
           </div>
         </div>
