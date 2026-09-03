@@ -116,16 +116,6 @@ export default function AdminDashboard() {
           </Link>
         </div>
 
-        <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
-          <h3 style={{ marginBottom: '16px' }}>Password Reset</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
-            Assist users by manually resetting their passwords when they lose access.
-          </p>
-          <Link to="/admin/password-reset" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <Key size={16} /> Password Reset
-          </Link>
-        </div>
-
       <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
           <h3 style={{ marginBottom: '16px' }}>Manage Contests</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>

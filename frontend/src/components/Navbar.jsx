@@ -121,9 +121,6 @@ export default function Navbar() {
                     <NavLink to="/admin/quiz-certificates" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)' }}>
                       <Award size={16} /> Quiz Certificates
                     </NavLink>
-                    <NavLink to="/admin/password-reset" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)' }}>
-                      <Key size={16} /> Password Reset
-                    </NavLink>
                     <NavLink to="/admin/certificate-verification" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)' }}>
                       <Shield size={16} /> Certificate Verification
                     </NavLink>
