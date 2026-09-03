@@ -335,8 +335,6 @@ app.post("/api/auth/login", async (req, res) => {
     if (!(await bcrypt.compare(password, user.password))) return res.status(400).json({ message: "Incorrect password" });
     const token = jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role, tokenVersion: user.tokenVersion }, JWT_SECRET, { expiresIn: "7d" });
     
-    sendLoginNotification(user.name, user.email);
-
     res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role, course: user.course, branch: user.branch, semester: user.semester, mobileNumber: user.mobileNumber, skills: user.skills } });
   } catch (e) { res.status(500).json({ message: "Login failed", error: e.message }); }
 });
