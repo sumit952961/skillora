@@ -126,6 +126,16 @@ export default function AdminDashboard() {
           </Link>
         </div>
 
+      <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ marginBottom: '16px' }}>Manage Contests</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
+            Create and edit competitive arenas, upload bulk questions, and track participants.
+          </p>
+          <Link to="/admin/contests" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <Award size={16} /> Go to Contests
+          </Link>
+        </div>
+
         <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
           <h3 style={{ marginBottom: '16px' }}>Verify Certificates</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
@@ -133,6 +143,16 @@ export default function AdminDashboard() {
           </p>
           <Link to="/admin/certificate-verification" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
             <Shield size={16} /> Verification Data
+          </Link>
+        </div>
+
+        <div style={{ background: 'var(--bg-secondary)', padding: '32px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)' }}>
+          <h3 style={{ marginBottom: '16px' }}>Social Broadcast</h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '24px' }}>
+            Broadcast updates and notifications across all linked social media platforms.
+          </p>
+          <Link to="/admin/broadcast" className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderColor: 'var(--primary)', color: 'var(--primary)' }}>
+            <Bell size={16} /> Social Broadcast
           </Link>
         </div>
       </div>
