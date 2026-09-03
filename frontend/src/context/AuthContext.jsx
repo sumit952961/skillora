@@ -209,12 +209,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const submitQuiz = async (quizData, score, customAppId) => {
+  const submitQuiz = async (quizData, score, customAppId, totalQs) => {
     try {
       const res = await fetch(`${API_URL}/quizzes/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ quizId: quizData.id, quizTitle: quizData.title, score, totalQuestions: quizData.questions.length, appNumber: customAppId })
+        body: JSON.stringify({ quizId: quizData.id, quizTitle: quizData.title, score, totalQuestions: totalQs || quizData.questions.length, appNumber: customAppId })
       });
       if (res.ok) {
         const { application } = await res.json();
