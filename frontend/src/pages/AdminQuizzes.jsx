@@ -190,13 +190,13 @@ export default function AdminQuizzes() {
                     <button type="button" onClick={() => removeQuestion(qIdx)} style={{ background: 'none', border: 'none', color: 'var(--accent-danger)', cursor: 'pointer' }}><Trash2 size={16} /></button>
                   </div>
                   
-                  <input required className="form-input" style={{ marginBottom: '12px' }} placeholder="Question text" value={q.question} onChange={e => updateQuestion(qIdx, 'question', e.target.value)} />
+                  <input className="form-input" style={{ marginBottom: '12px' }} placeholder="Question text" value={q.question} onChange={e => updateQuestion(qIdx, 'question', e.target.value)} />
                   
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     {q.options.map((opt, optIdx) => (
                       <div key={optIdx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <input type="radio" name={`answer-${qIdx}`} checked={q.answer === optIdx} onChange={() => updateQuestion(qIdx, 'answer', optIdx)} />
-                        <input required className="form-input" placeholder={`Option ${optIdx + 1}`} value={opt} onChange={e => updateOption(qIdx, optIdx, e.target.value)} />
+                        <input className="form-input" placeholder={`Option ${optIdx + 1}`} value={opt} onChange={e => updateOption(qIdx, optIdx, e.target.value)} />
                       </div>
                     ))}
                   </div>
