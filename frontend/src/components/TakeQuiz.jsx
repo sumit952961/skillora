@@ -234,7 +234,7 @@ export default function TakeQuiz({ quiz, onBack }) {
               </div>
               <div>
                 <h4 style={{ margin: '0 0 4px 0', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Total Questions</h4>
-                <p style={{ margin: 0, fontWeight: '600', fontSize: '1.1rem' }}>{quiz.questions.length}</p>
+                <p style={{ margin: 0, fontWeight: '600', fontSize: '1.1rem' }}>{quiz.questionsPerStudent || 20}</p>
               </div>
             </div>
           </div>
