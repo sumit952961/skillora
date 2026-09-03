@@ -55,16 +55,44 @@ export default function AdminQuizzes() {
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws);
 
-        const newQuestions = data.map(row => ({
-          question: row.question || '',
-          options: [
-            row.option1 || '',
-            row.option2 || '',
-            row.option3 || '',
-            row.option4 || ''
-          ],
-          answer: parseInt(row.answer) || 0
-        })).filter(q => q.question && q.options.some(opt => opt !== ''));
+        const getVal = (row, ...targetKeys) => {
+          const foundKey = Object.keys(row).find(k => {
+            const normalizedK = k.toLowerCase().replace(/[\s_]+/g, '');
+            return targetKeys.some(tk => normalizedK === tk.toLowerCase().replace(/[\s_]+/g, ''));
+          });
+          return row[foundKey];
+        };
+
+        const newQuestions = data.map(row => {
+          let correctStr = getVal(row, 'answer', 'correctoptionindex', 'correctoption', 'correct');
+          let correctIndex = parseInt(correctStr);
+          
+          if (isNaN(correctIndex) && typeof correctStr === 'string') {
+            const letter = correctStr.trim().toUpperCase();
+            if (letter === 'A') correctIndex = 0;
+            else if (letter === 'B') correctIndex = 1;
+            else if (letter === 'C') correctIndex = 2;
+            else if (letter === 'D') correctIndex = 3;
+            else correctIndex = 0;
+          } else if (isNaN(correctIndex)) {
+            correctIndex = 0;
+          }
+
+          return {
+            question: getVal(row, 'question', 'q') || '',
+            options: [
+              getVal(row, 'option1', 'optiona', 'a') || '',
+              getVal(row, 'option2', 'optionb', 'b') || '',
+              getVal(row, 'option3', 'optionc', 'c') || '',
+              getVal(row, 'option4', 'optiond', 'd') || ''
+            ],
+            answer: correctIndex
+          };
+        }).filter(q => q.question && q.options.some(opt => opt !== ''));
+
+        if (newQuestions.length === 0) {
+          throw new Error("Upload Failed: Could not find valid questions. Please ensure columns are named 'question', 'option1', 'option2', 'option3', 'option4', 'answer'.");
+        }
 
         setEditingQuiz(prev => ({
           ...prev,
@@ -74,7 +102,7 @@ export default function AdminQuizzes() {
         alert(`Successfully uploaded ${newQuestions.length} questions from Excel!`);
       } catch (err) {
         console.error(err);
-        alert("Failed to parse Excel file. Please check the format.");
+        alert(err.message || "Failed to parse Excel file. Please check the format.");
       } finally {
         e.target.value = null;
       }
