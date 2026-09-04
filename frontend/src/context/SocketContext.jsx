@@ -18,25 +18,20 @@ export const SocketProvider = ({ children }) => {
       console.log("Connected to Real-Time Server");
     });
 
-    let debounceTimer;
-
     socket.on('data_updated', (data) => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        const path = data?.path || "";
-        console.log("Server indicated data changed at path:", path);
-        
-        // Smart Filtering: Only refresh global data if relevant endpoints are modified
-        if (path.includes("/settings") || path.includes("/internships") || path.includes("/quizzes") || path.includes("/contests")) {
-          // If the path includes specific user actions like /apply or /applications, don't do a global refresh
-          if (!path.includes("/applications") && !path.includes("/apply")) {
-            setGlobalRefreshTrigger(prev => prev + 1);
-          }
+      const path = data?.path || "";
+      console.log("Server indicated data changed at path:", path);
+      
+      // Smart Filtering: Only refresh global data if relevant endpoints are modified
+      // This prevents internship/quiz/settings lists from reloading on every application update
+      if (path.includes("/settings") || path.includes("/internships") || path.includes("/quizzes") || path.includes("/contests")) {
+        if (!path.includes("/applications") && !path.includes("/apply")) {
+          setGlobalRefreshTrigger(prev => prev + 1);
         }
-        
-        // Always refresh user-specific data to be safe
-        setUserRefreshTrigger(prev => prev + 1);
-      }, 500); // 500ms Debounce
+      }
+      
+      // Always refresh user-specific data (applications, certificates etc.) immediately
+      setUserRefreshTrigger(prev => prev + 1);
     });
 
     return () => {

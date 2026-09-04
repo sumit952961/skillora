@@ -21,20 +21,20 @@ export const DataProvider = ({ children }) => {
 
   const [verifiedCertificates, setVerifiedCertificates] = useState([]);
 
-  // Fetch data from backend on mount
+  // Fetch data from backend on mount and on WebSocket triggers
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const intRes = await fetch(`${API_URL}/internships`);
+        // Fetch all in parallel for speed - don't clear state first (prevents blink)
+        const [intRes, quizRes, settingsRes, certRes] = await Promise.all([
+          fetch(`${API_URL}/internships`),
+          fetch(`${API_URL}/quizzes`),
+          fetch(`${API_URL}/settings`),
+          fetch(`${API_URL}/certificates`),
+        ]);
         if (intRes.ok) setInternships(await intRes.json());
-        
-        const quizRes = await fetch(`${API_URL}/quizzes`);
         if (quizRes.ok) setQuizzes(await quizRes.json());
-
-        const settingsRes = await fetch(`${API_URL}/settings`);
         if (settingsRes.ok) setSettings(await settingsRes.json());
-
-        const certRes = await fetch(`${API_URL}/certificates`);
         if (certRes.ok) setVerifiedCertificates(await certRes.json());
       } catch (err) {
         console.error("Error fetching data:", err);
