@@ -186,7 +186,7 @@ export default function AdminQuizCertificates() {
                             btn.innerText = "Sending...";
                             await handleCertSubmit(app.id, { certificateUrl: val }, app);
                             btn.disabled = false;
-                            btn.innerText = origText;
+                            // Remove manual reversion so React's socket update can take over the text
                           }} 
                           className="btn btn-outline" 
                           style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}

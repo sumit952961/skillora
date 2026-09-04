@@ -269,12 +269,10 @@ export default function AdminApplications() {
                                     alert("Please enter a valid URL.");
                                     return;
                                   }
-                                  const origText = btn.innerText;
                                   btn.disabled = true;
                                   btn.innerText = "Sending...";
                                   await handleCertSubmit(app.id, { offerLetterUrl: val });
                                   btn.disabled = false;
-                                  btn.innerText = origText;
                                 }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>
                                 {app.offerLetterUrl ? '✅ Update Link' : 'Upload & Send Email'}
                               </button>
