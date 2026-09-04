@@ -7,18 +7,9 @@ import { Calendar, Briefcase, ChevronRight, ShieldCheck, ArrowRight, Compass } f
 export default function MyInternships() {
   const { appliedInternships } = useContext(AuthContext);
   const { internships: allInternships } = useContext(DataContext);
-  const [myInternships, setMyInternships] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchMyInternships = async () => {
-      // In this version, we are using the global appliedInternships state directly
-      // rather than fetching from the mock backend.
-      setMyInternships(appliedInternships);
-      setLoading(false);
-    };
-    fetchMyInternships();
-  }, [appliedInternships]);
+  // Derive directly - no local state copy needed, prevents blink on WebSocket re-renders
+  const myInternships = appliedInternships || [];
+  const loading = !appliedInternships; // only show loading if data hasn't loaded at all yet
 
   if (loading) {
     return <div className="container"><h3>Fetching active courses...</h3></div>;

@@ -17,11 +17,15 @@ export default function InternshipTaskOverview() {
   const hasOfferLetter = !!application?.offerLetterUrl;
 
   useEffect(() => {
-    // Fetch from context
+    // Fetch from context - only show loading on very first render (details is null)
     const data = internships.find(i => i.id === id) || internships[0];
-    setDetails(data);
-    setLoading(false);
+    if (data) {
+      setDetails(data);
+      setLoading(false); // Clear loading once we have data
+    }
+    // Don't reset loading to true on WebSocket re-renders - prevents blink
   }, [id, internships]);
+
 
   const toggleTask = (taskId) => {
     setExpandedTasks(prev => ({ ...prev, [taskId]: !prev[taskId] }));

@@ -28,9 +28,31 @@ export const AuthProvider = ({ children }) => {
         fetch(`${API_URL}/my-quizzes`, { headers: { Authorization: `Bearer ${currentToken}` } }),
         fetch(`${API_URL}/my-contest-registrations`, { headers: { Authorization: `Bearer ${currentToken}` } })
       ]);
-      if (internshipRes.ok) setAppliedInternships(await internshipRes.json());
-      if (quizRes.ok) setQuizApplications(await quizRes.json());
-      if (contestRes.ok) setContestRegistrations(await contestRes.json());
+      // Only update state if data actually changed - prevents blink/flash on re-render
+      if (internshipRes.ok) {
+        const newData = await internshipRes.json();
+        setAppliedInternships(prev => {
+          const prevStr = JSON.stringify(prev);
+          const newStr = JSON.stringify(newData);
+          return prevStr === newStr ? prev : newData;
+        });
+      }
+      if (quizRes.ok) {
+        const newData = await quizRes.json();
+        setQuizApplications(prev => {
+          const prevStr = JSON.stringify(prev);
+          const newStr = JSON.stringify(newData);
+          return prevStr === newStr ? prev : newData;
+        });
+      }
+      if (contestRes.ok) {
+        const newData = await contestRes.json();
+        setContestRegistrations(prev => {
+          const prevStr = JSON.stringify(prev);
+          const newStr = JSON.stringify(newData);
+          return prevStr === newStr ? prev : newData;
+        });
+      }
     } catch (err) {
       console.warn('Failed to fetch student data:', err);
     }
