@@ -1845,7 +1845,7 @@ ${message}
 Respond appropriately based on your role, rules, and the knowledge base provided.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-3.5-flash-lite',
       contents: systemPrompt,
     });
     
