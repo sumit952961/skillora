@@ -27,7 +27,7 @@ export const SocketProvider = ({ children }) => {
         console.log("Server indicated data changed at path:", path);
         
         // Smart Filtering: Only refresh global data if relevant endpoints are modified
-        if (path.includes("/settings") || path.includes("/internships") || path.includes("/quizzes")) {
+        if (path.includes("/settings") || path.includes("/internships") || path.includes("/quizzes") || path.includes("/contests")) {
           // If the path includes specific user actions like /apply or /applications, don't do a global refresh
           if (!path.includes("/applications") && !path.includes("/apply")) {
             setGlobalRefreshTrigger(prev => prev + 1);

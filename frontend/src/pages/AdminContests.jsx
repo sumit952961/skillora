@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Plus, Edit2, Trash2, Upload, PlayCircle, Clock, Calendar, CheckCircle, Award, Save } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { SocketContext } from '../context/SocketContext';
 
 export default function AdminContests() {
   const [contests, setContests] = useState([]);
@@ -30,10 +31,11 @@ export default function AdminContests() {
   const [certLinks, setCertLinks] = useState({});
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+  const { globalRefreshTrigger } = useContext(SocketContext) || {};
 
   useEffect(() => {
     fetchContests();
-  }, []);
+  }, [globalRefreshTrigger]);
 
   // Compute unique domains from all contests for the upload dropdown
   const allDomains = Array.from(new Set(contests.flatMap(c => c.domains)));
@@ -81,7 +83,6 @@ export default function AdminContests() {
       
       if (res.ok) {
         setShowModal(false);
-        fetchContests();
         resetForm();
       }
     } catch (err) {
@@ -93,7 +94,6 @@ export default function AdminContests() {
     if (!window.confirm("Are you sure you want to delete this contest?")) return;
     try {
       await fetch(`${API_URL}/contests/${id}`, { method: 'DELETE' });
-      fetchContests();
     } catch (err) {
       console.error(err);
     }

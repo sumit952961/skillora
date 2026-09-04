@@ -1,11 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
+import { SocketContext } from '../context/SocketContext';
 import { Upload, CheckCircle, Search, Trophy, ShieldCheck } from 'lucide-react';
 
 export default function AdminQuizCertificates() {
   const { API_URL, token } = useContext(AuthContext);
   const { addVerifiedCertificate, verifiedCertificates } = useContext(DataContext);
+  const { userRefreshTrigger } = useContext(SocketContext) || {};
   const [users, setUsers] = useState({});
   const [allAppsList, setAllAppsList] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +34,7 @@ export default function AdminQuizCertificates() {
 
   useEffect(() => {
     if (token) fetchData();
-  }, [token]);
+  }, [token, userRefreshTrigger]);
 
   const filteredApps = allAppsList.filter(app => 
     app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,7 +51,7 @@ export default function AdminQuizCertificates() {
       });
       if (res.ok) {
         alert('Certificate updated successfully!');
-        fetchData();
+        // fetchData() is removed because WebSocket will trigger it automatically
         
         // Add to verified certificates if not exists
         if (updates.certificateUrl) {
