@@ -10,9 +10,10 @@ export default function AdminApplications() {
   const { userRefreshTrigger } = useContext(SocketContext) || {};
   const [users, setUsers] = useState({});
   const [allAppsList, setAllAppsList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const [expandedAppId, setExpandedAppId] = useState(null);
-  const [reviewModalData, setReviewModalData] = useState(null); // { appId, task, feedbackText }
+  const [reviewModalData, setReviewModalData] = useState(null);
 
   const handleDeleteApp = async (appId, e) => {
     e.stopPropagation();
@@ -50,6 +51,8 @@ export default function AdminApplications() {
       }
     } catch (e) {
       console.error("Failed to fetch admin data", e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -105,7 +108,28 @@ export default function AdminApplications() {
         <p style={{ color: 'var(--text-muted)' }}>Track student progress and upload completion certificates.</p>
       </div>
 
-      {allAppsList.length === 0 ? (
+      {isLoading ? (
+        // Skeleton loader — shows while data is fetching
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {[1,2,3].map(i => (
+            <div key={i} style={{
+              background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)', padding: '24px',
+              animation: 'pulse 1.5s ease-in-out infinite'
+            }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: 'var(--border-color)' }} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ height: '16px', width: '40%', background: 'var(--border-color)', borderRadius: '6px' }} />
+                  <div style={{ height: '12px', width: '25%', background: 'var(--border-color)', borderRadius: '6px', opacity: 0.6 }} />
+                </div>
+                <div style={{ height: '32px', width: '100px', background: 'var(--border-color)', borderRadius: '8px' }} />
+              </div>
+              <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>
+            </div>
+          ))}
+        </div>
+      ) : allAppsList.length === 0 ? (
         <div style={{ background: 'var(--bg-secondary)', padding: '40px', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px solid var(--border-color)' }}>
           <h3 style={{ color: 'var(--text-muted)' }}>No student applications found.</h3>
         </div>

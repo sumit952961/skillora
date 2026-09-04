@@ -68,12 +68,17 @@ export const AuthProvider = ({ children }) => {
           if (res.ok) {
             const data = await res.json();
             setUser(data);
+            // Set loading false immediately after user is confirmed - don't wait for student data
+            setLoading(false);
+            // Fetch role-specific data in background (parallel)
             if (data.role === 'student') {
-              await fetchStudentData(token);
+              fetchStudentData(token); // no await - runs in background
             }
             if (data.role === 'admin') {
-              const reqsRes = await fetch(`${API_URL}/admin/password-resets`, { headers: { Authorization: `Bearer ${token}` }});
-              if (reqsRes.ok) setPasswordResetRequests(await reqsRes.json());
+              fetch(`${API_URL}/admin/password-resets`, { headers: { Authorization: `Bearer ${token}` }})
+                .then(r => r.ok ? r.json() : null)
+                .then(d => { if (d) setPasswordResetRequests(d); })
+                .catch(() => {});
             }
           } else {
             throw new Error('Invalid token from backend');
@@ -81,9 +86,11 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
           console.warn('Backend unavailable');
           logout();
+          setLoading(false);
         }
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchProfile();
   }, [token]);
