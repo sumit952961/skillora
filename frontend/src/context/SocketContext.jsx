@@ -31,8 +31,8 @@ export const SocketProvider = ({ children }) => {
         }
       }
       
-      // Only refresh user-specific data (applications, certificates etc.) for relevant data updates
-      if (path.includes("/applications") || path.includes("/apply") || path.includes("/certificates") || path.includes("/profile") || path.includes("/users")) {
+      // Only refresh user-specific data (applications, tasks, certificates etc.) for relevant data updates
+      if (path.includes("/applications") || path.includes("/apply") || path.includes("/tasks") || path.includes("/certificates") || path.includes("/profile") || path.includes("/users")) {
         setUserRefreshTrigger(prev => prev + 1);
       }
     });
