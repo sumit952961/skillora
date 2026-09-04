@@ -59,7 +59,7 @@ const SessionLoader = () => (
       animation: 'spin 0.8s linear infinite'
     }} />
     <div style={{ textAlign: 'center' }}>
-      <p style={{ color: '#6366f1', fontWeight: 600, fontSize: '1rem', margin: 0 }}>Skillora</p>
+      <p style={{ color: '#6366f1', fontWeight: 600, fontSize: '1rem', margin: 0 }}>Skillzeno</p>
       <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', margin: '4px 0 0' }}>Loading your session...</p>
     </div>
     <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
