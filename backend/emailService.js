@@ -170,3 +170,56 @@ export const sendAdminContestNotification = async (studentName, studentEmail, co
     html: baseTemplate(content),
   }).catch(console.error);
 };
+
+export const sendOfferLetterEmail = async (studentName, studentEmail, internshipRole, offerLetterUrl) => {
+  const content = `
+    <h2 style="color:#1f2937;margin-top:0;">Welcome to SkillZeno, ${studentName}! 🎉</h2>
+    <p>We are thrilled to inform you that your application has been successfully reviewed, and you have been selected for the <strong>${internshipRole}</strong> internship at SkillZeno!</p>
+    <p>Your official <strong>Internship Offer Letter</strong> is attached below. Please review it carefully to confirm your domain, duration, and other important details.</p>
+    
+    <div style="background:#f9fafb;padding:24px;border-radius:8px;border:1px solid #e5e7eb;margin:32px 0;">
+      <h3 style="margin-top:0;color:#111827;font-size:18px;">📌 Next Steps After Selection:</h3>
+      <ul style="margin:0;padding-left:20px;color:#4b5563;line-height:1.6;">
+        <li style="margin-bottom:12px;"><strong>Log in:</strong> Visit <a href="https://www.skillzeno.in/" style="color:#4f46e5;text-decoration:none;">SkillZeno.in</a> and sign in to your dashboard.</li>
+        <li style="margin-bottom:12px;"><strong>Check Tasks:</strong> Go to the <strong>'My Internship'</strong> section to find your assigned projects and deadlines.</li>
+        <li style="margin-bottom:12px;"><strong>Submit Work:</strong> Complete the tasks and submit them directly through the website portal.</li>
+        <li><strong>Get Certified:</strong> Once all tasks are approved, download your Completion Certificate!</li>
+      </ul>
+    </div>
+
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${offerLetterUrl}" style="background:#4f46e5;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:6px;font-weight:bold;display:inline-block;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1);">Download Offer Letter</a>
+    </div>
+    
+    <p>If you face any issues, please reach out to us through the Contact section on our website.</p>
+    <p>Wishing you a productive and valuable internship experience.</p>
+  `;
+  await sendEmail({
+    to: studentEmail,
+    subject: `SkillZeno Internship – Offer Letter & Next Steps 🚀`,
+    html: baseTemplate(content),
+  }).catch(console.error);
+};
+
+export const sendCompletionCertificateEmail = async (studentName, studentEmail, internshipRole, certificateUrl) => {
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="font-size: 48px; margin: 0 auto;">🎓</div>
+    </div>
+    <h2 style="color:#1f2937;margin-top:0;text-align:center;">Congratulations on Your Success, ${studentName}! 🌟</h2>
+    <p>You did it! We are incredibly proud to inform you that you have successfully completed your <strong>${internshipRole}</strong> internship with SkillZeno.</p>
+    <p>Your hard work, dedication, and the projects you built during this period have truly stood out. Attached to this email is your official <strong>Internship Completion Certificate</strong> to recognize your excellent performance.</p>
+    
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${certificateUrl}" style="background:#4f46e5;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:6px;font-weight:bold;display:inline-block;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1);">View & Download Certificate</a>
+    </div>
+    
+    <p>Wishing you the absolute best for your future endeavors. Keep growing! 🚀</p>
+  `;
+  await sendEmail({
+    to: studentEmail,
+    subject: `🎓 Achievement Unlocked: Your SkillZeno Internship Certificate!`,
+    html: baseTemplate(content),
+  }).catch(console.error);
+};
+

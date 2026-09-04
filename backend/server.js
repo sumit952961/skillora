@@ -13,7 +13,7 @@ import path from "path";
 import fs from "fs";
 import axios from "axios";
 import FormData from "form-data";
-import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification } from "./emailService.js";
+import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification, sendOfferLetterEmail, sendCompletionCertificateEmail } from "./emailService.js";
 
 dotenv.config();
 
@@ -846,8 +846,20 @@ app.put("/api/admin/applications/:id", authenticateToken, authorizeAdmin, async 
       app = await Application.findById(req.params.id);
     }
     if (!app) return res.status(404).json({ message: "Application not found" });
-    if (req.body.offerLetterUrl !== undefined) app.offerLetterUrl = req.body.offerLetterUrl;
-    if (req.body.certificateUrl !== undefined) app.certificateUrl = req.body.certificateUrl;
+    
+    if (req.body.offerLetterUrl !== undefined) {
+      app.offerLetterUrl = req.body.offerLetterUrl;
+      if (req.body.offerLetterUrl) {
+        sendOfferLetterEmail(app.studentName, app.studentEmail, app.details?.title || 'Internship', req.body.offerLetterUrl);
+      }
+    }
+    if (req.body.certificateUrl !== undefined) {
+      app.certificateUrl = req.body.certificateUrl;
+      if (req.body.certificateUrl) {
+        sendCompletionCertificateEmail(app.studentName, app.studentEmail, app.details?.title || 'Internship', req.body.certificateUrl);
+      }
+    }
+    
     await app.save();
     res.json({ message: "Application updated", application: { ...app.toObject(), id: app._id.toString() } });
   } catch (e) { res.status(500).json({ message: "Failed to update application" }); }
