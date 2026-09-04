@@ -561,6 +561,10 @@ app.delete("/api/admin/applications/:id", authenticateToken, authorizeAdmin, asy
     app.isDeleted = true;
     app.deletedAt = new Date();
     await app.save();
+    
+    // Also delete any associated certificates from Certificate Verification
+    await Certificate.deleteMany({ applicationId: app.appNumber });
+    
     res.json({ message: "Application moved to trash successfully" });
   } catch (e) { res.status(500).json({ message: "Failed to delete application" }); }
 });
