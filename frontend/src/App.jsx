@@ -46,29 +46,9 @@ import { MapPin, Phone, Mail, BookOpen, ShieldCheck, Award } from 'lucide-react'
 import SEO from './components/SEO'
 import './App.css'
 
-const SessionLoader = () => (
-  <div style={{
-    minHeight: '100vh', display: 'flex', flexDirection: 'column',
-    alignItems: 'center', justifyContent: 'center',
-    background: 'var(--bg-main, #0f0f1a)', gap: '20px'
-  }}>
-    <div style={{
-      width: '52px', height: '52px', borderRadius: '50%',
-      border: '3px solid rgba(99,102,241,0.2)',
-      borderTop: '3px solid #6366f1',
-      animation: 'spin 0.8s linear infinite'
-    }} />
-    <div style={{ textAlign: 'center' }}>
-      <p style={{ color: '#6366f1', fontWeight: 600, fontSize: '1rem', margin: 0 }}>Skillzeno</p>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', margin: '4px 0 0' }}>Loading your session...</p>
-    </div>
-    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-  </div>
-);
-
 function ProtectedRoute({ children }) {
   const { user, loading } = useContext(AuthContext);
-  if (loading) return <SessionLoader />;
+  if (loading) return <div className="container"><h3>Verifying session...</h3></div>;
   if (!user) return <Navigate to="/login" replace />;
   if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
   return <><SEO noindex={true} />{children}</>;
@@ -76,7 +56,7 @@ function ProtectedRoute({ children }) {
 
 function AdminRoute({ children }) {
   const { user, loading } = useContext(AuthContext);
-  if (loading) return <SessionLoader />;
+  if (loading) return <div className="container"><h3>Verifying session...</h3></div>;
   if (!user || user.role !== 'admin') return <Navigate to="/login" replace />;
   return <><SEO noindex={true} />{children}</>;
 }
