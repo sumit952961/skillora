@@ -1776,11 +1776,11 @@ ${message}
 
 Respond appropriately based on your role.`;
 
-    // Call Gemini with output token limit to ensure fast response
+    // Call Gemini (Response generation time depends entirely on Google API servers)
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash',
       contents: systemPrompt,
-      config: { maxOutputTokens: 256, temperature: 0.7 }
+      config: { temperature: 0.7 }
     });
     
     return res.json({ reply: response.text });
