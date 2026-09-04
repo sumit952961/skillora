@@ -1,9 +1,11 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { SocketContext } from './SocketContext';
 
 export const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
+  const { refreshTrigger } = useContext(SocketContext) || {};
 
   const [internships, setInternships] = useState([]);
 
@@ -39,7 +41,7 @@ export const DataProvider = ({ children }) => {
       }
     };
     fetchData();
-  }, [API_URL]);
+  }, [API_URL, refreshTrigger]);
 
   // Removed localStorage usage completely
 

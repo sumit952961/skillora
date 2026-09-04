@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, Link } from 'react-router-dom'
 import { AuthProvider, AuthContext } from './context/AuthContext'
 import { DataProvider } from './context/DataContext'
+import { SocketProvider, SocketContext } from './context/SocketContext'
 import Navbar from './components/Navbar'
 import AIAssistant from './components/AIAssistant'
 import Home from './pages/Home'
@@ -76,6 +77,14 @@ function ScrollToTop() {
 
 function AppContent() {
   const [activePolicy, setActivePolicy] = useState(null);
+  const { user, token, fetchStudentData } = useContext(AuthContext);
+  const { refreshTrigger } = useContext(SocketContext) || {};
+
+  useEffect(() => {
+    if (refreshTrigger > 0 && token && user?.role === 'student' && fetchStudentData) {
+      fetchStudentData(token);
+    }
+  }, [refreshTrigger, token, user, fetchStudentData]);
 
   return (
     <>
@@ -430,9 +439,11 @@ export default function App() {
   return (
     <DataProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
+        <SocketProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </SocketProvider>
       </AuthProvider>
     </DataProvider>
   )

@@ -1,11 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
+import { SocketContext } from '../context/SocketContext';
 import { FileText, CheckCircle2, Upload, X, ShieldCheck, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 
 export default function AdminApplications() {
   const { API_URL, token } = useContext(AuthContext);
   const { addVerifiedCertificate, verifiedCertificates } = useContext(DataContext);
+  const { refreshTrigger } = useContext(SocketContext) || {};
   const [users, setUsers] = useState({});
   const [allAppsList, setAllAppsList] = useState([]);
   
@@ -53,7 +55,7 @@ export default function AdminApplications() {
 
   useEffect(() => {
     if (token) fetchData();
-  }, [token]);
+  }, [token, refreshTrigger]);
 
   const handleCertSubmit = async (appId, updates) => {
     try {

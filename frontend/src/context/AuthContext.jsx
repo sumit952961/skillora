@@ -383,7 +383,7 @@ export const AuthProvider = ({ children }) => {
       quizApplications, submitQuiz, processQuizPayment, contestRegistrations,
       passwordResetRequests, requestPasswordReset, resetUserPassword,
       sendOtp, verifyOtp, resetPasswordWithOtp, changePassword,
-      API_URL
+      API_URL, fetchStudentData
     }}>
       {children}
     </AuthContext.Provider>

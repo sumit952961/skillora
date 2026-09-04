@@ -13,11 +13,30 @@ import path from "path";
 import fs from "fs";
 import axios from "axios";
 import FormData from "form-data";
+import http from "http";
+import { Server } from "socket.io";
 import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification, sendOfferLetterEmail, sendCompletionCertificateEmail } from "./emailService.js";
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: "*" }
+});
+
+// Middleware to emit socket event on any successful data modification
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        io.emit("data_updated");
+      }
+    }
+  });
+  next();
+});
+
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "secretkey";
 
@@ -2141,6 +2160,7 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
       }, 5 * 60 * 1000); // 300,000 ms = 5 minutes
     }
     
+    io.emit('data_updated');
     res.json({ message: "Broadcast completed", results: results });
   } catch (error) {
     console.error("Broadcast Error:", error);
@@ -2148,4 +2168,4 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
   }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
