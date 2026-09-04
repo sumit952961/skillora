@@ -240,12 +240,47 @@ export default function AdminCertificateVerification() {
                     <CheckCircle size={14} /> Certificate Uploaded
                   </span>
                 </div>
-                <div>
-                  <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Certificate URL</label>
-                  <a href={app.certificateUrl} target="_blank" rel="noreferrer"
-                    style={{ color: 'var(--primary)', fontSize: '0.85rem', wordBreak: 'break-all' }}>
-                    {app.certificateUrl}
-                  </a>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                  {(() => {
+                    const cert = verifiedCertificates.find(vc => vc.applicationId === app.id);
+                    if (!cert) return <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Certificate record not found in system.</div>;
+                    
+                    return (
+                      <>
+                        <div className="form-group" style={{ margin: 0 }}>
+                          <label style={{ fontSize: '0.85rem' }}>Certificate Number (Verification ID)</label>
+                          <input
+                            type="text" className="form-input"
+                            placeholder="e.g. CERT-12345"
+                            defaultValue={cert.certificateNumber?.startsWith('PENDING-') ? '' : cert.certificateNumber}
+                            id={`quizCertNum-${cert.id}`}
+                          />
+                        </div>
+                        <div className="form-group" style={{ margin: 0 }}>
+                          <label style={{ fontSize: '0.85rem' }}>Performance Remarks (Publicly visible upon verification)</label>
+                          <textarea
+                            className="form-input" rows="3"
+                            placeholder="e.g. Scored exceptionally well..."
+                            defaultValue={cert.performanceRemarks || ''}
+                            id={`quizRemarks-${cert.id}`}
+                          ></textarea>
+                        </div>
+                        <div>
+                          <button
+                            onClick={async () => {
+                              const num = document.getElementById(`quizCertNum-${cert.id}`).value;
+                              const remarks = document.getElementById(`quizRemarks-${cert.id}`).value;
+                              const success = await updateVerifiedCertificate(cert.id, { certificateNumber: num, performanceRemarks: remarks });
+                              if (success) alert('Verification details saved successfully!');
+                            }}
+                            className="btn btn-primary"
+                          >
+                            Save Verification Details
+                          </button>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
