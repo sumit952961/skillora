@@ -1776,30 +1776,14 @@ ${message}
 
 Respond appropriately based on your role.`;
 
-    // Retry logic: up to 3 attempts with 1.5s delay (handles temporary 503 overload)
-    let lastError;
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        const response = await ai.models.generateContent({
-          model: 'gemini-3.6-flash',
-          contents: systemPrompt,
-        });
-        return res.json({ reply: response.text });
-      } catch (err) {
-        lastError = err;
-        const errMsg = err.message || '';
-        // Only retry on 503 (overloaded) errors
-        if (errMsg.includes('503') || errMsg.includes('UNAVAILABLE') || errMsg.includes('high demand')) {
-          if (attempt < 3) {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            continue;
-          }
-        }
-        // For other errors, fail immediately
-        throw err;
-      }
-    }
-    throw lastError;
+    // Call Gemini with output token limit to ensure fast response
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: systemPrompt,
+      config: { maxOutputTokens: 256, temperature: 0.7 }
+    });
+    
+    return res.json({ reply: response.text });
   } catch (error) {
     console.error("AI Chat Error:", error);
     res.status(500).json({ message: "Sorry, I am having trouble connecting to my brain right now. Please try again later.", error: error.message });
