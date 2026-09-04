@@ -34,11 +34,13 @@ export default function AdminCertificateVerification() {
     fetchQuizCerts();
   }, [token, API_URL, userRefreshTrigger]);
 
-  // Filter internship certs
+  // Filter internship certs (exclude Assessment/Quiz certs)
   const filteredInternship = verifiedCertificates.filter(vc =>
-    vc.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vc.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (vc.certificateNumber && vc.certificateNumber.toLowerCase().includes(searchTerm.toLowerCase()))
+    vc.domain !== 'Assessment' && (
+      vc.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vc.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (vc.certificateNumber && vc.certificateNumber.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
   );
 
   // Filter quiz certs
