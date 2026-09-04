@@ -90,7 +90,7 @@ export default function AdminCertificateVerification() {
             background: activeTab === 'internship' ? 'rgba(255,255,255,0.2)' : 'var(--border-color)',
             borderRadius: '20px', padding: '1px 8px', fontSize: '0.75rem', fontWeight: 700
           }}>
-            {verifiedCertificates.length}
+            {verifiedCertificates.filter(vc => vc.domain !== 'Assessment' && !vc.domain?.startsWith('Quiz')).length}
           </span>
         </button>
         <button style={tabStyle('quiz')} onClick={() => setActiveTab('quiz')}>
