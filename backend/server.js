@@ -1422,7 +1422,7 @@ Respond ONLY with a valid JSON object matching this exact schema, without markdo
 }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash-lite',
+      model: 'gemini-1.5-flash',
       contents: prompt,
       config: { 
         responseMimeType: "application/json",
@@ -1492,7 +1492,7 @@ Respond ONLY with a valid JSON object matching this exact schema:
 }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash-lite',
+      model: 'gemini-1.5-flash',
       contents: prompt,
       config: { responseMimeType: "application/json" }
     });
@@ -1742,7 +1742,7 @@ app.post("/api/chat", async (req, res) => {
   try {
     const { message, history } = req.body;
     
-    // Optional Authentication for saving history
+    // Optional Authentication
     let userId = null;
     const authHeader = req.headers['authorization'];
     if (authHeader) {
@@ -1751,127 +1751,52 @@ app.post("/api/chat", async (req, res) => {
         try {
           const decoded = jwt.verify(token, JWT_SECRET);
           userId = decoded.id;
-        } catch (err) {
-          // invalid token, treat as guest
-        }
+        } catch (err) { /* invalid token = guest */ }
       }
     }
     
-    if (!message) {
-      return res.status(400).json({ message: "Message is required" });
-    }
-
-    if (!process.env.GEMINI_API_KEY) {
-      return res.status(500).json({ message: "AI is currently unavailable (API key missing)." });
-    }
+    if (!message) return res.status(400).json({ message: "Message is required" });
+    if (!process.env.GEMINI_API_KEY) return res.status(500).json({ message: "AI is currently unavailable (API key missing)." });
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    
-    // Fetch live data from Database
-    const activeInternships = await Internship.find({}).select('title duration skillsRequired').lean();
-    const activeContests = await Contest.find({ isActive: true }).select('title description startDate').lean();
-    
-    let liveContext = "### LIVE DATABASE DATA (Use this to provide up-to-date answers):\n";
-    if (activeInternships.length > 0) {
-      liveContext += "- **Active Internships**: " + activeInternships.map(i => `${i.title} (${i.duration} weeks)`).join(", ") + "\n";
-    } else {
-      liveContext += "- **Active Internships**: None right now.\n";
-    }
-    
-    if (activeContests.length > 0) {
-      liveContext += "- **Active Contests**: " + activeContests.map(c => c.title).join(", ") + "\n";
-    } else {
-      liveContext += "- **Active Contests**: None right now.\n";
-    }
 
-    // Fetch past history from DB for persistent memory context
-    let dbHistoryContext = "";
-    if (userId) {
-      const pastChat = await AIChatHistory.findOne({ userId });
-      if (pastChat && pastChat.messages && pastChat.messages.length > 0) {
-        dbHistoryContext = "### PAST CONVERSATION MEMORY (Use this context if the user refers to past chats):\n";
-        // Get last 6 messages from DB
-        pastChat.messages.slice(-6).forEach(msg => {
-          dbHistoryContext += `${msg.role === 'user' ? 'Student' : 'Assistant'}: ${msg.content}\n`;
-        });
-        dbHistoryContext += "\n";
-      }
-    }
-
-    // Construct immediate conversation history for context
+    // Construct recent conversation history (last 4 msgs only)
     let formattedHistory = "";
     if (history && Array.isArray(history)) {
-      history.slice(-5).forEach(msg => {
+      history.slice(-4).forEach(msg => {
         formattedHistory += `${msg.role === 'user' ? 'Student' : 'Assistant'}: ${msg.content}\n`;
       });
     }
 
-    const systemPrompt = `You are the official AI Assistant and Career/Coding Mentor for 'SkillZeno'.
-Your role:
-1. Help users navigate the platform, apply for internships, and understand features.
-2. Act as a coding and career mentor. Answer coding questions, explain concepts, and give interview advice.
-3. Be friendly, encouraging, and concise. Format responses with markdown for readability (bullet points, bold text).
-4. Do not mention that you are an AI trained by Google. You are 'SkillZeno AI Mentor'.
-5. **CRITICAL RULE**: DO NOT say "Namaste", "Welcome", or repeat greetings in every single message. Only answer the user's current question directly.
-6. **CRITICAL RULE**: BE EXTREMELY CONCISE. Answer ONLY what the user explicitly asks about. If they ask about internships, talk ONLY about internships. Do NOT volunteer information about quizzes, contests, or other features unless specifically asked.
+    const systemPrompt = `You are SkillZeno AI Mentor. Be concise and direct.
+Rules: No greetings every message. Answer only what is asked. Use markdown.
+Do not reveal you are built on Google AI.
 
-### SKILLZENO KNOWLEDGE BASE (Use this to answer user queries accurately):
-- **Internships:** SkillZeno offers high-quality, hands-on internship programs across various domains (like Web Development, AI, etc.). Students can enroll, complete tasks via their dashboard, and build real-world portfolios. All internship task submissions are done via the student dashboard under the 'My Internships' or 'Tasks' section.
-- **Arena:** A competitive gaming and learning battleground with three distinct modes:
-  1. **Beat the AI**: An adaptive endless quiz battle where the AI learns and gets harder as you perform better.
-  2. **Speed Rush**: A fast-paced survival mode with extremely simple questions but a strict 5-second timer per question and a 3-life system.
-  3. **Word Ninja**: An endless, full-bleed typing game where users must rapidly type falling gibberish words to defeat monsters and survive.
-- **Dark Mode:** SkillZeno now features a premium, device-grade Zinc Dark Mode. Users can toggle it anytime from the top navigation bar for a comfortable, eye-friendly experience.
-- **Quizzes:** SkillZeno features standard technical quizzes where students can test their knowledge on specific programming languages or frameworks.
-- **Contests:** Periodic coding contests and hackathons where students can compete with others to win prizes and showcase their skills on a leaderboard.
-- **Certificates & Verification Portal:** Upon successfully completing internships or passing major milestones, students receive verifiable certificates with a unique Certificate ID. Anyone (like employers) can visit the SkillZeno Certificate Verification Portal, enter the Certificate ID, and instantly verify its authenticity.
-- **Contact Details:** 
-  - Email: skillzeno26@gmail.com
-  - WhatsApp/Phone: +91 7048107697
-  - Instagram: @skillzeno26 (https://www.instagram.com/skillzeno26)
-  - Headquarters: NH-56 near Agrasen Chauraha Usarpurwa, Shivpur, Varanasi, Uttar Pradesh 221003
-  - **Important:** If a user wants to send a direct message to the team, instruct them to visit the 'Contact Us' (/contact) page on the website and fill out the form there to send a message directly.
+Platform info: SkillZeno offers internships, quizzes, coding contests (Arena), certificates with verification portal.
+Contact: skillzeno26@gmail.com | +91 7048107697 | Instagram: @skillzeno26
+For direct messages, guide users to the /contact page.
 
-${liveContext}
-
-${dbHistoryContext}
-
-Immediate Conversation History:
-${formattedHistory}
-
-Student's new message:
-${message}
-
-Respond appropriately based on your role, rules, and the knowledge base provided.`;
+${formattedHistory ? `Recent chat:\n${formattedHistory}` : ""}
+Student: ${message}
+Assistant:`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash-lite',
+      model: 'gemini-1.5-flash',
       contents: systemPrompt,
+      config: { temperature: 0.7, maxOutputTokens: 512 }
     });
     
     const replyText = response.text;
-
-    // Save to History if logged in
-    if (userId) {
-      const chatUpdate = {
-        $push: {
-          messages: {
-            $each: [
-              { role: 'user', content: message },
-              { role: 'ai', content: replyText }
-            ]
-          }
-        }
-      };
-      
-      await AIChatHistory.findOneAndUpdate(
-        { userId },
-        chatUpdate,
-        { upsert: true, new: true }
-      );
-    }
-
     res.json({ reply: replyText });
+
+    // Save to History async (non-blocking — after response sent)
+    if (userId && replyText) {
+      AIChatHistory.findOneAndUpdate(
+        { userId },
+        { $push: { messages: { $each: [{ role: 'user', content: message }, { role: 'ai', content: replyText }] } } },
+        { upsert: true, new: true }
+      ).catch(err => console.error("Chat history save error:", err));
+    }
   } catch (error) {
     console.error("AI Chat Error:", error);
     res.status(500).json({ message: "Sorry, I am having trouble connecting to my brain right now. Please try again later.", error: error.message });
