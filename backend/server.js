@@ -79,7 +79,9 @@ const applicationSchema = new mongoose.Schema({
   paymentDetails: { type: Object, default: null },
   tasks: [{ id: String, title: String, status: { type: String, default: "Pending" }, submissionLink: { type: String, default: "" }, linkedinLink: { type: String, default: "" }, feedback: { type: String, default: "" } }],
   offerLetterUrl: { type: String, default: "" },
-  certificateUrl: { type: String, default: "" }
+  certificateUrl: { type: String, default: "" },
+  isDeleted: { type: Boolean, default: false },
+  deletedAt: { type: Date, index: { expires: 2592000 } }
 }, { timestamps: true });
 
 const quizApplicationSchema = new mongoose.Schema({
@@ -504,7 +506,7 @@ app.get("/api/internships", async (req, res) => {
 
 app.get("/api/my-internships", authenticateToken, async (req, res) => {
   try {
-    const apps = await Application.find({ userId: req.user.id }).sort({ _id: -1 });
+    const apps = await Application.find({ userId: req.user.id, isDeleted: { $ne: true } }).sort({ _id: -1 });
     const internships = await Internship.find();
     res.json(apps.map(app => ({ 
       ...app.toObject(), 
@@ -514,9 +516,63 @@ app.get("/api/my-internships", authenticateToken, async (req, res) => {
   } catch (e) { res.status(500).json({ message: "Failed to fetch internships" }); }
 });
 
+app.get("/api/admin/applications", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const apps = await Application.find({ isDeleted: { $ne: true } }).sort({ _id: -1 });
+    const internships = await Internship.find();
+    res.json(apps.map(app => ({ 
+      ...app.toObject(), 
+      id: app.appNumber || app._id.toString(), 
+      details: internships.find(i => i._id.toString() === app.internshipId)?.toObject() || { title: "Archived Internship" } 
+    })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
+});
+
+app.delete("/api/admin/applications/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    let app = await Application.findOne({ appNumber: req.params.id });
+    if (!app && mongoose.Types.ObjectId.isValid(req.params.id)) {
+      app = await Application.findById(req.params.id);
+    }
+    if (!app) return res.status(404).json({ message: "Application not found" });
+    
+    app.isDeleted = true;
+    app.deletedAt = new Date();
+    await app.save();
+    res.json({ message: "Application moved to trash successfully" });
+  } catch (e) { res.status(500).json({ message: "Failed to delete application" }); }
+});
+
+app.put("/api/admin/applications/restore/:id", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    let app = await Application.findOne({ appNumber: req.params.id });
+    if (!app && mongoose.Types.ObjectId.isValid(req.params.id)) {
+      app = await Application.findById(req.params.id);
+    }
+    if (!app) return res.status(404).json({ message: "Application not found" });
+    
+    app.isDeleted = false;
+    app.deletedAt = undefined;
+    await app.save();
+    res.json({ message: "Application restored successfully" });
+  } catch (e) { res.status(500).json({ message: "Failed to restore application" }); }
+});
+
+app.get("/api/admin/trash", authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const apps = await Application.find({ isDeleted: true }).sort({ deletedAt: -1 });
+    const internships = await Internship.find();
+    res.json(apps.map(app => ({ 
+      ...app.toObject(), 
+      id: app.appNumber || app._id.toString(), 
+      details: internships.find(i => i._id.toString() === app.internshipId)?.toObject() || { title: "Archived Internship" } 
+    })));
+  } catch (e) { res.status(500).json({ message: "Failed to fetch trash" }); }
+});
+
 app.post("/api/internships/apply", authenticateToken, async (req, res) => {
   try {
-    if (await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId }))
+    if (await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId, isDeleted: { $ne: true } }))
       return res.status(400).json({ message: "Already applied" });
     const newApp = await Application.create({ 
       appNumber: req.body.appNumber || `APP-${Date.now()}`,
@@ -547,7 +603,7 @@ app.post("/api/payment/create-order", authenticateToken, async (req, res) => {
 
 app.post("/api/internships/final-submit", authenticateToken, async (req, res) => {
   try {
-    const app = await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId });
+    const app = await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId, isDeleted: { $ne: true } });
     if (!app) return res.status(404).json({ message: "Application not found" });
 
     // Verify Signature if provided
@@ -592,7 +648,7 @@ app.post("/api/internships/final-submit", authenticateToken, async (req, res) =>
 
 app.post("/api/tasks/submit", authenticateToken, async (req, res) => {
   try {
-    const app = await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId });
+    const app = await Application.findOne({ userId: req.user.id, internshipId: req.body.internshipId, isDeleted: { $ne: true } });
     if (!app) return res.status(404).json({ message: "Application not found" });
     const task = app.tasks.find(t => t.id === req.body.taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
@@ -783,17 +839,7 @@ app.put("/api/admin/certificates/:id", authenticateToken, authorizeAdmin, async 
   } catch (e) { res.status(500).json({ message: "Failed to update certificate" }); }
 });
 
-app.get("/api/admin/applications", authenticateToken, authorizeAdmin, async (req, res) => {
-  try {
-    const apps = await Application.find().sort({ _id: -1 });
-    const internships = await Internship.find();
-    res.json(apps.map(app => ({ 
-      ...app.toObject(), 
-      id: app.appNumber || app._id.toString(), 
-      details: internships.find(i => i._id.toString() === app.internshipId)?.toObject() || { title: "Archived Internship" } 
-    })));
-  } catch (e) { res.status(500).json({ message: "Failed to fetch applications" }); }
-});
+
 
 // Admin Internship CRUD
 app.post("/api/admin/internships", authenticateToken, authorizeAdmin, async (req, res) => {
@@ -904,7 +950,7 @@ app.put("/api/admin/quiz-applications/:id", authenticateToken, authorizeAdmin, a
 
 app.get("/api/dashboard/summary", authenticateToken, async (req, res) => {
   try {
-    const apps = await Application.find({ userId: req.user.id });
+    const apps = await Application.find({ userId: req.user.id, isDeleted: { $ne: true } });
     let totalTasks = 0, completedTasks = 0;
     apps.forEach(app => app.tasks.forEach(t => { totalTasks++; if (t.status === "Approved") completedTasks++; }));
     res.json({ activeInternships: apps.filter(a => a.status === "In Progress").length, completedTasks, totalTasks, certificatesEarned: await Certificate.countDocuments({ userId: req.user.id }), taskProgressPercent: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0 });

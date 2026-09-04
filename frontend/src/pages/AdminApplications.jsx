@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
-import { FileText, CheckCircle2, Upload, X, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, CheckCircle2, Upload, X, ShieldCheck, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 
 export default function AdminApplications() {
   const { API_URL, token } = useContext(AuthContext);
@@ -11,6 +11,25 @@ export default function AdminApplications() {
   
   const [expandedAppId, setExpandedAppId] = useState(null);
   const [reviewModalData, setReviewModalData] = useState(null); // { appId, task, feedbackText }
+
+  const handleDeleteApp = async (appId, e) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to move this application to Trash? The student will be able to apply again.")) return;
+    try {
+      const res = await fetch(`${API_URL}/admin/applications/${appId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        alert("Application moved to trash successfully.");
+        fetchData();
+      } else {
+        alert("Failed to delete application.");
+      }
+    } catch (error) {
+      alert("Error deleting application.");
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -126,6 +145,13 @@ export default function AdminApplications() {
                         <CheckCircle2 size={12} /> Docs
                       </span>
                     )}
+                    <button 
+                      onClick={(e) => handleDeleteApp(app.id, e)} 
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', color: 'var(--accent-danger)' }}
+                      title="Move to Trash"
+                    >
+                      <Trash2 size={18} />
+                    </button>
                     {expandedAppId === app.id ? <ChevronUp size={20} color="var(--text-muted)" /> : <ChevronDown size={20} color="var(--text-muted)" />}
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Award, BookOpen, LogOut, CheckCircle, User, Briefcase, LayoutDashboard, Settings, MoreVertical, Key, Shield, Menu, X, Trophy, Zap, Send, Bell } from 'lucide-react';
+import { Award, BookOpen, LogOut, CheckCircle, User, Briefcase, LayoutDashboard, Settings, MoreVertical, Key, Shield, Menu, X, Trophy, Zap, Send, Bell, Trash2 } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
 import '../navbar-fix.css';
 
@@ -132,6 +132,9 @@ export default function Navbar() {
                     </NavLink>
                     <NavLink to="/admin/broadcast" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--primary)', borderBottom: '1px solid var(--border-color)' }}>
                       <Send size={16} /> Social Broadcast
+                    </NavLink>
+                    <NavLink to="/admin/trash" onClick={() => setShowAdminMenu(false)} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'var(--accent-danger)', borderBottom: '1px solid var(--border-color)' }}>
+                      <Trash2 size={16} /> Trash Bin
                     </NavLink>
                     <button onClick={() => { setShowAdminMenu(false); handleLogout(); }} className="dropdown-link" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-danger)', background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}>
                       <LogOut size={16} /> Logout

@@ -25,6 +25,7 @@ import ContestLeaderboard from './pages/ContestLeaderboard'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminInternships from './pages/AdminInternships'
 import AdminApplications from './pages/AdminApplications'
+import AdminTrash from './pages/AdminTrash'
 import AdminQuizzes from './pages/AdminQuizzes'
 import AdminQuizCertificates from './pages/AdminQuizCertificates'
 import AdminSettings from './pages/AdminSettings'
@@ -150,6 +151,11 @@ function AppContent() {
           <Route path="/admin/applications" element={
             <AdminRoute>
               <AdminApplications />
+            </AdminRoute>
+          } />
+          <Route path="/admin/trash" element={
+            <AdminRoute>
+              <AdminTrash />
             </AdminRoute>
           } />
           <Route path="/admin/quizzes" element={
