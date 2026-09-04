@@ -30,7 +30,10 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
       if (res.statusCode >= 200 && res.statusCode < 300) {
-        io.emit("data_updated", { path: req.path });
+        // Exclude /chat and auth/login endpoints from socket broadcasts
+        if (!req.path.includes('/chat') && !req.path.includes('/login') && !req.path.includes('/verify') && !req.path.includes('/auth')) {
+          io.emit("data_updated", { path: req.path });
+        }
       }
     }
   });
@@ -1419,7 +1422,7 @@ Respond ONLY with a valid JSON object matching this exact schema, without markdo
 }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash-lite',
+      model: 'gemini-2.0-flash',
       contents: prompt,
       config: { 
         responseMimeType: "application/json",
@@ -1489,7 +1492,7 @@ Respond ONLY with a valid JSON object matching this exact schema:
 }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash-lite',
+      model: 'gemini-2.0-flash',
       contents: prompt,
       config: { responseMimeType: "application/json" }
     });
@@ -1842,7 +1845,7 @@ ${message}
 Respond appropriately based on your role, rules, and the knowledge base provided.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash-lite',
+      model: 'gemini-2.0-flash',
       contents: systemPrompt,
     });
     

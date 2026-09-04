@@ -171,7 +171,7 @@ export default function AIAssistant() {
         headers,
         body: JSON.stringify({ 
           message: userText,
-          history: messages 
+          history: messages.slice(-6) 
         })
       });
 

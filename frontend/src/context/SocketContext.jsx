@@ -20,6 +20,7 @@ export const SocketProvider = ({ children }) => {
 
     socket.on('data_updated', (data) => {
       const path = data?.path || "";
+      if (path.includes("/chat")) return;
       console.log("Server indicated data changed at path:", path);
       
       // Smart Filtering: Only refresh global data if relevant endpoints are modified
@@ -30,12 +31,13 @@ export const SocketProvider = ({ children }) => {
         }
       }
       
-      // Always refresh user-specific data (applications, certificates etc.) immediately
-      setUserRefreshTrigger(prev => prev + 1);
+      // Only refresh user-specific data (applications, certificates etc.) for relevant data updates
+      if (path.includes("/applications") || path.includes("/apply") || path.includes("/certificates") || path.includes("/profile") || path.includes("/users")) {
+        setUserRefreshTrigger(prev => prev + 1);
+      }
     });
 
     return () => {
-      clearTimeout(debounceTimer);
       socket.disconnect();
     };
   }, [API_URL]);
