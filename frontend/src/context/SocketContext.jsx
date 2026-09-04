@@ -32,7 +32,7 @@ export const SocketProvider = ({ children }) => {
       }
       
       // Only refresh user-specific data (applications, tasks, certificates etc.) for relevant data updates
-      if (path.includes("/applications") || path.includes("/apply") || path.includes("/tasks") || path.includes("/certificates") || path.includes("/profile") || path.includes("/users")) {
+      if (path.includes("/applications") || path.includes("/apply") || path.includes("/tasks") || path.includes("/certificates") || path.includes("/profile") || path.includes("/users") || path.includes("/final-submit") || path.includes("/submit") || path.includes("/payment") || path.includes("/registrations")) {
         setUserRefreshTrigger(prev => prev + 1);
       }
     });
