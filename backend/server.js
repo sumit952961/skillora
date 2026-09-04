@@ -1422,7 +1422,7 @@ Respond ONLY with a valid JSON object matching this exact schema, without markdo
 }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.6-flash',
       contents: prompt,
       config: { 
         responseMimeType: "application/json",
@@ -1492,7 +1492,7 @@ Respond ONLY with a valid JSON object matching this exact schema:
 }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.6-flash',
       contents: prompt,
       config: { responseMimeType: "application/json" }
     });
@@ -1845,7 +1845,7 @@ ${message}
 Respond appropriately based on your role, rules, and the knowledge base provided.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.6-flash',
       contents: systemPrompt,
     });
     
