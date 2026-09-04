@@ -30,8 +30,8 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
       if (res.statusCode >= 200 && res.statusCode < 300) {
-        // Exclude /chat and auth/login endpoints from socket broadcasts
-        if (!req.path.includes('/chat') && !req.path.includes('/login') && !req.path.includes('/verify') && !req.path.includes('/auth')) {
+        // Exclude /chat and auth endpoints from socket broadcasts
+        if (!req.path.includes('/chat') && !req.path.includes('/auth/')) {
           io.emit("data_updated", { path: req.path });
         }
       }
