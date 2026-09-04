@@ -212,14 +212,20 @@ export default function AdminApplications() {
                                 defaultValue={app.offerLetterUrl || ''} 
                                 id={`offer-${app.id}`}
                               />
-                              <button onClick={() => {
-                                const val = document.getElementById(`offer-${app.id}`).value;
-                                if (val && !/^https?:\/\/.+$/.test(val)) {
-                                  alert("Please enter a valid URL.");
-                                  return;
-                                }
-                                handleCertSubmit(app.id, { offerLetterUrl: val });
-                              }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>
+                              <button onClick={async (e) => {
+                                  const btn = e.currentTarget;
+                                  const val = document.getElementById(`offer-${app.id}`).value;
+                                  if (val && !/^https?:\/\/.+$/.test(val)) {
+                                    alert("Please enter a valid URL.");
+                                    return;
+                                  }
+                                  const origText = btn.innerText;
+                                  btn.disabled = true;
+                                  btn.innerText = "Sending...";
+                                  await handleCertSubmit(app.id, { offerLetterUrl: val });
+                                  btn.disabled = false;
+                                  btn.innerText = origText;
+                                }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>
                                 {app.offerLetterUrl ? '✅ Update Link' : 'Upload & Send Email'}
                               </button>
                             </div>
@@ -241,13 +247,17 @@ export default function AdminApplications() {
                               />
                               <button 
                                 disabled={!app.finalSubmitted}
-                                onClick={() => {
+                                onClick={async (e) => {
+                                  const btn = e.currentTarget;
                                   const val = document.getElementById(`cert-${app.id}`).value;
                                   if (val && !/^https?:\/\/.+$/.test(val)) {
                                     alert("Please enter a valid URL.");
                                     return;
                                   }
-                                  handleCertSubmit(app.id, { certificateUrl: val });
+                                  const origText = btn.innerText;
+                                  btn.disabled = true;
+                                  btn.innerText = "Sending...";
+                                  await handleCertSubmit(app.id, { certificateUrl: val });
                                   
                                   // Add to verified certificates if not exists
                                   if (val) {
@@ -264,6 +274,8 @@ export default function AdminApplications() {
                                       });
                                     }
                                   }
+                                  btn.disabled = false;
+                                  btn.innerText = origText;
                                 }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>
                                 {app.certificateUrl ? '✅ Update Link' : 'Upload & Send Email'}
                               </button>
