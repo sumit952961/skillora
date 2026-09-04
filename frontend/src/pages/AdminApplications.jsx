@@ -200,7 +200,10 @@ export default function AdminApplications() {
                       <div style={{ padding: '16px', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                           <div className="form-group" style={{ margin: 0 }}>
-                            <label style={{ fontSize: '0.85rem' }}>Offer Letter URL</label>
+                            <label style={{ fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between' }}>
+                              <span>Offer Letter URL</span>
+                              {app.offerLetterUrl && <a href={app.offerLetterUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>View Uploaded ↗</a>}
+                            </label>
                             <div style={{ display: 'flex', gap: '12px' }}>
                               <input 
                                 type="url" 
@@ -216,11 +219,16 @@ export default function AdminApplications() {
                                   return;
                                 }
                                 handleCertSubmit(app.id, { offerLetterUrl: val });
-                              }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>Save</button>
+                              }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>
+                                {app.offerLetterUrl ? '✅ Update Link' : 'Upload & Send Email'}
+                              </button>
                             </div>
                           </div>
                           <div className="form-group" style={{ margin: 0 }}>
-                            <label style={{ fontSize: '0.85rem' }}>Completion Certificate URL</label>
+                            <label style={{ fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between' }}>
+                              <span>Completion Certificate URL</span>
+                              {app.certificateUrl && <a href={app.certificateUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>View Uploaded ↗</a>}
+                            </label>
                             <div style={{ display: 'flex', gap: '12px' }}>
                               <input 
                                 type="url" 
@@ -256,7 +264,9 @@ export default function AdminApplications() {
                                       });
                                     }
                                   }
-                                }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>Save</button>
+                                }} className="btn btn-outline" style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}>
+                                {app.certificateUrl ? '✅ Update Link' : 'Upload & Send Email'}
+                              </button>
                             </div>
                             {!app.finalSubmitted && <span style={{ fontSize: '0.75rem', color: 'var(--accent-warning)', marginTop: '4px' }}>Final submit is required to unlock this field.</span>}
                           </div>
