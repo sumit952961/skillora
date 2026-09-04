@@ -15,7 +15,7 @@ import axios from "axios";
 import FormData from "form-data";
 import http from "http";
 import { Server } from "socket.io";
-import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification, sendOfferLetterEmail, sendCompletionCertificateEmail } from "./emailService.js";
+import { sendWelcomeEmail, sendLoginNotification, sendPasswordResetOTP, sendPasswordResetConfirmation, sendPasswordChangeConfirmation, sendAdminContestNotification, sendOfferLetterEmail, sendCompletionCertificateEmail, sendQuizCertificateEmail } from "./emailService.js";
 
 dotenv.config();
 
@@ -967,8 +967,14 @@ app.put("/api/admin/quiz-applications/:id", authenticateToken, authorizeAdmin, a
       app = await QuizApplication.findById(req.params.id);
     }
     if (!app) return res.status(404).json({ message: "Quiz application not found" });
+    const oldUrl = app.certificateUrl;
     app.certificateUrl = req.body.certificateUrl;
     await app.save();
+
+    if (req.body.certificateUrl && req.body.certificateUrl !== oldUrl) {
+      sendQuizCertificateEmail(app.studentName, app.studentEmail, app.quizTitle, req.body.certificateUrl);
+    }
+
     res.json({ message: "Quiz certificate updated", application: { ...app.toObject(), id: app._id.toString() } });
   } catch (e) { res.status(500).json({ message: "Failed to update quiz application" }); }
 });

@@ -223,3 +223,25 @@ export const sendCompletionCertificateEmail = async (studentName, studentEmail, 
   }).catch(console.error);
 };
 
+export const sendQuizCertificateEmail = async (studentName, studentEmail, quizTitle, certificateUrl) => {
+  const content = `
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="font-size: 48px; margin: 0 auto;">🏆</div>
+    </div>
+    <h2 style="color:#1f2937;margin-top:0;text-align:center;">Congratulations on Your Success, ${studentName}! 🎉</h2>
+    <p>You did it! We are incredibly proud to inform you that you have successfully passed the <strong>${quizTitle}</strong> quiz.</p>
+    <p>We are thrilled to inform you that your official certificate of completion has been generated and is now available. Your dedication to learning and upskilling is truly commendable!</p>
+    
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${certificateUrl}" style="background:#4f46e5;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:6px;font-weight:bold;display:inline-block;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1);">View My Certificate</a>
+    </div>
+    
+    <p>Keep learning, building, and growing with SkillZeno! 🚀</p>
+  `;
+  await sendEmail({
+    to: studentEmail,
+    subject: `Congratulations! Your SkillZeno Quiz Certificate is Ready! 🏆`,
+    html: baseTemplate(content),
+  }).catch(console.error);
+};
+
