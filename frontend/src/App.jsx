@@ -78,13 +78,13 @@ function ScrollToTop() {
 function AppContent() {
   const [activePolicy, setActivePolicy] = useState(null);
   const { user, token, fetchStudentData } = useContext(AuthContext);
-  const { refreshTrigger } = useContext(SocketContext) || {};
+  const { userRefreshTrigger } = useContext(SocketContext) || {};
 
   useEffect(() => {
-    if (refreshTrigger > 0 && token && user?.role === 'student' && fetchStudentData) {
+    if (userRefreshTrigger > 0 && token && user?.role === 'student' && fetchStudentData) {
       fetchStudentData(token);
     }
-  }, [refreshTrigger, token, user, fetchStudentData]);
+  }, [userRefreshTrigger, token, user, fetchStudentData]);
 
   return (
     <>

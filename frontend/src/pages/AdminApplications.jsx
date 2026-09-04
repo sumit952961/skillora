@@ -7,7 +7,7 @@ import { FileText, CheckCircle2, Upload, X, ShieldCheck, ChevronDown, ChevronUp,
 export default function AdminApplications() {
   const { API_URL, token } = useContext(AuthContext);
   const { addVerifiedCertificate, verifiedCertificates } = useContext(DataContext);
-  const { refreshTrigger } = useContext(SocketContext) || {};
+  const { userRefreshTrigger } = useContext(SocketContext) || {};
   const [users, setUsers] = useState({});
   const [allAppsList, setAllAppsList] = useState([]);
   
@@ -24,7 +24,7 @@ export default function AdminApplications() {
       });
       if (res.ok) {
         alert("Application moved to trash successfully.");
-        fetchData();
+        // fetchData() is removed because WebSocket will trigger it automatically
       } else {
         alert("Failed to delete application.");
       }
@@ -55,7 +55,7 @@ export default function AdminApplications() {
 
   useEffect(() => {
     if (token) fetchData();
-  }, [token, refreshTrigger]);
+  }, [token, userRefreshTrigger]);
 
   const handleCertSubmit = async (appId, updates) => {
     try {
@@ -66,7 +66,6 @@ export default function AdminApplications() {
       });
       if (res.ok) {
         alert('Application updated successfully!');
-        fetchData();
       } else {
         alert('Failed to update');
       }
@@ -91,7 +90,6 @@ export default function AdminApplications() {
       if (res.ok) {
         alert(`Task has been ${status.toLowerCase()}!`);
         setReviewModalData(null);
-        fetchData();
       } else {
         alert('Failed to verify task');
       }

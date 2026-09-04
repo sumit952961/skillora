@@ -5,7 +5,7 @@ export const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const API_URL = import.meta.env.VITE_API_URL || 'https://skillora-api-mw5c.onrender.com/api';
-  const { refreshTrigger } = useContext(SocketContext) || {};
+  const { globalRefreshTrigger } = useContext(SocketContext) || {};
 
   const [internships, setInternships] = useState([]);
 
@@ -41,7 +41,7 @@ export const DataProvider = ({ children }) => {
       }
     };
     fetchData();
-  }, [API_URL, refreshTrigger]);
+  }, [API_URL, globalRefreshTrigger]);
 
   // Removed localStorage usage completely
 

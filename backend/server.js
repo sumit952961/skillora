@@ -30,7 +30,7 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
       if (res.statusCode >= 200 && res.statusCode < 300) {
-        io.emit("data_updated");
+        io.emit("data_updated", { path: req.path });
       }
     }
   });
@@ -2160,7 +2160,7 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
       }, 5 * 60 * 1000); // 300,000 ms = 5 minutes
     }
     
-    io.emit('data_updated');
+    io.emit('data_updated', { path: '/api/admin/broadcast' });
     res.json({ message: "Broadcast completed", results: results });
   } catch (error) {
     console.error("Broadcast Error:", error);
