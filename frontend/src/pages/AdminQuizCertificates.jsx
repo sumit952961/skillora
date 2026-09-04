@@ -158,7 +158,10 @@ export default function AdminQuizCertificates() {
                     </h4>
                     
                     <div className="form-group" style={{ margin: 0 }}>
-                      <label style={{ fontSize: '0.85rem' }}>Certificate URL</label>
+                      <label style={{ fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between' }}>
+                        <span>Certificate URL</span>
+                        {app.certificateUrl && <a href={app.certificateUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 'bold' }}>View Uploaded ↗</a>}
+                      </label>
                       <div style={{ display: 'flex', gap: '12px' }}>
                         <input 
                           type="url" 
@@ -171,18 +174,24 @@ export default function AdminQuizCertificates() {
                         />
                         <button 
                           disabled={!app.paymentSubmitted}
-                          onClick={() => {
+                          onClick={async (e) => {
+                            const btn = e.currentTarget;
                             const val = document.getElementById(`cert-${app.id}`).value;
                             if (val && !/^https?:\/\/.+$/.test(val)) {
                               alert("Please enter a valid URL.");
                               return;
                             }
-                            handleCertSubmit(app.id, { certificateUrl: val }, app);
+                            const origText = btn.innerText;
+                            btn.disabled = true;
+                            btn.innerText = "Sending...";
+                            await handleCertSubmit(app.id, { certificateUrl: val }, app);
+                            btn.disabled = false;
+                            btn.innerText = origText;
                           }} 
                           className="btn btn-outline" 
                           style={{ padding: '8px 16px', whiteSpace: 'nowrap' }}
                         >
-                          Save
+                          {app.certificateUrl ? '🔄 Update Link' : 'Save & Send Email'}
                         </button>
                       </div>
                       {!app.paymentSubmitted && <span style={{ fontSize: '0.75rem', color: 'var(--accent-warning)', marginTop: '4px' }}>Payment submission is required to unlock this field.</span>}
