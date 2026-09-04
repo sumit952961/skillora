@@ -1742,60 +1742,46 @@ app.post("/api/chat", async (req, res) => {
   try {
     const { message, history } = req.body;
     
-    // Optional Authentication
-    let userId = null;
-    const authHeader = req.headers['authorization'];
-    if (authHeader) {
-      const token = authHeader.split(" ")[1];
-      if (token) {
-        try {
-          const decoded = jwt.verify(token, JWT_SECRET);
-          userId = decoded.id;
-        } catch (err) { /* invalid token = guest */ }
-      }
+    if (!message) {
+      return res.status(400).json({ message: "Message is required" });
     }
-    
-    if (!message) return res.status(400).json({ message: "Message is required" });
-    if (!process.env.GEMINI_API_KEY) return res.status(500).json({ message: "AI is currently unavailable (API key missing)." });
+
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ message: "AI is currently unavailable (API key missing)." });
+    }
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-    // Construct recent conversation history (last 4 msgs only)
+    
+    // Construct conversation history for context
     let formattedHistory = "";
     if (history && Array.isArray(history)) {
-      history.slice(-4).forEach(msg => {
+      history.slice(-5).forEach(msg => {
         formattedHistory += `${msg.role === 'user' ? 'Student' : 'Assistant'}: ${msg.content}\n`;
       });
     }
 
-    const systemPrompt = `You are SkillZeno AI Mentor. Be concise and direct.
-Rules: No greetings every message. Answer only what is asked. Use markdown.
-Do not reveal you are built on Google AI.
+    const systemPrompt = `You are the official AI Assistant and Career/Coding Mentor for 'SkillZeno'.
+SkillZeno is a premium online platform offering high-quality internships, an adaptive AI coding/quiz battleground called 'Arena', and verifiable certificates.
+Your role:
+1. Help users navigate the platform, apply for internships, and understand features.
+2. Act as a coding and career mentor. Answer coding questions, explain concepts, and give interview advice.
+3. Be friendly, encouraging, and concise. Format responses with markdown for readability (bullet points, bold text, code blocks if necessary).
+4. Do not mention that you are an AI trained by Google. You are 'SkillZeno AI Mentor'.
 
-Platform info: SkillZeno offers internships, quizzes, coding contests (Arena), certificates with verification portal.
-Contact: skillzeno26@gmail.com | +91 7048107697 | Instagram: @skillzeno26
-For direct messages, guide users to the /contact page.
+Conversation History:
+${formattedHistory}
 
-${formattedHistory ? `Recent chat:\n${formattedHistory}` : ""}
-Student: ${message}
-Assistant:`;
+Student's new message:
+${message}
+
+Respond appropriately based on your role.`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3.5-flash-lite',
       contents: systemPrompt,
     });
-    
-    const replyText = response.text;
-    res.json({ reply: replyText });
 
-    // Save to History async (non-blocking — after response sent)
-    if (userId && replyText) {
-      AIChatHistory.findOneAndUpdate(
-        { userId },
-        { $push: { messages: { $each: [{ role: 'user', content: message }, { role: 'ai', content: replyText }] } } },
-        { upsert: true, new: true }
-      ).catch(err => console.error("Chat history save error:", err));
-    }
+    res.json({ reply: response.text });
   } catch (error) {
     console.error("AI Chat Error:", error);
     res.status(500).json({ message: "Sorry, I am having trouble connecting to my brain right now. Please try again later.", error: error.message });
