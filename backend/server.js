@@ -2036,8 +2036,10 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           if (!token || !instaId) throw new Error("Meta Access Token or Instagram Account ID missing");
           if (!req.file) throw new Error("Instagram strictly requires an Image or Video to post");
           
-          // Construct public URL for Render
-          const publicUrl = `${req.protocol}://${req.get('host')}/uploads/social/${req.file.filename}`;
+          // Construct public URL - must be publicly accessible (not localhost)
+          const host = req.get('host');
+          const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+          const publicUrl = `${protocol}://${host}/uploads/social/${req.file.filename}`;
           const isVideo = req.file.mimetype.startsWith('video/');
           
           let uploadPayload = {
@@ -2056,7 +2058,21 @@ app.post('/api/social/broadcast', authenticateToken, authorizeAdmin, upload.sing
           const mediaRes = await axios.post(`https://graph.facebook.com/v19.0/${instaId}/media`, uploadPayload);
           const creationId = mediaRes.data.id;
           
-          // 2. Publish Media
+          // 2. Poll container status until FINISHED (Instagram needs time to process the media)
+          let containerStatus = 'IN_PROGRESS';
+          let pollAttempts = 0;
+          while (containerStatus !== 'FINISHED' && pollAttempts < 15) {
+            await new Promise(resolve => setTimeout(resolve, 4000)); // wait 4 seconds
+            const statusRes = await axios.get(`https://graph.facebook.com/v19.0/${creationId}`, {
+              params: { fields: 'status_code', access_token: token }
+            });
+            containerStatus = statusRes.data.status_code;
+            pollAttempts++;
+            if (containerStatus === 'ERROR') throw new Error('Instagram media container failed to process');
+          }
+          if (containerStatus !== 'FINISHED') throw new Error('Instagram media container timed out');
+          
+          // 3. Publish Media
           await axios.post(`https://graph.facebook.com/v19.0/${instaId}/media_publish`, {
              creation_id: creationId,
              access_token: token
