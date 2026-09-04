@@ -53,7 +53,7 @@ export default function MyInternships() {
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '8px' }}>{app.details?.company}</p>
                 <div style={{ display: 'flex', gap: '16px', color: 'var(--text-light)', fontSize: '0.8rem' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={14} /> Applied on: {app.appliedDate}</span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={14} /> App No: {app.id}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={14} /> App No: {app.appNumber || app.id}</span>
                 </div>
               </div>
               <Link to={`/my-internships/${app.internshipId}`} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
