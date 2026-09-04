@@ -36,7 +36,7 @@ export default function AdminCertificateVerification() {
 
   // Filter internship certs (exclude Assessment/Quiz certs)
   const filteredInternship = verifiedCertificates.filter(vc =>
-    vc.domain !== 'Assessment' && (
+    vc.domain !== 'Assessment' && !vc.domain?.startsWith('Quiz') && (
       vc.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vc.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (vc.certificateNumber && vc.certificateNumber.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -224,7 +224,7 @@ export default function AdminCertificateVerification() {
                   <div>
                     <h3 style={{ fontSize: '1.1rem', marginBottom: '4px' }}>{app.studentName}</h3>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                      <strong>Quiz:</strong> {app.quizTitle} &nbsp;|&nbsp; <strong>Score:</strong> {app.score ?? 'N/A'}%
+                      <strong>Quiz:</strong> {app.quizTitle} &nbsp;|&nbsp; <strong>Score:</strong> {app.score ?? 'N/A'}% — Issued: {app.takenDate || (app.createdAt ? app.createdAt.split('T')[0] : 'N/A')}
                     </p>
                     {app.studentEmail && (
                       <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{app.studentEmail}</p>
